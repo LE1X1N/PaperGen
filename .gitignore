@@ -1,0 +1,12 @@
+.gradio
+.vscode
+.idea/
+.VSCodeCounter
+__pycache__
+
+services/image_service/test/
+services/image_service/log/
+services/image_service/screenshots/
+data/
+
+services/paper_service/test/
