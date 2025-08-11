@@ -3,8 +3,8 @@ from multiprocessing import Process, Manager, Lock, Queue
 import logging
 import time
 
-
 from config import conf, SYSTEM_PROMPT
+from src.errors import *
 from src.core.parser import DataParser
 from src.llm import *
 from src.browser.manager import init_driver, capture_screenshot
@@ -14,10 +14,6 @@ from src.tmpl import TemplateManager
 from src.utils import get_generated_files
 
 logger = get_logger()
-
-class FrontendError(Exception):
-    # frontend render/compile error
-    pass  
 
 class TaskManager:
     def __init__(self):
@@ -33,9 +29,15 @@ class TaskManager:
             
             -> Thread(Prompt构建 -> 代码生成 -> 截屏渲染 -> 输出图片) -> MainThread(结果保存)
         """
-        # tasks = self.parser.parse_page(data, request_id)
+        # 1. module-level tasks
         tasks = self.parser.parse_module(data, request_id)
+        logger.info(f"Request ID: {request_id}: 开始模块级别模板生成! 任务数量：{len(tasks)}")
+        futures = [self.executor.submit(self._process_single_task, task) for task in tasks]
+        gen_tmpls = [future.result() for future in futures]
         
+        # 2. page-level tasks
+        tasks = self.parser.parse_page(data, gen_tmpls, request_id)
+        logger.info(f"Request ID: {request_id}: 开始页面级别代码生成！任务数量：{len(tasks)}")
         futures = [self.executor.submit(self._process_single_task, task) for task in tasks]
         return [future.result() for future in futures]
         
@@ -57,19 +59,18 @@ class TaskManager:
         render_success = False
         for turn in range(conf["max_retries"]):
             logger.info(f"Request ID: {request_id} -> Task_{task_id}: 进行第 {turn+1} 轮尝试...")
-        
-            # 3. code generation
-            start_time = time.time()
-            res = call_chat_completion(messages)
-            messages.append({"role": "assistant", "content": res})
-            logger.info(f"Request ID: {request_id} -> Task_{task_id}: 代码生成成功！耗时：{time.time() - start_time} s")
-            
-            # 4. Code check
-            generated_files = get_generated_files(res)
-            react_code = generated_files.get("index.tsx") or generated_files.get("index.jsx")
-        
+
             try:
-            
+                # 3. code generation
+                start_time = time.time()
+                res = call_chat_completion(messages)
+                messages.append({"role": "assistant", "content": res})
+                logger.info(f"Request ID: {request_id} -> Task_{task_id}: 代码生成成功！耗时：{time.time() - start_time} s")
+                
+                # 4. Code check
+                generated_files = get_generated_files(res)
+                react_code = generated_files.get("index.tsx") or generated_files.get("index.jsx")
+    
                 # 4. Launch brower to render react 
                 port = get_random_available_port()       # a random port to bind with gradio
                 logger.info(f"Request ID: {request_id} ->, Task ID: {task_id}, Gradio Port: {port}")
@@ -95,9 +96,7 @@ class TaskManager:
                 for _ in range(conf["render_timeout"]):
                     with browser_lock:
                         logger.info(f"Request ID: {request_id} -> Task_{task_id}: 检查渲染状态...")
-                        
                         if not browser_registry.empty():
-                            
                             completed_flag = browser_registry.get()
                             
                             if completed_flag != task_id:
@@ -107,7 +106,6 @@ class TaskManager:
                             
                             if completed_flag == task_id:
                                 # compile success
-                                
                                 wait_rounds = 0
                                 while wait_rounds < 3:
                                     logger.info(f"Request ID: {request_id} -> Task_{task_id}: 编译成功，等待渲染成功信号...")
@@ -135,7 +133,7 @@ class TaskManager:
                 messages.pop()      # exclude assistanct generated code
             except ConnectionRefusedError as e:
                 logger.error(f"Request ID: {request_id} -> Task_{task_id}: 【端口连接错误】{e}")
-                messages.pop()      # exclude assistanct generated code
+                messages.pop()      # exclude assistanct generated code   
             except Exception as e:
                 logger.error(f"Request ID: {request_id} -> Task_{task_id}: 【其他错误】{e}")
                 messages.pop()   

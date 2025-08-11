@@ -1,8 +1,6 @@
 from typing import Dict, List, Optional, Tuple
-
 import gradio as gr
 import time
-
 from dashscope.api_entities.dashscope_response import Role
 import random
 from openai import OpenAI
@@ -12,47 +10,22 @@ import modelscope_studio.components.legacy as legacy
 import modelscope_studio.components.antd as antd
 import modelscope_studio.components.pro as pro
 
-from app_conf import SYSTEM_PROMPT, REACT_IMPORTS, SERVICE_NAME, ALL_DEMOS
 from utils import *
-import yaml
+from app_conf import SYSTEM_PROMPT, REACT_IMPORTS, SERVICE_NAME, ALL_DEMOS, MODEL, PORT, BASE_URL, API_KEY
 
 # logger
 logger = setup_logger(SERVICE_NAME)
-
-with open("config/system_conf.yaml", "r") as f:
-    conf = yaml.safe_load(f)
-
 
 DEMO_LIST = ALL_DEMOS[random.randint(0, 10)]
 
 # open-ai client
 client = OpenAI(
-    base_url=conf["base_url"],  
-    api_key=conf["api_key"] 
+    base_url=BASE_URL,  
+    api_key=API_KEY 
 )
-MODEL = conf["model"]
-PORT = conf["port"]
 
 print(f"Service Port: {PORT}")
 print(f"Model: {MODEL}")
-
-
-History = List[Tuple[str, str]]
-Messages = List[Dict[str, str]]
-
-def history_to_messages(history: History, system: str) -> Messages:
-    messages = [{"role": Role.SYSTEM, "content": system}]
-    for h in history:
-        messages.append({"role": Role.USER, "content": h[0]})
-        messages.append({"role": Role.ASSISTANT, "content": h[1]})
-    return messages
-
-def messages_to_history(messages: Messages) -> Tuple[str, History]:
-    assert messages[0]["role"] == Role.SYSTEM
-    history = []
-    for q, r in zip(messages[1::2], messages[2::2]):
-        history.append([q["content"], r["content"]])
-    return history
 
 
 class GradioEvents:
@@ -77,12 +50,6 @@ class GradioEvents:
                 model=MODEL,  
                 messages=messages, 
                 stream=True,
-                extra_headers={
-                    'AIMC-OrderId': "coder-test-leixin",
-                    'AIMC-OrderType': "test",
-                    'AIMC-Remarks' : "test-leixin",
-                    'DOUBAO-THINKING': "disabled"  
-                }
             )
 
         full_content = "" 
@@ -189,7 +156,7 @@ class GradioEvents:
         yield from GradioEvents.generation_code(error_prompt, _setting, _history, task_id)
         
 
-with gr.Blocks(css_paths="frontend/app_style.css") as demo:
+with gr.Blocks(css_paths="demo/app_style.css") as demo:
     # gradio state
     history = gr.State([])      # chat history
     setting = gr.State({"system": SYSTEM_PROMPT,})

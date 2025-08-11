@@ -120,9 +120,6 @@ def build_module_prompt(module:dict):
              ### 3. 参考示例
              {module["tmpl"]}
         """
-        
-        
-        
     return prompt
 
 
@@ -131,24 +128,23 @@ def build_page_prompt(page:dict):
         Build prompt based on JSON
     """
     prompt = f"""
-            你需要为【{page["web_title"]}】的 【{page["module_name"]}】模块，生成对应 React 代码模板（JSX），具体要求如下：
+            你需要为【{page["module_name"]}】模块 中的 【{page["page_name"]}】界面，生成对应 React 代码（JSX），请参考以下示例的设计模式，根据模块特点灵活设计布局，同时遵守核心原则。
 
-            ### 1. 模块基本信息
+            ### 1. 页面基本信息
+            - 系统名称：{page["web_title"]}
             - 模块名称：{page["module_name"]}
-            - 模块包含界面：{page["page_name"]}
-            - 参考模板风格：{page["page_tmpl"]}
-        
-            ### 2. 核心需求
-            生成该模块的 **基础框架代码**，需固定以下内容（确保模块内所有页面风格统一），同时预留可修改插槽：
-           
-            #### （1）预留可修改插槽
-            在代码中用 **明确注释标记** 以下可修改区域（供后续页面级生成时填充）：
-            - `<!-- MODULE_SLOT: main_content -->`：主内容区（每个页面的具体内容在这里替换）
-            - `<!-- MODULE_SLOT: page_title -->`：顶部栏的当前页面名称（随页面动态变化）
+            - 页面名称：{page["page_name"]}
+            - 页面描述：{page["page_desc"]}
             
-            #### （2）其他约束
-            - 必须使用与{page_tmpl}一致的依赖库（import React, lucide-react图标、framer-motion、dayjs）
-            - 代码需包含完整的组件结构（可直接运行，无需额外修改框架部分）
+            ### 2. 模块模板代码（仅参考可修改的区域，不改动其他部分）
+            {page["tmpl"]}
+            
+            ### 3. 核心设计原则
+            1. **强约束替换范围**  
+              明确要求模型“仅修改 `data-slot` 标记内的内容”，并通过示例展示如何定位和替换，避免模型误改模板框架（如导航栏、样式类）。  
+
+            2. **风格统一保障**  
+              强制复用模板中的样式类名、依赖和组件风格，确保模块内页面风格一致。  
         """
     return prompt
 
@@ -162,7 +158,13 @@ def call_chat_completion(messages):
         response = client.chat.completions.create(
                 model=conf["model"],  
                 messages=messages,
-                stream=False
+                stream=False,
+                extra_headers={
+                    'AIMC-OrderId': "coder-test-leixin",
+                    'AIMC-OrderType': "test",
+                    'AIMC-Remarks' : "test-leixin",
+                    'DOUBAO-THINKING': "disabled"  
+                }
             )
         res = response.choices[0].message.content
         return res
