@@ -17,26 +17,26 @@ Coder-Artifacts
 ├─ src
 │  ├─ __init__.py
 │  ├─ api
-│  │  └─ routes.py
-│  ├─ app.py
+│  │  └─ routes.py         # API
+│  ├─ app.py               # Flask app初始化
 │  ├─ browser
 │  │  ├─ __init__.py
-│  │  ├─ manager.py
-│  │  └─ renderer.py
+│  │  ├─ manager.py       # Selenium Driver相关
+│  │  └─ renderer.py      # Gradio界面渲染相关
 │  ├─ core
-│  │  ├─ parser.py
-│  │  └─ task_manager.py
-│  ├─ errors.py
+│  │  ├─ parser.py        # JSON解析
+│  │  └─ task_manager.py  # 任务处理核心
+│  ├─ errors.py           
 │  ├─ llm
 │  │  ├─ __init__.py
-│  │  └─ client.py
+│  │  └─ client.py        # LLM调用
 │  ├─ tmpl
 │  │  ├─ __init__.py
 │  │  ├─ static
 │  │  │  ├─ 小程序模板.jsx
 │  │  │  ├─ 网页模板-管理系统（上下）.jsx
 │  │  │  └─ 网页模板-管理系统（左右）.jsx
-│  │  └─ tmpl_manager.py
+│  │  └─ tmpl_manager.py  # 代码模板管理
 │  └─ utils
 │     ├─ __init__.py
 │     ├─ common.py
