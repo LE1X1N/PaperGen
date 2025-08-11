@@ -2,7 +2,7 @@
 service_name : self_coder_service
 port: 8687         # port for Flask (only for dev)
 max_workers: 3     # multithread
-max_retries: 3     # Number of retry attempts after failure
+max_retries: 5     # Number of retry attempts after failure
 connect_timeout: 15      # Wait the port to be listend
 render_timeout: 25    # max gradio rendering time 
 

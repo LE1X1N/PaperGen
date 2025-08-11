@@ -19,9 +19,9 @@ class DataParser:
                                             "web_title": data["title"], 
                                             "web_detail": data["page_detail"] ,
                                             "module_name": module["page_name"],
+                                            "module_desc": module["page_description"],
                                             "module_pages": [m["name"] for m in module['page']],
                                             "tmpl": self.tmpl_manager.load_template(int(module["style"]))
-  
                     })
                 }
             )

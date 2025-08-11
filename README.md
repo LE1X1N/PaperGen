@@ -71,7 +71,7 @@ CUDA_VISIBLE_DEVICES=2,3 vllm serve ~/huggingface/Qwen3-Coder-30B-A3B-Instruct/ 
 ### 3.2 Selenium容器启动
 ``` bash
 # 启动
-docker run -d --network host --name selenium-chrome selenium/standalone-chrome
+docker run -d --network host --name leixin-selenium-chrome selenium/standalone-chrome
 
 # 停止 
 docker stop selenium-chrome
