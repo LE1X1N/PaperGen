@@ -6,7 +6,7 @@ class DataParser:
         self.tmpl_manager = tmpl_manager
 
     def parse_module(self, data:dict, request_id: str) -> list:
-        # Parse JSON into tasks list
+        # Parse module JSON into tasks list
         tasks = []
         
         for mid, module in enumerate(data["web_pages"]):
@@ -27,8 +27,8 @@ class DataParser:
             )
         return tasks
 
-    def parse_page(self, data: dict, request_id: str) -> list:
-        # Parse JSON into tasks list
+    def parse_page(self, data: dict, gen_tmpls: dict, request_id: str) -> list:
+        # Parse page JSON into tasks list
         tasks = []
         for mid, module in enumerate(data["web_pages"]):
             for pid, page in enumerate(module['page']):
@@ -43,7 +43,7 @@ class DataParser:
                                     "module_name": module["page_name"],
                                     "page_name": page["name"],
                                     "page_desc": page["text"],
-                                    "tmpl": self.tmpl_manager.load_template(int(module["style"]))
+                                    "tmpl": gen_tmpls[mid]["code"] if gen_tmpls[mid]["status"] else self.tmpl_manager.load_template(int(module["style"]))
                         })
 
                     }

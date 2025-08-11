@@ -1,3 +1,15 @@
+SERVICE_NAME = "Qwen-Coder"
+
+with open("demo/tmpls/网页模板-管理系统（上下）.jsx", 'r', encoding='utf-8') as f:
+    WEB_TEMPLATE = f.read()
+
+# openai
+BASE_URL =  "http://localhost:8001/v1"
+API_KEY =  "sk-XXXXXX"
+MODEL =  "Qwen3"
+PORT = 8686
+
+
 SYSTEM_PROMPT = """You are an expert on frontend design, you will always respond to web design tasks.
 Your task is to create a website according to the user's request using either native HTML or React framework
 When choosing implementation framework, you should follow these rules:
@@ -60,7 +72,7 @@ You can ONLY use libraries in [lucide-react, recharts, framer-motion, p5.js, thr
 Remember to only return code for the App.jsx file and nothing else. The resulting application should be visually impressive, highly functional, and something users would be proud to showcase.
 """
 
-SERVICE_NAME = "Qwen-Coder"
+
 
 
 REACT_IMPORTS = {
@@ -101,8 +113,7 @@ REACT_IMPORTS = {
 
 
 
-with open("tmpls/网页模板-管理系统（上下）.jsx", 'r', encoding='utf-8') as f:
-    WEB_TEMPLATE = f.read()
+
 
 
 
