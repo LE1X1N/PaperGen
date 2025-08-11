@@ -5,16 +5,16 @@ import modelscope_studio.components.base as ms
 import modelscope_studio.components.pro as pro
 
 from config import REACT_IMPORTS, conf
-from src.util import get_generated_files
+from src.utils import get_generated_files
 
 logger = logging.getLogger(conf["service_name"])
 
-def launch_sandbox_demo(request_id, task_id, code, port, browser_registry, browser_lock):
+def launch_sandbox_demo(request_id, task_id, res, port, browser_registry, browser_lock):
     """
         Sandbox based on modelscope_studio sandboxs
     """
     
-    generated_files = get_generated_files(code)
+    generated_files = get_generated_files(res)
     react_code = generated_files.get("index.tsx") or generated_files.get("index.jsx")
     html_code = generated_files.get("index.html")
         

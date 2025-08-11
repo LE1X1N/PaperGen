@@ -1,14 +1,11 @@
-import threading
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import os
-import logging
-from config import conf
 
 from config import SCREENSHOT_DIR
+from src.utils import get_logger
 
-
-logger = logging.getLogger(conf["service_name"])
+logger = get_logger()
 
 def init_driver():
     """

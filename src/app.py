@@ -2,7 +2,7 @@ from flask import Flask
 
 from config import conf
 from src.api.routes import api_bp
-from src.util import setup_logger
+from src.utils import setup_logger
 
 def create_app():
     app = Flask(__name__)
