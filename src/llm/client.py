@@ -129,12 +129,12 @@ def build_page_prompt(page:dict):
         Build prompt based on JSON
     """
     prompt = f"""
-            你需要基于【{page["module_name"]}】模块的模板代码，为【{page["page_name"]}】页面生成具体功能实现 （React），**仅修改模板中/* MODULE_SLOT: [占位位置描述] */ 标记的内容**，同时确保与模块风格统一。
+            你需要基于【{page["module_name"]}】模块的模板代码，为【{page["page_name"]}】页面生成具体功能实现 （React JSX），**仅修改模板中/* MODULE_SLOT: [占位位置描述] */ 标记的内容**，同时确保与模块风格统一。
             
             ### 1. 页面基本信息
             - 系统名称：{page["web_title"]}
             - 页面所属模块：{page["module_name"]}
-            - 页面名称：{page["page_name"]}
+            - 页面名称：{page["page_name"]}   (导航栏根据此激活对应项)
             - 页面功能描述：{page["page_desc"]}
             
             ### 2. 模块模板代码
@@ -146,9 +146,9 @@ def build_page_prompt(page:dict):
 
             1. **替换范围**  
             - 仅修改模板中所有标记为 /* MODULE_SLOT: [占位位置描述] */ 的内容。
-            - 若标记对应导航栏功能：需实现当前页面在导航栏中的 “激活状态”（如高亮样式），并保留其他导航项的框架
             
             2. **风格统一**  
+            - 若标记对应导航栏功能：需实现当前页面在导航栏中的 “激活状态”（如高亮样式），并保留其他导航项的框架
             - 必须复用模板中的所有样式类名
             - 图标需使用模板中已导入的库（如 lucide-react），且图标风格（大小、颜色）与模板中其他导航项保持一致
         """
