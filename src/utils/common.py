@@ -2,6 +2,7 @@ import re
 import time
 import socket
 
+
 def get_generated_files(text):
     patterns = {
         'html': r'```html\n(.+?)\n```',
@@ -29,12 +30,12 @@ def remove_code_block(text):
     else:
         return text.strip()
 
-        
+
 def get_random_available_port():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(('', 0)) # a random socket
+        s.bind(('', 0))  # a random socket
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 0)
-        _, port = s.getsockname()   # get port
+        _, port = s.getsockname()  # get port
     return port
 
 
@@ -49,8 +50,8 @@ def wait_for_port(port, timeout=10):
                 s.connect(("localhost", port))
                 return True
         except (ConnectionRefusedError, OSError):
-            time.sleep(0.5)  
-    return False  
+            time.sleep(0.5)
+    return False
 
 # if __name__ == "__main__":
 #     for i in range(10):

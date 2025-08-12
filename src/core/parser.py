@@ -12,8 +12,8 @@ class DataParser:
         for mid, module in enumerate(data["web_pages"]):
             tasks.append(
                 {
-                    "request_id" : request_id,
-                    "task_id" : f'{mid}',
+                    "request_id": request_id,
+                    "task_id": f'{mid}',
                     "return_code": True,
                     "query": build_module_prompt({
                                             "web_title": data["title"], 
@@ -34,8 +34,8 @@ class DataParser:
             for pid, page in enumerate(module['page']):
                 tasks.append(
                     {
-                        "request_id" : request_id,
-                        "task_id" : f'{mid}_{pid}',
+                        "request_id": request_id,
+                        "task_id": f'{mid}_{pid}',
                         "return_code": False,
                         "query": build_page_prompt({
                                     "web_title": data["title"], 

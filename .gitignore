@@ -1,5 +1,6 @@
 .gradio
 .vscode
+.idea/
 __pycache__
 
 demo/log/

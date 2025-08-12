@@ -90,7 +90,7 @@ uwsgi --stop log/uwsgi.pid
 
 ## 4. 服务测试
 
-```
+``` bash
 curl -X POST http://localhost:8687/v1/gen_images -H "Content-Type: application/json"  -d @data.json
 ```
 
