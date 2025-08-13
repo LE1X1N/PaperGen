@@ -17,26 +17,26 @@ Coder-Artifacts
 ├─ src
 │  ├─ __init__.py
 │  ├─ api
-│  │  └─ routes.py
-│  ├─ app.py
+│  │  └─ routes.py         # API
+│  ├─ app.py               # Flask app初始化
 │  ├─ browser
 │  │  ├─ __init__.py
-│  │  ├─ manager.py
-│  │  └─ renderer.py
+│  │  ├─ manager.py       # Selenium Driver相关
+│  │  └─ renderer.py      # Gradio界面渲染相关
 │  ├─ core
-│  │  ├─ parser.py
-│  │  └─ task_manager.py
-│  ├─ errors.py
+│  │  ├─ parser.py        # JSON解析
+│  │  └─ task_manager.py  # 任务处理核心
+│  ├─ errors.py           
 │  ├─ llm
 │  │  ├─ __init__.py
-│  │  └─ client.py
+│  │  └─ client.py        # LLM调用
 │  ├─ tmpl
 │  │  ├─ __init__.py
 │  │  ├─ static
 │  │  │  ├─ 小程序模板.jsx
 │  │  │  ├─ 网页模板-管理系统（上下）.jsx
 │  │  │  └─ 网页模板-管理系统（左右）.jsx
-│  │  └─ tmpl_manager.py
+│  │  └─ tmpl_manager.py  # 代码模板管理
 │  └─ utils
 │     ├─ __init__.py
 │     ├─ common.py
@@ -71,7 +71,7 @@ CUDA_VISIBLE_DEVICES=2,3 vllm serve ~/huggingface/Qwen3-Coder-30B-A3B-Instruct/ 
 ### 3.2 Selenium容器启动
 ``` bash
 # 启动
-docker run -d --network host --name selenium-chrome selenium/standalone-chrome
+docker run -d --network host --name leixin-selenium-chrome selenium/standalone-chrome
 
 # 停止 
 docker stop selenium-chrome
@@ -90,8 +90,20 @@ uwsgi --stop log/uwsgi.pid
 
 ## 4. 服务测试
 
+``` bash
+# 发送请求
+curl -X POST http://localhost:8687/v1/gen_images -H "Content-Type: application/json"  -d @data.json
 ```
-curl -X POST http://localhost:8687/v1/gen_images -H "Content-Type: application/json"  -d @test/data.json
+
+此时会立马返回对应的任务ID号，比如：
+
+{"message":"Task launch success!","request_id":"3ca7c636-cd02-4f66-ab01-632431d95978"}
+
+
+可以根据这个任务ID号查询状态
+```bash
+# 获取处理状态
+curl http://localhost:8687/v1/progress/<request_id>
 ```
 
 

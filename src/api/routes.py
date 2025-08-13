@@ -1,35 +1,39 @@
+import threading
 from flask import Blueprint, request, jsonify
-import time
 import uuid
+import time
 
 from src.core.task_manager import TaskManager
 from src.utils import get_logger
 
-
 logger = get_logger()
 api_bp = Blueprint('v1', __name__)
-
 task_manager = TaskManager()
+
 
 @api_bp.route('/gen_images', methods=['POST'])
 def gen_images():
-    start_time = time.time()
     request_id = str(uuid.uuid4())
-    logger.info(f"Request ID: {request_id} ->: 开始处理请求")
-    
     try:
         data = request.get_json()
-        results = task_manager.process_tasks(data, request_id)
-        logger.info(f"Request ID: {request_id} -> 请求完成，耗时 {time.time() - start_time} s")
-        return jsonify({"request_id" : request_id, "response": results})
-    
-    except Exception as e:
-        logger.info(f"Request ID: {request_id} -> 请求处理失败")
-        return jsonify({"status": "error", "message": str(e)}), 500
+        task_thread = threading.Thread(target=task_manager.process_tasks, args=(request_id, data))    # Daemon task thread
+        task_thread.start()
+        return jsonify({"code": 0, "message": "Task launch success!", "request_id": request_id, })
 
+    except Exception as e:
+        error_msg = f"请求处理失败: {str(e)}"
+        logger.error(f"Request ID: {request_id} -> {error_msg}")
+        return jsonify({"code": -1, "message": error_msg}), 500
+
+
+@api_bp.route('/progress/<request_id>', methods=['GET'])
+def get_progress(request_id: str):
+    progress = task_manager.progress_manager.get_progress(request_id)
+    if not progress:
+        return jsonify({"error": "请求ID不存在"}), 404
+    return jsonify(progress)
 
 
 @api_bp.route('/health', methods=['GET'])
 def health_check():
     return jsonify({"status": "healthy", "service": "picture_processor"})
-

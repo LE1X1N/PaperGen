@@ -1,16 +1,18 @@
 # service config
-service_name : self_coder_service
-port: 8687         # port for Flask (only for dev)
-max_workers: 3     # multithread
-max_retries: 3     # Number of retry attempts after failure
-connect_timeout: 15      # Wait the port to be listend
-render_timeout: 25    # max gradio rendering time 
+service_type : website.result
+port: 8687              # port for Flask (only for dev)
+max_workers: 5       # multithread
+max_retries: 5          # Number of retry attempts after failure
+connect_timeout: 15     # Wait the port to be listend
+render_timeout: 25      # max gradio rendering time 
+
+
+# db config
+upload_url : "http://10.20.171.5:32005/file/DAS_ha"
+download_url_prefix: "http://10.20.171.4:52003/fsdata/website/website.result"
+
 
 # openai config
 base_url: http://localhost:8001/v1
 api_key: sk-XXXXXX
 model: Qwen3
-
-# base_url: http://oneapi.aimc.offline/v1
-# api_key: sk-XXXX
-# model: gpt-4.1-mini
