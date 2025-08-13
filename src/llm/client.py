@@ -26,6 +26,11 @@ def build_module_prompt(module:dict):
             - 导航栏：完整展示所有页面（{module["module_pages"]}），包含名称和图标，但** 无任何点击逻辑 **（用`MODULE_SLOT`占位）。
             - 依赖导入：包含`React`、图标库（如`lucide-react`）等必要依赖，与参考示例一致。
             
+            2.4. **风格与配色**：
+            - 布局与配色需与模块功能 {module["module_name"]} 匹配。
+            - 主色调需明亮轻快, 辅助色与主色调形成和谐对比，增强视觉层次感。
+            - 仅参考代码的布局，风格配色需要重新设计。
+            
              ### 3. 参考布局代码
              {module["tmpl"]}
         """

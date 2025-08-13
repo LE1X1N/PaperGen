@@ -19,27 +19,27 @@ def launch_sandbox_demo(request_id, task_id, res, port, browser_registry=None, b
     # compile / render 
     def handle_compile_error(e: gr.EventData):
         """ Compile Error """
-        error_msg = f"Request ID: {request_id} -> Task_{task_id} 【编译错误】：{e._data['payload'][0]}"
+        error_msg = f"【编译错误】：{e._data['payload'][0]}"
         if logger:
-            logger.error(error_msg)
+            logger.error(f"Request ID: {request_id} -> Task_{task_id}: {error_msg}")
         if browser_registry:
             with browser_lock:
                 browser_registry.put(error_msg)  # error flag
 
     def handle_render_error(e: gr.EventData):
         """ Render error """
-        error_msg = f"Request ID: {request_id} -> Task_{task_id} 【渲染错误】：{e._data['payload'][0]}"
+        error_msg = f"【渲染错误】：{e._data['payload'][0]}"
         if logger:
-            logger.error(error_msg)
+            logger.error(f"Request ID: {request_id} -> Task_{task_id}: {error_msg}")
         if browser_registry:
             with browser_lock:
                 browser_registry.put(error_msg)  # error flag
 
     def handle_compile_success():
         """ Compile Success """
-        msg = f"Request ID: {request_id} -> Task_{task_id}:【编译成功】: 代码编译成功，无语法错误，开始渲染..."
+        msg = f"【编译成功】: 代码编译成功，无语法错误，开始渲染..."
         if logger:
-            logger.info(msg)
+            logger.info(f"Request ID: {request_id} -> Task_{task_id}:{msg}")
         if browser_registry is not None:
             with browser_lock:
                 browser_registry.put(task_id)  # compile success flag

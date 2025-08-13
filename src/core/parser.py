@@ -6,7 +6,7 @@ class DataParser:
     def __init__(self, tmpl_manager: TemplateManager):
         self.tmpl_manager = tmpl_manager
 
-    def parse_module(self, data:dict, request_id: str) -> list:
+    def parse_module(self, request_id: str, data:dict) -> list[dict]:
         # Parse module JSON into tasks list
         tasks = []
         
@@ -14,7 +14,7 @@ class DataParser:
             tasks.append(
                 {
                     "request_id": request_id,
-                    "task_id": f'{mid}',
+                    "task_id": f'module-{mid}',
                     "return_code": True,
                     "query": build_module_prompt({
                                             "web_title": data["title"], 
@@ -22,13 +22,13 @@ class DataParser:
                                             "module_name": module["page_name"],
                                             "module_desc": module["page_description"],
                                             "module_pages": [m["name"] for m in module['page']],
-                                            "tmpl": self.tmpl_manager.load_template(int(module["style"]))
+                                            "tmpl": self.tmpl_manager.load_template(int(module["style"]+1))
                     })
                 }
             )
         return tasks
 
-    def parse_page(self, data: dict, gen_tmpls: dict, request_id: str) -> list:
+    def parse_page(self, request_id: str, data: dict, gen_tmpls: dict) -> list[dict]:
         # Parse page JSON into tasks list
         tasks = []
         for mid, module in enumerate(data["web_pages"]):
@@ -36,7 +36,7 @@ class DataParser:
                 tasks.append(
                     {
                         "request_id": request_id,
-                        "task_id": f'{mid}_{pid}',
+                        "task_id": f"{page["id"]}",
                         "return_code": False,
                         "query": build_page_prompt({
                                     "web_title": data["title"], 
@@ -50,4 +50,11 @@ class DataParser:
                     }
                 )
         return tasks
-    
+
+    @staticmethod
+    def parse_task_ids(data:dict) -> list[str]:
+        task_ids = []
+        for module in data["web_pages"]:
+            for page in module['page']:
+                task_ids.append(page["id"])
+        return task_ids

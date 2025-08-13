@@ -13,14 +13,10 @@ class UploadManager:
             paths.append(res["path"])
         return [self._upload_single_file(path) for path in paths]
 
-    def _upload_single_file(self, file_path):
+    def upload_single_file(self, file_path):
         files = {'file': open(file_path, 'rb')}
         data = {'service_type': self.service_type}
-
-        response = requests.post(self.url, files=files, data=data)
+        response = requests.post(self.url, files=files, data=data).json()
         return response
-
-
-
 
 

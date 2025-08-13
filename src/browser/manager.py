@@ -24,15 +24,11 @@ def init_driver():
     )
 
 
-def capture_screenshot(request_id, task_id, driver):
+def capture_screenshot(request_id, task_id, driver, save_dir):
     """
         Capture screenshots
     """
     try:
-        # dir
-        save_dir = SCREENSHOT_DIR / request_id
-        os.makedirs(save_dir, exist_ok=True)
-
         # window size 
         total_height = driver.execute_script("return document.body.scrollHeight")
         driver.set_window_size(1920, total_height)
@@ -40,8 +36,6 @@ def capture_screenshot(request_id, task_id, driver):
         # save screenshot
         screenshot_path = save_dir / f"task_{task_id}.png"
         driver.save_screenshot(screenshot_path)
-        logger.info(f"Request ID: {request_id} -> Task ID: {task_id} 截图已保存至 {screenshot_path}")
-
     except Exception as e:
         logger.info(f"Request ID: {request_id} -> Task ID: {task_id} 截屏失败 - {str(e)}")
 

@@ -91,7 +91,19 @@ uwsgi --stop log/uwsgi.pid
 ## 4. 服务测试
 
 ``` bash
+# 发送请求
 curl -X POST http://localhost:8687/v1/gen_images -H "Content-Type: application/json"  -d @data.json
+```
+
+此时会立马返回对应的任务ID号，比如：
+
+{"message":"Task launch success!","request_id":"3ca7c636-cd02-4f66-ab01-632431d95978"}
+
+
+可以根据这个任务ID号查询状态
+```bash
+# 获取处理状态
+curl http://localhost:8687/v1/progress/<request_id>
 ```
 
 

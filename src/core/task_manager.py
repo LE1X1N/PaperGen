@@ -1,9 +1,10 @@
 from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import Process, Lock, Queue
 import time
-
-from config import conf, SYSTEM_PROMPT
 from openai import APIConnectionError
+import os
+
+from config import conf, SYSTEM_PROMPT, SCREENSHOT_DIR
 from src.errors import *
 from src.core.parser import DataParser
 from src.llm import *
@@ -12,6 +13,8 @@ from src.browser.renderer import launch_sandbox_demo
 from src.utils import get_random_available_port, wait_for_port, get_logger
 from src.tmpl import TemplateManager
 from src.utils import get_generated_files
+from .progress_manager import ProgressManager
+from .upload_manager import UploadManager
 
 logger = get_logger()
 
@@ -20,8 +23,10 @@ class TaskManager:
     def __init__(self):
         self.parser = DataParser(tmpl_manager=TemplateManager())
         self.executor = ThreadPoolExecutor(conf["max_workers"])
+        self.progress_manager = ProgressManager(base_dir=SCREENSHOT_DIR)
+        self.upload_manager = UploadManager()
 
-    def process_tasks(self, data: dict, request_id: str) -> list:
+    def process_tasks(self, request_id: str, data: dict) -> list:
         """
             Multi-thread processing tasks
             
@@ -29,20 +34,28 @@ class TaskManager:
             
             -> Thread(Prompt构建 -> 代码生成 -> 截屏渲染 -> 输出图片) -> MainThread(结果保存)
         """
-        # 1. module-level tasks
-        tasks = self.parser.parse_module(data, request_id)
+        start_time = time.time()
+        
+        # 1. Images save dir
+        file_path = self.progress_manager.init_request(request_id, data)
+        logger.info(f"Request ID: {request_id} ->: 开始处理请求，状态文件存储路径：{file_path}")
+        
+        # 2. module-level tasks
+        tasks = self.parser.parse_module(request_id, data)
         logger.info(f"Request ID: {request_id}: 开始模块级别模板生成! 任务数量：{len(tasks)}")
         futures = [self.executor.submit(self._process_single_task, task) for task in tasks]
         gen_tmpls = [future.result() for future in futures]
 
-        # 2. page-level tasks
-        tasks = self.parser.parse_page(data, gen_tmpls, request_id)
+        # 3. page-level tasks
+        tasks = self.parser.parse_page(request_id, data, gen_tmpls)
         logger.info(f"Request ID: {request_id}: 开始页面级别代码生成！任务数量：{len(tasks)}")
         futures = [self.executor.submit(self._process_single_task, task) for task in tasks]
+        
+        logger.info(f"Request ID: {request_id} -> 处理请求完成！共耗时 {time.time() - start_time} s")
         return [future.result() for future in futures]
+    
 
     def _process_single_task(self, task: dict) -> dict:
-
         # 1.  parse data
         request_id = task["request_id"]
         task_id = task["task_id"]
@@ -120,9 +133,11 @@ class TaskManager:
                                     wait_rounds += 1
                                     time.sleep(1)
 
-                                logger.info(f"Request ID: {request_id} -> Task_{task_id}: 【渲染成功】 启动Selenium捕捉...")
+                                logger.info(f"Request ID: {request_id} -> Task_{task_id}: 【渲染成功】 前端代码渲染成功！")
                                 if not return_code:
-                                    img_path = capture_screenshot(request_id, task_id, driver)
+                                    img_path = capture_screenshot(request_id, task_id, driver, save_dir=self.progress_manager._get_request_dir(request_id))
+                                    logger.info(f"Request ID: {request_id} -> Task ID_{task_id}: Selenium 截图已保存至 {img_path}")
+                                
                                 render_success = True
                                 break
                     time.sleep(1)
@@ -157,12 +172,32 @@ class TaskManager:
             # exit judge
             if render_success:
                 logger.info(f"Request ID: {request_id} -> Task_{task_id}: 第 {turn + 1} 轮成功！")
-
-                if return_code:
-                    return {"task_id": task_id, "status": render_success, "code": react_code}
-                else:
-                    return {"task_id": task_id, "status": render_success, "path": img_path}
+                break
             else:
                 logger.info(f"Request ID: {request_id} -> Task_{task_id}: 第 {turn + 1} 轮失败！")
 
-        return {"task_id": task_id, "status": render_success, "msg": "失败重试超过最大测试轮次！"}
+        
+        
+        if return_code:
+            # module level 
+            return {"task_id": task_id, "status": render_success, "code": react_code}
+        else:
+            if render_success:
+                
+                #  save image to db
+                res = self.upload_manager.upload_single_file(img_path)
+                if res['code'] == 0:
+                    download_url = conf["download_url_prefix"] + res["result"]
+                    self.progress_manager.update_task_status(request_id, task_id, "success", url=download_url)
+                    logger.info(f"Request ID: {request_id} -> Task_{task_id}: 【任务成功】上传文件访问路径：{download_url}")
+                    return {"task_id": task_id, "status": True}
+                else:
+                    error_msg = res["message"]
+                    self.progress_manager.update_task_status(request_id, task_id, "failed", "", error_msg)
+                    logger.error(f"Request ID: {request_id} -> Task_{task_id}: 【任务失败】上传文件失败: {error_msg}")
+                    return {"task_id": task_id, "status": False, "message": error_msg}
+            else:
+                error_msg = "任务超过最大重试次数"
+                self.progress_manager.update_task_status(request_id, task_id, "failed", "", error_msg)
+                logger.error(f"Request ID: {request_id} -> Task_{task_id}: 【任务失败】{error_msg}")
+                return {"task_id": task_id, "status": False, "message": error_msg}
