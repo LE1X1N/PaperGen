@@ -1,6 +1,5 @@
 import requests
 from config import conf
-from .parser import DataParser
 
 
 class UploadManager:

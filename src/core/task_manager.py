@@ -1,6 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import Process, Lock, Queue
-import logging
 import time
 
 from config import conf, SYSTEM_PROMPT

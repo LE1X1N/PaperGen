@@ -1,5 +1,6 @@
 from pathlib import Path
 
+
 class TemplateManager:
     def __init__(self):
         

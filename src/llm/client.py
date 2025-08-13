@@ -1,5 +1,6 @@
 from config import conf, client
 
+
 def build_module_prompt(module:dict):
     prompt = f"""
             你需要为【{module["web_title"]}】系统的【{module["module_name"]}】模块生成对应 React 代码模板（JSX），请参考以下示例的设计模式，同时严格遵循以下规则：。

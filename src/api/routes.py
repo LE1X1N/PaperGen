@@ -51,6 +51,7 @@ def task_status(request_id):
     success_tasks = os.listdir(save_dir)
     return jsonify({"status": "success", "message": success_tasks})
 
+
 @api_bp.route('/health', methods=['GET'])
 def health_check():
     return jsonify({"status": "healthy", "service": "picture_processor"})
