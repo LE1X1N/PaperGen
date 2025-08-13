@@ -3,6 +3,7 @@ from multiprocessing import Process, Lock, Queue
 import time
 
 from config import conf, SYSTEM_PROMPT
+from openai import APIConnectionError
 from src.errors import *
 from src.core.parser import DataParser
 from src.llm import *
@@ -59,8 +60,11 @@ class TaskManager:
             logger.info(f"Request ID: {request_id} -> Task_{task_id}: 进行第 {turn + 1} 轮尝试...")
 
             try:
-                # 3. code generation
                 start_time = time.time()
+                browser = None  
+                driver = None   
+                
+                # 3. code generation
                 res = call_chat_completion(messages)
                 messages.append({"role": "assistant", "content": res})
                 logger.info(
@@ -130,18 +134,20 @@ class TaskManager:
                 logger.error(f"Request ID: {request_id} -> Task_{task_id}: 【前端错误】{e}")
                 messages.append({"role": "user", "content": str(e)})
             except TimeoutError as e:
-                logger.error(f"Request ID: {request_id} -> Task_{task_id}: 【渲染超时错误】{e}")
+                logger.error(f"Request ID: {request_id} -> Task_{task_id}: 【Gradio渲染超时错误】{e}")
                 messages.pop()  # exclude assistant generated code
             except ConnectionRefusedError as e:
-                logger.error(f"Request ID: {request_id} -> Task_{task_id}: 【端口连接错误】{e}")
-                messages.pop()  # exclude assistant generated code
+                logger.error(f"Request ID: {request_id} -> Task_{task_id}: 【Gradio端口连接错误】{e}")
+            except APIConnectionError as e:
+                logger.error(f"Request ID: {request_id} -> Task_{task_id}: 【OpenAI连接错误】{e}")
             except Exception as e:
                 logger.error(f"Request ID: {request_id} -> Task_{task_id}: 【其他错误】{e}")
                 messages.pop()
             finally:
-                browser.kill()
-                logger.info(
-                    f"Request ID: {request_id} -> Task_{task_id}: Gradio浏览器 退出! 错误码: {browser.exitcode}")
+                if browser:
+                    browser.kill()
+                    logger.info(
+                        f"Request ID: {request_id} -> Task_{task_id}: Gradio浏览器 退出! 错误码: {browser.exitcode}")
 
                 if driver:
                     driver.close()

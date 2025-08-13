@@ -1,5 +1,5 @@
 from config import conf, client
-
+from openai import APIConnectionError
 
 def build_module_prompt(module:dict):
     prompt = f"""
@@ -85,5 +85,5 @@ def call_chat_completion(messages):
         res = response.choices[0].message.content
         return res
     
-    except Exception as e:
-        raise Exception(f"处理响应失败: {str(e)}")
+    except APIConnectionError:
+        raise
