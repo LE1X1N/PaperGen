@@ -1,56 +1,48 @@
-from pathlib import Path
-import yaml
-from openai import OpenAI
+# service config
+service_type : website.result
+max_workers: 5          # multithread
+max_retries: 5          # Number of retry attempts after failure
+connect_timeout: 15     # Wait the port to be listend
+render_timeout: 25      # max gradio rendering time 
 
-# screen shot save dir
-SCREENSHOT_DIR = Path("screenshots")
-SCREENSHOT_DIR.mkdir(exist_ok=True)
+# db config
+upload_url : http://10.20.171.5:32005/file/DAS_ha
+download_url_prefix: http://10.20.171.4:52003/fsdata/website/website.result
 
-# load config
-with open("config/system_conf.yaml", "r") as f:
-    conf = yaml.safe_load(f)
+screenshot_dir: screenshots/
 
-# OpenAI client
-client = OpenAI(
-    base_url=conf["base_url"],
-    api_key=conf["api_key"]
-)
+# openai config
+base_url: http://localhost:8001/v1
+api_key: sk-XXXXXX
+model: Qwen3
 
-# React dependencies
-REACT_IMPORTS = {
+# llm config
+react_import: {
     # UI框架
     "semantic-ui-react": "https://esm.sh/semantic-ui-react@2.1.5",
     "semantic-ui-css": "https://esm.sh/semantic-ui-css@2.5.0",
-    
     # 样式工具
     "styled-components": "https://esm.sh/styled-components@6.1.19",
     "@tailwindcss/browser": "https://esm.sh/@tailwindcss/browser@4.1.11",
-    
     # 图标库
     "lucide-react": "https://esm.sh/lucide-react@0.525.0",
-    
     # 动画引擎
     "framer-motion": "https://esm.sh/framer-motion@12.23.6",
     "matter-js": "https://esm.sh/matter-js@0.20.0",
-    
     # 3D 引擎  
     "three": "https://esm.sh/three@0.178.0",
     "@react-three/fiber": "https://esm.sh/@react-three/fiber@9.2.0",
     "@react-three/drei": "https://esm.sh/@react-three/drei@10.5.2",
-
-      
     # 数据可视化
     "recharts": "https://esm.sh/recharts@3.1.0",
     "konva": "https://esm.sh/konva@9.3.22",
     "react-konva": "https://esm.sh/react-konva@19.0.7",
     "p5": "https://esm.sh/p5@2.0.3",
-    
     # 工具库
     "dayjs": "https://esm.sh/dayjs",
 }
 
-
-SYSTEM_PROMPT= """
+system_prompt: |
     You are an expert on frontend design, you will always respond to web design tasks.
     Your task is to create a website according to the user's request using either native HTML or React framework
     When choosing implementation framework, you should follow these rules:
@@ -111,4 +103,4 @@ SYSTEM_PROMPT= """
     You can ONLY use libraries in [lucide-react, recharts, framer-motion, p5.js, three], do NOT use uninstalled libraries!
 
     Remember to only return code for the App.jsx file and nothing else. The resulting application should be visually impressive, highly functional, and something users would be proud to showcase.
-"""
+

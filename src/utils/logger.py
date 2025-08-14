@@ -2,7 +2,7 @@ import logging
 import os
 from concurrent_log_handler import ConcurrentRotatingFileHandler
 
-from config import conf
+from src.config import conf
 
 
 def setup_logger(service_type):

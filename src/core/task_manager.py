@@ -2,9 +2,9 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import Process, Lock, Queue
 from openai import APIConnectionError
-from config import conf, SYSTEM_PROMPT, SCREENSHOT_DIR
 
 from src.errors import *
+from src.config import conf
 from src.llm import call_chat_completion
 from src.browser import launch_sandbox_demo
 from src.browser import  init_driver, capture_screenshot
@@ -21,7 +21,7 @@ class TaskManager:
     def __init__(self):
         self.parser = DataParser(tmpl_manager=TemplateManager())
         self.executor = ThreadPoolExecutor(conf["max_workers"])
-        self.progress_manager = ProgressManager(base_dir=SCREENSHOT_DIR)
+        self.progress_manager = ProgressManager(base_dir=conf["screenshot_dir"])
         self.upload_manager = UploadManager()
 
     def process_tasks(self, request_id: str, data: dict) -> list:
@@ -63,7 +63,7 @@ class TaskManager:
         logger.info(f"Request ID: {request_id} -> Task_{task_id}: ********* 任务 {task_id} 开始！*********")
 
         # 2. create messages
-        messages = [{"role": 'system', "content": SYSTEM_PROMPT}]
+        messages = [{"role": 'system', "content": conf["system_prompt"]}]
         messages.append({"role": "user", "content": query})
 
         # Multi-turn generation

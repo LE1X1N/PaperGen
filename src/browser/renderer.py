@@ -3,7 +3,7 @@ import modelscope_studio.components.antd as antd
 import modelscope_studio.components.base as ms
 import modelscope_studio.components.pro as pro
 
-from config import REACT_IMPORTS
+from src.config import conf
 from src.utils import get_generated_files
 
 
@@ -51,7 +51,7 @@ def launch_sandbox_demo(request_id, task_id, res, port, browser_registry=None, b
                 sandbox = pro.WebSandbox(
                     height=1080,
                     template="react" if react_code else "html",
-                    imports=REACT_IMPORTS,
+                    imports=conf["react_import"],
                     value={
                         "./index.tsx": """import Demo from './demo.tsx'
                                             import "@tailwindcss/browser"

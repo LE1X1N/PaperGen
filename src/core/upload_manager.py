@@ -1,5 +1,5 @@
 import requests
-from config import conf
+from src.config import conf
 
 
 class UploadManager:

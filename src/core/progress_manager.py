@@ -4,12 +4,14 @@ from src.utils import get_logger
 from datetime import datetime
 from .data_parser import DataParser
 from typing import Dict, Optional
+from pathlib import Path
 
 logger = get_logger()
 
 class ProgressManager:
     def __init__(self, base_dir: str):
-        self.base_dir = base_dir
+        
+        self.base_dir = Path(base_dir)
         self.base_dir.mkdir(exist_ok=True)
         logger.info(f"创建文件存储路径：{self.base_dir}")
         self.request_dict_name = "request_status.json"
