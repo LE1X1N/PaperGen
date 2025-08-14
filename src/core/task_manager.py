@@ -50,9 +50,10 @@ class TaskManager:
         tasks = self.parser.parse_page(request_id, data, gen_tmpls)
         logger.info(f"Request ID: {request_id}: 开始页面级别代码生成！任务数量：{len(tasks)}")
         futures = [self.executor.submit(self._process_single_task, task) for task in tasks]
+        results = [future.result() for future in futures]
         
         logger.info(f"Request ID: {request_id} -> 处理请求完成！共耗时 {time.time() - start_time} s")
-        return [future.result() for future in futures]
+        return results
     
 
     def _process_single_task(self, task: dict) -> dict:

@@ -1,7 +1,6 @@
 import threading
 from flask import Blueprint, request, jsonify
 import uuid
-import time
 
 from src.core.task_manager import TaskManager
 from src.utils import get_logger
@@ -14,9 +13,10 @@ task_manager = TaskManager()
 @api_bp.route('/gen_images', methods=['POST'])
 def gen_images():
     request_id = str(uuid.uuid4())
+    logger.info(f"接收请求： {request_id}")
     try:
-        data = request.get_json()
-        task_thread = threading.Thread(target=task_manager.process_tasks, args=(request_id, data))    # Daemon task thread
+        data = request.get_json()['data']
+        task_thread = threading.Thread(target=task_manager.process_tasks, args=(request_id, data))  
         task_thread.start()
         return jsonify({"code": 0, "message": "Task launch success!", "request_id": request_id, })
 
