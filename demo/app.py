@@ -11,12 +11,10 @@ import modelscope_studio.components.antd as antd
 import modelscope_studio.components.pro as pro
 
 from utils import *
-from app_conf import SYSTEM_PROMPT, REACT_IMPORTS, SERVICE_NAME, ALL_DEMOS, MODEL, PORT, BASE_URL, API_KEY
+from app_conf import SYSTEM_PROMPT, REACT_IMPORTS, SERVICE_NAME, DEMO_LIST, MODEL, PORT, BASE_URL, API_KEY
 
 # logger
 logger = setup_logger(SERVICE_NAME)
-
-DEMO_LIST = ALL_DEMOS[random.randint(0, 10)]
 
 # open-ai client
 client = OpenAI(

@@ -1,4 +1,4 @@
-from src.tmpl import TemplateManager
+from .tmpl_manager import TemplateManager
 from src.llm import build_module_prompt, build_page_prompt
 
 

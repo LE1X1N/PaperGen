@@ -2,7 +2,7 @@ import json
 import os
 from src.utils import get_logger
 from datetime import datetime
-from .parser import DataParser
+from .data_parser import DataParser
 from typing import Dict, Optional
 
 logger = get_logger()

@@ -1,12 +1,9 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-import os
 
-from config import SCREENSHOT_DIR
-from src.utils import get_logger
+from src.utils import  get_logger
 
 logger = get_logger()
-
 
 def init_driver():
     """

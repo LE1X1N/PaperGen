@@ -1,23 +1,21 @@
+import time
 from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import Process, Lock, Queue
-import time
 from openai import APIConnectionError
-import os
-
 from config import conf, SYSTEM_PROMPT, SCREENSHOT_DIR
+
 from src.errors import *
-from src.core.parser import DataParser
-from src.llm import *
-from src.browser.manager import init_driver, capture_screenshot
-from src.browser.renderer import launch_sandbox_demo
-from src.utils import get_random_available_port, wait_for_port, get_logger
-from src.tmpl import TemplateManager
-from src.utils import get_generated_files
+from src.llm import call_chat_completion
+from src.browser import launch_sandbox_demo
+from src.browser import  init_driver, capture_screenshot
+from src.utils import get_random_available_port, wait_for_port, get_logger, get_generated_files
+
+from .data_parser import DataParser
+from .tmpl_manager import TemplateManager
 from .progress_manager import ProgressManager
 from .upload_manager import UploadManager
 
 logger = get_logger()
-
 
 class TaskManager:
     def __init__(self):
