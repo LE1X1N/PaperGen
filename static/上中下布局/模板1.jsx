@@ -1,6 +1,6 @@
 import React from "react";
 
-const navItems = Array.from({ length: 15 }).map((_, i) => `导航 ${i + 1}`);
+const navItems = Array.from({ length: 5 }).map((_, i) => `导航 ${i + 1}`);
 
 export default function App() {
   return (

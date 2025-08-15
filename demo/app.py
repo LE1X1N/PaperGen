@@ -43,7 +43,7 @@ class GradioEvents:
         messages = history_to_messages(_history, _setting["system"])
         messages.append({"role": Role.USER, "content": query})
     
-        # open-ai compatible generation
+        # OpenAI compatible generation
         gen = client.chat.completions.create(
                 model=MODEL,  
                 messages=messages, 

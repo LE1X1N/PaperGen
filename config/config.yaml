@@ -34,6 +34,7 @@ react_import: {
     "@react-three/fiber": "https://esm.sh/@react-three/fiber@9.2.0",
     "@react-three/drei": "https://esm.sh/@react-three/drei@10.5.2",
     # 数据可视化
+    "echarts": "https://esm.sh/echarts@6.0.0",
     "recharts": "https://esm.sh/recharts@3.1.0",
     "konva": "https://esm.sh/konva@9.3.22",
     "react-konva": "https://esm.sh/react-konva@19.0.7",

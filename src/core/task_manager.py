@@ -24,18 +24,18 @@ class TaskManager:
         self.progress_manager = ProgressManager(base_dir=conf["screenshot_dir"])
         self.upload_manager = UploadManager()
 
-    def process_tasks(self, request_id: str, data: dict) -> list:
+    def process_tasks(self, request_id: str, data: dict, task_id: str) -> list:
         """
             Multi-thread processing tasks
             
             MainThread(输入JSON -> 数据解析) 
-            
-            -> Thread(Prompt构建 -> 代码生成 -> 截屏渲染 -> 输出图片) -> MainThread(结果保存)
+                -> Thread(Prompt构建 -> 代码生成 -> 截屏渲染 -> 输出图片) 
+            -> MainThread(结果保存)
         """
         start_time = time.time()
         
         # 1. Images save dir
-        file_path = self.progress_manager.init_request(request_id, data)
+        file_path = self.progress_manager.init_request(request_id, data, task_id)
         logger.info(f"Request ID: {request_id} ->: 开始处理请求，状态文件存储路径：{file_path}")
         
         # 2. module-level tasks
@@ -145,7 +145,7 @@ class TaskManager:
                     raise TimeoutError("Gradio渲染超时！")
 
             except FrontendError as e:
-                logger.error(f"Request ID: {request_id} -> Task_{task_id}: 【前端错误】{e}")
+                logger.error(f"Request ID: {request_id} -> Task_{task_id}: 【前端代码错误】{e}")
                 messages.append({"role": "user", "content": str(e)})
             except TimeoutError as e:
                 logger.error(f"Request ID: {request_id} -> Task_{task_id}: 【Gradio渲染超时错误】{e}")

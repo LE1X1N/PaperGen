@@ -22,7 +22,7 @@ class ProgressManager:
     def _get_request_dict_path(self, request_id):
         return self._get_request_dir(request_id) /  self.request_dict_name
         
-    def init_request(self, request_id: str, data: dict):
+    def init_request(self, request_id: str, data: dict, task_id: str):
         task_ids = DataParser.parse_task_ids(data)
         
         # create corresponding dir
@@ -33,6 +33,7 @@ class ProgressManager:
         file_path = save_dir / self.request_dict_name
         
         request_dict = {
+            "task_id": task_id,
             "request_id": request_id,
             "create_time": datetime.now().isoformat(),
             "total_tasks": len(task_ids),

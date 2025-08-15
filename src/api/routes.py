@@ -12,13 +12,17 @@ task_manager = TaskManager()
 
 @api_bp.route('/gen_images', methods=['POST'])
 def gen_images():
-    request_id = str(uuid.uuid4())
-    logger.info(f"接收请求： {request_id}")
     try:
-        data = request.get_json()['data']
-        task_thread = threading.Thread(target=task_manager.process_tasks, args=(request_id, data))  
+        req = request.get_json()
+        task_id = req['task_id']
+        request_id = str(uuid.uuid4())
+        data = req['data']
+        
+        logger.info(f"接收请求. 【任务ID】{task_id} 【请求ID】{request_id}")
+        
+        task_thread = threading.Thread(target=task_manager.process_tasks, args=(request_id, data, task_id))  
         task_thread.start()
-        return jsonify({"code": 0, "message": "Task launch success!", "request_id": request_id, })
+        return jsonify({"code": 0, "message": "任务创建成功!", "task_id": task_id,  "request_id": request_id})
 
     except Exception as e:
         error_msg = f"请求处理失败: {str(e)}"
