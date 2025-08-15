@@ -215,7 +215,7 @@ class TaskManager:
                 except ConnectTimeout as e:
                     error_msg = f"【图片上传失败】{e}"
                     self.progress_manager.update_task_status(request_id, task_id, "failed", "", error_msg)
-                    logger.error("fRequest ID: {request_id} -> Task_{task_id}: {error_msg}")
+                    logger.error(f"Request ID: {request_id} -> Task_{task_id}: {error_msg}")
                     return {"task_id": task_id, "status": False, "message": error_msg}
                 
             else:
