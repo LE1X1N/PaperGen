@@ -72,6 +72,29 @@ class ProgressManager:
             json.dump(data, f, indent=2, ensure_ascii=False)
         return True
     
+
+    def update_all_tasks(self, request_id: str, status:str, url:str="", error: str=""):
+        # read JSON
+        file_path = self._get_request_dict_path(request_id)
+        if not file_path.exists():
+            return False   
+        with open(file_path, "r", encoding="utf-8") as f:
+            data = json.load(f) 
+        
+        # updata task field
+        for task in data.get("tasks", []):
+            task["status"] = status
+            task["url"] = url
+            if error:
+                task["error"] = error
+            else:
+                task.pop("error", None)  
+        
+        # write JSON
+        with open(file_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        return True
+        
     
     def get_progress(self, request_id: str) -> Optional[Dict]:
         file_path = self._get_request_dict_path(request_id)

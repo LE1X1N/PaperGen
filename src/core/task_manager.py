@@ -2,6 +2,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import Process, Lock, Queue
 from openai import APIConnectionError
+from requests.exceptions import ConnectTimeout
 
 from src.errors import *
 from src.config import conf
@@ -24,6 +25,7 @@ class TaskManager:
         self.progress_manager = ProgressManager(base_dir=conf["screenshot_dir"])
         self.upload_manager = UploadManager()
 
+
     def process_tasks(self, request_id: str, data: dict, task_id: str) -> list:
         """
             Multi-thread processing tasks
@@ -39,13 +41,27 @@ class TaskManager:
         logger.info(f"Request ID: {request_id} ->: 开始处理请求，状态文件存储路径：{file_path}")
         
         # 2. module-level tasks
-        tasks = self.parser.parse_module(request_id, data)
+        try:
+            tasks = self.parser.parse_module(request_id, data)
+        except KeyError as e:
+            error_msg = f"【JSON解析错误】KeyError: {str(e)}"
+            self.progress_manager.update_all_tasks(request_id, status="failed", url="", error=error_msg)
+            logger.error(f"Request ID: {request_id}: {error_msg}")
+            return
+            
         logger.info(f"Request ID: {request_id}: 开始模块级别模板生成! 任务数量：{len(tasks)}")
         futures = [self.executor.submit(self._process_single_task, task) for task in tasks]
         gen_tmpls = [future.result() for future in futures]
 
         # 3. page-level tasks
-        tasks = self.parser.parse_page(request_id, data, gen_tmpls)
+        try:
+            tasks = self.parser.parse_page(request_id, data, gen_tmpls)
+        except KeyError as e:
+            error_msg = f"【JSON解析错误】KeyError: {str(e)}"
+            self.progress_manager.update_all_tasks(request_id, status="failed", url="", error=error_msg)
+            logger.error(f"Request ID: {request_id}: {error_msg}")
+            return
+            
         logger.info(f"Request ID: {request_id}: 开始页面级别代码生成！任务数量：{len(tasks)}")
         futures = [self.executor.submit(self._process_single_task, task) for task in tasks]
         results = [future.result() for future in futures]
@@ -178,23 +194,30 @@ class TaskManager:
         
         
         if return_code:
-            # module level 
+            # module level task
             return {"task_id": task_id, "status": render_success, "code": react_code}
         else:
+            # page level task
             if render_success:
-                
-                #  save image to db
-                res = self.upload_manager.upload_single_file(img_path)
-                if res['code'] == 0:
-                    download_url = conf["download_url_prefix"] + res["result"]
-                    self.progress_manager.update_task_status(request_id, task_id, "success", url=download_url)
-                    logger.info(f"Request ID: {request_id} -> Task_{task_id}: 【任务成功】上传文件访问路径：{download_url}")
-                    return {"task_id": task_id, "status": True}
-                else:
-                    error_msg = res["message"]
+                try:
+                    res = self.upload_manager.upload_single_file(img_path)   #  upload image to file system
+                    if res['code'] == 0:
+                        download_url = conf["download_url_prefix"] + res["result"]
+                        self.progress_manager.update_task_status(request_id, task_id, "success", url=download_url)
+                        logger.info(f"Request ID: {request_id} -> Task_{task_id}: 【任务成功】上传文件访问路径：{download_url}")
+                        return {"task_id": task_id, "status": True}
+                    else:
+                        error_msg = res["message"]
+                        self.progress_manager.update_task_status(request_id, task_id, "failed", "", error_msg)
+                        logger.error(f"Request ID: {request_id} -> Task_{task_id}: 【任务失败】上传文件失败: {error_msg}")
+                        return {"task_id": task_id, "status": False, "message": error_msg}
+                    
+                except ConnectTimeout as e:
+                    error_msg = f"【图片上传失败】{e}"
                     self.progress_manager.update_task_status(request_id, task_id, "failed", "", error_msg)
-                    logger.error(f"Request ID: {request_id} -> Task_{task_id}: 【任务失败】上传文件失败: {error_msg}")
+                    logger.error("fRequest ID: {request_id} -> Task_{task_id}: {error_msg}")
                     return {"task_id": task_id, "status": False, "message": error_msg}
+                
             else:
                 error_msg = "任务超过最大重试次数"
                 self.progress_manager.update_task_status(request_id, task_id, "failed", "", error_msg)

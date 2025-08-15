@@ -12,14 +12,19 @@ task_manager = TaskManager()
 
 @api_bp.route('/gen_images', methods=['POST'])
 def gen_images():
+    request_id = str(uuid.uuid4())
     try:
-        req = request.get_json()
+        req = request.get_json()        
         task_id = req['task_id']
-        request_id = str(uuid.uuid4())
         data = req['data']
         
+        valid, msg = task_manager.parser.check_field(data)   # check whether JSON is correct
+        if not valid:
+            return jsonify({"code": -1, "message": f"任务创建失败! {msg}"}), 500
+    
         logger.info(f"接收请求. 【任务ID】{task_id} 【请求ID】{request_id}")
-        
+        logger.info(req)
+
         task_thread = threading.Thread(target=task_manager.process_tasks, args=(request_id, data, task_id))  
         task_thread.start()
         return jsonify({"code": 0, "message": "任务创建成功!", "task_id": task_id,  "request_id": request_id})
