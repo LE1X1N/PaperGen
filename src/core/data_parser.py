@@ -1,6 +1,5 @@
-from .tmpl_manager import TemplateManager
 from src.llm import build_module_prompt, build_page_prompt
-
+from .tmpl_manager import TemplateManager
 
 class DataParser:
     def __init__(self, tmpl_manager: TemplateManager):

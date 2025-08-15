@@ -1,10 +1,11 @@
 import json
 import os
-from src.utils import get_logger
 from datetime import datetime
-from .data_parser import DataParser
 from typing import Dict, Optional
 from pathlib import Path
+
+from src.utils import get_logger
+from .data_parser import DataParser
 
 logger = get_logger()
 

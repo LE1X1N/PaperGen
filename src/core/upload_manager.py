@@ -1,6 +1,7 @@
 import requests
-from src.config import conf
 from requests.exceptions import ConnectTimeout
+
+from src.config import conf
 
 class UploadManager:
     def __init__(self):
