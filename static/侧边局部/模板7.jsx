@@ -1,78 +1,74 @@
 import React from "react";
+import { Cpu, LayoutDashboard, Activity, Settings, Users, ChartBar } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function App() {
-  return (
-    <div className="flex h-screen font-['PingFang SC',sans-serif] text-gray-900 bg-gradient-to-r from-yellow-50 via-yellow-100 to-yellow-50">
-      {/* 侧边栏 */}
-      <aside className="flex flex-col w-72 bg-yellow-400 shadow-xl">
-        <div className="flex items-center justify-center h-20 border-b border-yellow-300">
-          <h2 className="text-3xl font-extrabold text-white tracking-widest">
-            管理系统
-          </h2>
-        </div>
-        <nav className="flex flex-col flex-grow px-8 py-10 space-y-6">
-          {[
-            { name: "仪表盘", icon: "⬛" },
-            { name: "报告", icon: "📊" },
-            { name: "用户", icon: "👥" },
-            { name: "设置", icon: "⚙️" },
-          ].map((item) => (
-            <a
-              key={item.name}
-              href="#"
-              className="flex items-center space-x-4 px-5 py-3 rounded-lg bg-yellow-300 text-yellow-900 font-semibold shadow-inner transition-transform transform hover:scale-105 hover:bg-yellow-350 active:scale-95"
-              draggable={false}
-            >
-              <span className="text-xl select-none">{item.icon}</span>
-              <span>{item.name}</span>
-            </a>
-          ))}
+  const menuItems = [
+    { icon: <LayoutDashboard className="w-5 h-5" />, label: "仪表盘" },
+    { icon: <Cpu className="w-5 h-5" />, label: "系统监控" },
+    { icon: <Activity className="w-5 h-5" />, label: "活动日志" },
+    { icon: <Users className="w-5 h-5" />, label: "用户管理" },
+    { icon: <ChartBar className="w-5 h-5" />, label: "数据分析" },
+    { icon: <Settings className="w-5 h-5" />, label: "设置" },
+  ];
 
-          <div className="mt-auto">
-            <a
-              href="#"
-              className="block w-full text-center px-5 py-3 font-semibold rounded-lg bg-yellow-500 text-white shadow-lg hover:bg-yellow-600 transition"
+  return (
+    <div className="flex min-h-screen bg-gradient-to-tr from-[#0f172a] via-[#1e293b] to-[#334155] text-slate-300 font-sans">
+      {/* 侧边栏 */}
+      <aside className="w-64 bg-gradient-to-b from-[#111827] via-[#1f2937] to-[#111827] shadow-lg flex flex-col">
+        <div className="flex items-center justify-center h-16 border-b border-slate-700">
+          <Cpu className="w-8 h-8 text-cyan-400 mr-2" />
+          <span className="text-cyan-400 text-xl font-semibold tracking-wide select-none">
+            科技前端
+          </span>
+        </div>
+        <nav className="flex-1 mt-6">
+          {menuItems.map(({ icon, label }, idx) => (
+            <motion.div
+              key={label}
+              whileHover={{ backgroundColor: "rgba(14, 116, 144, 0.7)" }}
+              className="flex items-center px-6 py-3 space-x-3 cursor-pointer text-slate-300 hover:text-cyan-400 transition-colors"
+              style={{ userSelect: "none" }}
+              aria-label={label}
+              tabIndex={0}
             >
-              登出
-            </a>
-          </div>
+              <div className="">{icon}</div>
+              <span className="text-base font-medium">{label}</span>
+            </motion.div>
+          ))}
         </nav>
+        <div className="p-4 border-t border-slate-700 text-sm text-slate-500 select-none">
+          © 2024 科技公司
+        </div>
       </aside>
 
-      {/* 主内容 */}
-      <main className="flex flex-col flex-grow overflow-auto">
-        {/* 顶部 */}
-        <header className="flex items-center justify-between bg-white shadow-md h-16 px-10 border-b border-yellow-200">
-          <h1 className="text-2xl font-bold tracking-wide text-yellow-800 select-none">
-            欢迎来到管理后台
-          </h1>
-          <div className="text-yellow-700 font-medium select-none">管理员</div>
-        </header>
+      {/* 主内容区 */}
+      <main className="flex-1 p-10">
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-3xl font-extrabold text-cyan-400 mb-6 select-none"
+        >
+          欢迎来到科技感前端框架
+        </motion.h1>
 
-        {/* 内容区域 */}
-        <section className="flex-grow p-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            {[1, 2, 3, 4, 5, 6].map((idx) => (
-              <div
-                key={idx}
-                className="relative rounded-xl bg-gradient-to-br from-yellow-50 to-yellow-100 shadow-lg p-8 flex flex-col justify-between cursor-default select-none"
-                style={{
-                  boxShadow:
-                    "inset 0 0 20px rgba(250, 204, 21, 0.15), 0 6px 15px rgba(250, 204, 21, 0.3)",
-                }}
-              >
-                <h2 className="text-2xl font-extrabold text-yellow-700 mb-4">
-                  模块标题 {idx}
-                </h2>
-                <p className="text-yellow-900 leading-relaxed tracking-wide">
-                  这个卡片展示了模块 {idx} 的简洁内容描述，色彩柔和且具有现代感，配合整体明亮的金黄色调营造温暖而充满活力的氛围。
-                </p>
-                <div className="absolute -top-6 right-6 text-6xl font-bold text-yellow-300 select-none opacity-30 pointer-events-none">
-                  {idx}
-                </div>
-              </div>
-            ))}
-          </div>
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {[1, 2, 3, 4, 5, 6].map((card) => (
+            <motion.div
+              key={card}
+              whileHover={{ scale: 1.05, boxShadow: "0 12px 24px rgba(14,116,144,0.6)" }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              className="bg-gradient-to-tr from-[#0f172a] to-[#134e4a] rounded-xl border border-cyan-500/60 p-6 shadow-md backdrop-blur-sm"
+            >
+              <h2 className="text-xl font-semibold mb-2 text-cyan-300 select-none">
+                科技卡片 #{card}
+              </h2>
+              <p className="text-slate-400 leading-relaxed select-text">
+                这是一个静态示例卡片，展示侧边栏布局的科技感设计风格。使用渐变、阴影和现代排版营造氛围。
+              </p>
+            </motion.div>
+          ))}
         </section>
       </main>
     </div>

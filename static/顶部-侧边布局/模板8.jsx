@@ -1,201 +1,144 @@
 import React from "react";
-import { Laptop, Bell, User, Menu, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Laptop, Bell, User } from "lucide-react";
 
-const navItems = ["首页", "产品", "关于我们"];
-const sidebarItems = [
-  {
-    key: "sub1",
-    icon: <User size={18} className="text-indigo-500" />,
-    label: "用户管理",
-    children: ["用户列表", "权限设置", "角色管理", "操作日志"],
-  },
-  {
-    key: "sub2",
-    icon: <Laptop size={18} className="text-indigo-500" />,
-    label: "设备监控",
-    children: ["设备状态", "告警信息", "设备配置", "统计报表"],
-  },
-  {
-    key: "sub3",
-    icon: <Bell size={18} className="text-indigo-500" />,
-    label: "系统通知",
-    children: ["通知列表", "消息设置", "更新日志", "帮助中心"],
-  },
-];
+const navItems = ["1", "2", "3"].map((key) => ({
+  key,
+  label: `导航 ${key}`,
+}));
+
+const sideItems = [User, Laptop, Bell].map((Icon, index) => {
+  const key = String(index + 1);
+  return {
+    key: `sub${key}`,
+    icon: <Icon size={16} />,
+    label: `子导航 ${key}`,
+    children: Array.from({ length: 4 }).map((_, j) => {
+      const subKey = index * 4 + j + 1;
+      return {
+        key: String(subKey),
+        label: `选项 ${subKey}`,
+      };
+    }),
+  };
+});
 
 export default function App() {
-  const [selectNav, setSelectNav] = React.useState(0);
-  const [selectSubMenu, setSelectSubMenu] = React.useState("sub1");
-  const [selectSubItem, setSelectSubItem] = React.useState(0);
-  const [sidebarOpen, setSidebarOpen] = React.useState(true);
+  const [selectedNavKey, setSelectedNavKey] = React.useState("2");
+  const [selectedSideKey, setSelectedSideKey] = React.useState("1");
+  const [openSubKeys, setOpenSubKeys] = React.useState(["sub1"]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-b from-indigo-50 via-indigo-100 to-white text-gray-900 select-none">
-      {/* 顶部导航 */}
-      <header className="flex items-center justify-between h-16 px-6 bg-gradient-to-r from-indigo-600 via-indigo-700 to-indigo-800 shadow-lg sticky top-0 z-40">
-        <div className="flex items-center space-x-3">
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="md:hidden p-2 rounded-md hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-white transition"
-            aria-label={sidebarOpen ? "关闭侧边栏" : "打开侧边栏"}
-          >
-            {sidebarOpen ? (
-              <X size={24} className="text-white" />
-            ) : (
-              <Menu size={24} className="text-white" />
-            )}
-          </button>
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0.7 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="text-white font-extrabold text-3xl tracking-widest select-text"
-          >
-            LOGO
-          </motion.div>
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50">
+      {/* Header */}
+      <header className="bg-gradient-to-r from-pink-500 to-purple-600 text-white flex items-center px-6 h-16 shadow-lg select-none font-sans">
+        <div className="text-2xl font-extrabold mr-10 tracking-widest drop-shadow-md">
+          Youthful 前端模板
         </div>
-
-        <nav className="hidden md:flex space-x-12 text-indigo-200 text-xl font-semibold tracking-wide">
-          {navItems.map((item, idx) => (
+        <nav className="flex space-x-8 flex-1 min-w-0">
+          {navItems.map(({ key, label }) => (
             <button
-              key={item}
-              onClick={() => setSelectNav(idx)}
-              className={`relative transition-colors duration-300 hover:text-white focus:outline-none ${
-                selectNav === idx ? "text-white" : ""
+              key={key}
+              onClick={() => setSelectedNavKey(key)}
+              className={`whitespace-nowrap px-5 py-2 rounded-lg font-semibold transition-colors duration-300 bg-gradient-to-r ${
+                selectedNavKey === key
+                  ? "from-pink-300 to-purple-300 text-purple-900 shadow-lg"
+                  : "text-white hover:from-pink-400 hover:to-purple-700"
               }`}
-              aria-current={selectNav === idx ? "page" : undefined}
+              aria-current={selectedNavKey === key ? "page" : undefined}
             >
-              {item}
-              {selectNav === idx && (
-                <motion.span
-                  layoutId="nav-underline"
-                  className="absolute left-0 -bottom-1 w-full h-1 bg-gradient-to-r from-pink-400 via-red-400 to-yellow-400 rounded-full shadow-xl"
-                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                />
-              )}
+              {label}
             </button>
           ))}
         </nav>
-
-        <button
-          className="hidden md:inline-flex items-center space-x-2 bg-indigo-700 hover:bg-indigo-800 focus:ring-2 focus:ring-offset-1 focus:ring-indigo-400 rounded-full py-1.5 px-4 text-white font-semibold tracking-wide transition"
-          aria-label="用户设置"
-        >
-          <User size={18} />
-          <span>Admin</span>
-        </button>
       </header>
 
-      {/* 主体部分：侧边栏 + 内容 */}
-      <div className="flex flex-1 max-w-[1280px] mx-auto mt-8 mb-12 px-4 sm:px-6 lg:px-8 w-full min-h-[calc(100vh-4rem-6rem)]">
-        {/* 侧边栏 */}
-        <AnimatePresence>
-          {sidebarOpen && (
-            <motion.aside
-              initial={{ x: -300, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -300, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="w-72 bg-gradient-to-b from-indigo-900 via-indigo-800 to-indigo-900 rounded-2xl shadow-2xl border border-indigo-700 sticky top-20 h-[calc(100vh-5rem)] overflow-y-auto py-8 custom-scrollbar"
-            >
-              {sidebarItems.map(({ key, icon, label, children }) => (
-                <div key={key} className="mb-10 last:mb-0 px-6">
-                  <div className="flex items-center mb-4 text-indigo-300 font-bold text-lg tracking-wide select-none">
-                    <span className="mr-3">{icon}</span>
-                    {label}
-                  </div>
-                  <ul role="list" className="space-y-2">
-                    {children.map((child, i) => {
-                      const isSelected = selectSubMenu === key && selectSubItem === i;
-                      return (
-                        <li key={child} className="list-none">
-                          <button
-                            onClick={() => {
-                              setSelectSubMenu(key);
-                              setSelectSubItem(i);
-                            }}
-                            className={`flex items-center w-full text-indigo-300 hover:text-white text-base rounded-lg py-2 px-5 transition-all duration-300 shadow-md hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 ${
-                              isSelected
-                                ? "bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 font-semibold text-white shadow-xl scale-105"
-                                : ""
-                            }`}
-                            aria-current={isSelected ? "true" : undefined}
-                          >
-                            {child}
-                          </button>
-                        </li>
-                      );
-                    })}
-                  </ul>
+      {/* Main Layout */}
+      <div className="flex flex-1 bg-gradient-to-tr from-pink-50 via-purple-50 to-indigo-50">
+        {/* Sidebar */}
+        <aside className="w-56 bg-white border-r border-pink-200 overflow-y-auto shadow-inner">
+          {sideItems.map(({ key, icon, label, children }) => (
+            <div key={key} className="border-b border-pink-100">
+              <button
+                onClick={() => {
+                  if (openSubKeys.includes(key)) {
+                    setOpenSubKeys((keys) => keys.filter((k) => k !== key));
+                  } else {
+                    setOpenSubKeys((keys) => [...keys, key]);
+                  }
+                }}
+                className="flex items-center gap-3 w-full px-5 py-3 text-purple-800 font-semibold hover:bg-purple-100 transition-colors rounded-md"
+                aria-expanded={openSubKeys.includes(key)}
+                aria-controls={`${key}-children`}
+              >
+                <span className="text-pink-500">{icon}</span>
+                <span className="flex-1 text-left">{label}</span>
+                <svg
+                  className={`transform transition-transform duration-300 text-purple-500 ${
+                    openSubKeys.includes(key) ? "rotate-90" : ""
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  width="18"
+                  height="18"
+                  aria-hidden="true"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+              {openSubKeys.includes(key) && (
+                <div
+                  id={`${key}-children`}
+                  className="pl-14 bg-purple-50 border-l border-purple-200 select-none rounded-br-lg rounded-bl-lg"
+                >
+                  {children.map(({ key: childKey, label: childLabel }) => (
+                    <button
+                      key={childKey}
+                      onClick={() => setSelectedSideKey(childKey)}
+                      className={`block w-full text-left px-4 py-2 mb-1 rounded-md font-semibold transition-colors duration-200 ${
+                        selectedSideKey === childKey
+                          ? "bg-pink-200 text-pink-700 shadow-md"
+                          : "text-purple-700 hover:bg-purple-200"
+                      }`}
+                      aria-current={selectedSideKey === childKey ? "page" : undefined}
+                    >
+                      {childLabel}
+                    </button>
+                  ))}
                 </div>
-              ))}
-            </motion.aside>
-          )}
-        </AnimatePresence>
+              )}
+            </div>
+          ))}
+        </aside>
 
-        {/* 内容区 */}
-        <main className="flex-1 bg-white rounded-3xl shadow-2xl border border-gray-200 p-10 min-h-[520px] select-text relative overflow-hidden">
-          <motion.div
-            key={`${selectSubMenu}-${selectSubItem}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className="max-w-4xl"
+        {/* Content Area */}
+        <main className="flex-1 p-10 overflow-auto">
+          {/* Breadcrumb */}
+          <nav
+            className="text-sm text-purple-600 mb-6 select-none font-semibold tracking-wide"
+            aria-label="Breadcrumb"
           >
-            <h1 className="text-4xl font-extrabold text-gray-900 mb-8 tracking-tight select-text drop-shadow-lg">
-              {sidebarItems.find((item) => item.key === selectSubMenu)?.children[
-                selectSubItem
-              ] || "欢迎"}
-            </h1>
-            <section className="text-gray-700 leading-relaxed space-y-6 text-lg tracking-wide">
-              <p className="bg-gradient-to-r from-pink-300 via-red-300 to-yellow-300 bg-clip-text text-transparent font-semibold drop-shadow-md">
-                这是一个炫酷现代的【顶部-侧边栏】布局示例，结合渐变色彩、立体阴影与流畅动画，打造出灵动且高质感的用户界面体验。
-              </p>
-              <p>
-                侧边栏采用渐变背景与霓虹选中效果，侧菜单项互动丰富，内容区配合动效及大字号排版，令阅读和导航都更加愉悦。
-              </p>
-              <p>
-                导航栏响应式显示菜单切换按钮，支持移动端良好体验，整体设计兼顾视觉冲击和实用功能，适用于管理系统、内容平台及展示型应用。
-              </p>
-            </section>
-          </motion.div>
-          {/* 底部发光渐变 */}
-          <div className="pointer-events-none absolute bottom-8 left-1/2 -translate-x-1/2 w-3/4 h-48 rounded-3xl bg-gradient-to-r from-pink-500 via-red-400 to-yellow-400 opacity-30 blur-3xl" />
+            <ol className="list-reset flex space-x-3">
+              <li>首页</li>
+              <li>/</li>
+              <li>列表</li>
+              <li>/</li>
+              <li>应用</li>
+            </ol>
+          </nav>
+
+          {/* Content Card */}
+          <section className="bg-white rounded-3xl shadow-2xl p-12 min-h-[320px] max-w-5xl mx-auto border border-pink-300">
+            <h2 className="text-4xl font-extrabold mb-6 text-pink-600 tracking-wide">
+              内容区域
+            </h2>
+            <p className="text-purple-700 leading-relaxed text-lg tracking-wide">
+              这里是页面的主要内容区域。采用年轻活力的粉紫渐变色调设计，整体风格清新亮眼，富有现代感与吸引力。
+            </p>
+          </section>
         </main>
       </div>
-
-      {/* 底部 */}
-      <footer className="py-4 text-center border-t border-indigo-200 bg-gradient-to-r from-indigo-600 via-indigo-700 to-indigo-800 text-indigo-200 text-sm select-none tracking-wide">
-        版权所有 © 2024 优秀团队倾情打造
-      </footer>
-
-      {/* scrollbar styles */}
-      <style>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(255 255 255 / 0.2);
-          border-radius: 9999px;
-        }
-        .custom-scrollbar:hover::-webkit-scrollbar-thumb {
-          background: rgba(255 255 255 / 0.4);
-        }
-        @media (max-width: 767px) {
-          aside {
-            position: fixed;
-            top: 4rem;
-            left: 0;
-            bottom: 0;
-            z-index: 100;
-            box-shadow: 8px 0 20px rgb(0 0 0 / 0.15);
-          }
-        }
-      `}</style>
     </div>
   );
 }

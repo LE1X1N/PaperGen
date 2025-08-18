@@ -1,23 +1,24 @@
 import React from "react";
-import { Laptop, Bell, User } from "lucide-react";
+import { Laptop, Bell, User, Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const navItems = ["首页", "产品", "关于我们"];
 const sidebarItems = [
   {
     key: "sub1",
-    icon: <User size={18} className="text-gray-500" />,
+    icon: <User size={18} className="text-indigo-500" />,
     label: "用户管理",
     children: ["用户列表", "权限设置", "角色管理", "操作日志"],
   },
   {
     key: "sub2",
-    icon: <Laptop size={18} className="text-gray-500" />,
+    icon: <Laptop size={18} className="text-indigo-500" />,
     label: "设备监控",
     children: ["设备状态", "告警信息", "设备配置", "统计报表"],
   },
   {
     key: "sub3",
-    icon: <Bell size={18} className="text-gray-500" />,
+    icon: <Bell size={18} className="text-indigo-500" />,
     label: "系统通知",
     children: ["通知列表", "消息设置", "更新日志", "帮助中心"],
   },
@@ -27,92 +28,174 @@ export default function App() {
   const [selectNav, setSelectNav] = React.useState(0);
   const [selectSubMenu, setSelectSubMenu] = React.useState("sub1");
   const [selectSubItem, setSelectSubItem] = React.useState(0);
+  const [sidebarOpen, setSidebarOpen] = React.useState(true);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-b from-white via-gray-50 to-gray-100 text-gray-800">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-indigo-50 via-indigo-100 to-white text-gray-900 select-none">
       {/* 顶部导航 */}
-      <header className="flex items-center justify-between h-14 px-6 bg-white border-b border-gray-200 shadow-sm sticky top-0 z-30">
-        <div className="text-2xl font-extrabold text-indigo-600 select-none tracking-wide">
-          Logo
+      <header className="flex items-center justify-between h-16 px-6 bg-gradient-to-r from-indigo-600 via-indigo-700 to-indigo-800 shadow-lg sticky top-0 z-40">
+        <div className="flex items-center space-x-3">
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="md:hidden p-2 rounded-md hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-white transition"
+            aria-label={sidebarOpen ? "关闭侧边栏" : "打开侧边栏"}
+          >
+            {sidebarOpen ? (
+              <X size={24} className="text-white" />
+            ) : (
+              <Menu size={24} className="text-white" />
+            )}
+          </button>
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0.7 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="text-white font-extrabold text-3xl tracking-widest select-text"
+          >
+            LOGO
+          </motion.div>
         </div>
-        <nav className="flex space-x-8 text-gray-600 text-lg font-medium select-none">
+
+        <nav className="hidden md:flex space-x-12 text-indigo-200 text-xl font-semibold tracking-wide">
           {navItems.map((item, idx) => (
             <button
               key={item}
               onClick={() => setSelectNav(idx)}
-              className={`relative px-1 transition-colors duration-300 hover:text-indigo-600 focus:outline-none focus-visible:text-indigo-600 ${
-                selectNav === idx ? "text-indigo-600" : ""
+              className={`relative transition-colors duration-300 hover:text-white focus:outline-none ${
+                selectNav === idx ? "text-white" : ""
               }`}
               aria-current={selectNav === idx ? "page" : undefined}
             >
               {item}
               {selectNav === idx && (
-                <span className="absolute left-0 -bottom-1 w-full h-[2px] bg-indigo-600 rounded-full"></span>
+                <motion.span
+                  layoutId="nav-underline"
+                  className="absolute left-0 -bottom-1 w-full h-1 bg-gradient-to-r from-pink-400 via-red-400 to-yellow-400 rounded-full shadow-xl"
+                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                />
               )}
             </button>
           ))}
         </nav>
+
+        <button
+          className="hidden md:inline-flex items-center space-x-2 bg-indigo-700 hover:bg-indigo-800 focus:ring-2 focus:ring-offset-1 focus:ring-indigo-400 rounded-full py-1.5 px-4 text-white font-semibold tracking-wide transition"
+          aria-label="用户设置"
+        >
+          <User size={18} />
+          <span>Admin</span>
+        </button>
       </header>
 
       {/* 主体部分：侧边栏 + 内容 */}
-      <div className="flex flex-1 max-w-[1280px] mx-auto mt-6 mb-12 px-4 sm:px-6 lg:px-8 w-full min-h-[calc(100vh-3.5rem-6rem)]">
+      <div className="flex flex-1 max-w-[1280px] mx-auto mt-8 mb-12 px-4 sm:px-6 lg:px-8 w-full min-h-[calc(100vh-4rem-6rem)]">
         {/* 侧边栏 */}
-        <aside className="w-60 bg-white rounded-lg shadow border border-gray-200 sticky top-20 h-[calc(100vh-5.5rem)] overflow-auto py-6">
-          {sidebarItems.map(({ key, icon, label, children }) => (
-            <div key={key} className="mb-8 last:mb-0">
-              <div className="flex items-center px-6 mb-3 text-gray-700 font-semibold text-base select-none tracking-wide">
-                <span className="mr-3">{icon}</span>
-                {label}
-              </div>
-              <ul role="list" className="space-y-1">
-                {children.map((child, i) => {
-                  const isSelected = selectSubMenu === key && selectSubItem === i;
-                  return (
-                    <li key={child} className="list-none">
-                      <button
-                        onClick={() => {
-                          setSelectSubMenu(key);
-                          setSelectSubItem(i);
-                        }}
-                        className={`flex items-center w-full text-gray-600 hover:text-indigo-600 text-sm rounded-md py-2 px-6 transition-colors duration-200 focus:outline-none focus-visible:bg-indigo-50 focus-visible:text-indigo-700 ${
-                          isSelected ? "bg-indigo-50 text-indigo-700 font-semibold" : ""
-                        }`}
-                        aria-current={isSelected ? "true" : undefined}
-                      >
-                        {child}
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          ))}
-        </aside>
+        <AnimatePresence>
+          {sidebarOpen && (
+            <motion.aside
+              initial={{ x: -300, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -300, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="w-72 bg-gradient-to-b from-indigo-900 via-indigo-800 to-indigo-900 rounded-2xl shadow-2xl border border-indigo-700 sticky top-20 h-[calc(100vh-5rem)] overflow-y-auto py-8 custom-scrollbar"
+            >
+              {sidebarItems.map(({ key, icon, label, children }) => (
+                <div key={key} className="mb-10 last:mb-0 px-6">
+                  <div className="flex items-center mb-4 text-indigo-300 font-bold text-lg tracking-wide select-none">
+                    <span className="mr-3">{icon}</span>
+                    {label}
+                  </div>
+                  <ul role="list" className="space-y-2">
+                    {children.map((child, i) => {
+                      const isSelected = selectSubMenu === key && selectSubItem === i;
+                      return (
+                        <li key={child} className="list-none">
+                          <button
+                            onClick={() => {
+                              setSelectSubMenu(key);
+                              setSelectSubItem(i);
+                            }}
+                            className={`flex items-center w-full text-indigo-300 hover:text-white text-base rounded-lg py-2 px-5 transition-all duration-300 shadow-md hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 ${
+                              isSelected
+                                ? "bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 font-semibold text-white shadow-xl scale-105"
+                                : ""
+                            }`}
+                            aria-current={isSelected ? "true" : undefined}
+                          >
+                            {child}
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              ))}
+            </motion.aside>
+          )}
+        </AnimatePresence>
 
         {/* 内容区 */}
-        <main className="flex-1 bg-white rounded-lg shadow border border-gray-200 p-8 min-h-[520px] select-text">
-          <h1 className="text-3xl font-extrabold text-gray-900 mb-8 tracking-tight">
-            {sidebarItems.find((item) => item.key === selectSubMenu)?.children[selectSubItem] ||
-              "欢迎"}
-          </h1>
-          <section className="text-gray-700 leading-relaxed space-y-5 text-base max-w-3xl">
-            <p>
-              这是一个简约大方的【顶部-侧边布局】页面示例。页面顶部包含清晰易用的导航栏，侧边栏分组明细，内容区域保持宽敞，方便展示主要信息与功能。
-            </p>
-            <p>
-              页面整体配色明快，采用了舒适的灰白和薰衣草蓝色调，结合适度圆角和阴影，提升质感与层次感。响应式设计保证了在不同屏幕宽度下的良好展示。
-            </p>
-            <p>
-              你可以根据需求替换导航名称、侧边菜单项和内容区域，搭建个性化展示类网站，例如管理后台、信息门户或内容发布平台。
-            </p>
-          </section>
+        <main className="flex-1 bg-white rounded-3xl shadow-2xl border border-gray-200 p-10 min-h-[520px] select-text relative overflow-hidden">
+          <motion.div
+            key={`${selectSubMenu}-${selectSubItem}`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: "easeOut" }}
+            className="max-w-4xl"
+          >
+            <h1 className="text-4xl font-extrabold text-gray-900 mb-8 tracking-tight select-text drop-shadow-lg">
+              {sidebarItems.find((item) => item.key === selectSubMenu)?.children[
+                selectSubItem
+              ] || "欢迎"}
+            </h1>
+            <section className="text-gray-700 leading-relaxed space-y-6 text-lg tracking-wide">
+              <p className="bg-gradient-to-r from-pink-300 via-red-300 to-yellow-300 bg-clip-text text-transparent font-semibold drop-shadow-md">
+                这是一个炫酷现代的【顶部-侧边栏】布局示例，结合渐变色彩、立体阴影与流畅动画，打造出灵动且高质感的用户界面体验。
+              </p>
+              <p>
+                侧边栏采用渐变背景与霓虹选中效果，侧菜单项互动丰富，内容区配合动效及大字号排版，令阅读和导航都更加愉悦。
+              </p>
+              <p>
+                导航栏响应式显示菜单切换按钮，支持移动端良好体验，整体设计兼顾视觉冲击和实用功能，适用于管理系统、内容平台及展示型应用。
+              </p>
+            </section>
+          </motion.div>
+          {/* 底部发光渐变 */}
+          <div className="pointer-events-none absolute bottom-8 left-1/2 -translate-x-1/2 w-3/4 h-48 rounded-3xl bg-gradient-to-r from-pink-500 via-red-400 to-yellow-400 opacity-30 blur-3xl" />
         </main>
       </div>
 
       {/* 底部 */}
-      <footer className="py-4 text-center border-t border-gray-200 bg-white text-sm text-gray-600 select-none">
-        版权所有 © 2024 由优秀团队打造
+      <footer className="py-4 text-center border-t border-indigo-200 bg-gradient-to-r from-indigo-600 via-indigo-700 to-indigo-800 text-indigo-200 text-sm select-none tracking-wide">
+        版权所有 © 2024 优秀团队倾情打造
       </footer>
+
+      {/* scrollbar styles */}
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(255 255 255 / 0.2);
+          border-radius: 9999px;
+        }
+        .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+          background: rgba(255 255 255 / 0.4);
+        }
+        @media (max-width: 767px) {
+          aside {
+            position: fixed;
+            top: 4rem;
+            left: 0;
+            bottom: 0;
+            z-index: 100;
+            box-shadow: 8px 0 20px rgb(0 0 0 / 0.15);
+          }
+        }
+      `}</style>
     </div>
   );
 }

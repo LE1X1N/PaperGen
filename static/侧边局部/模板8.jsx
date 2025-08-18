@@ -1,75 +1,66 @@
 import React from "react";
-import { Cpu, LayoutDashboard, Activity, Settings, Users, ChartBar } from "lucide-react";
-import { motion } from "framer-motion";
+import { Home, Zap, Bell, MessageCircle, Settings, LogOut } from "lucide-react";
 
 export default function App() {
   const menuItems = [
-    { icon: <LayoutDashboard className="w-5 h-5" />, label: "仪表盘" },
-    { icon: <Cpu className="w-5 h-5" />, label: "系统监控" },
-    { icon: <Activity className="w-5 h-5" />, label: "活动日志" },
-    { icon: <Users className="w-5 h-5" />, label: "用户管理" },
-    { icon: <ChartBar className="w-5 h-5" />, label: "数据分析" },
-    { icon: <Settings className="w-5 h-5" />, label: "设置" },
+    { icon: <Home className="w-6 h-6 text-gray-300" />, label: "首页" },
+    { icon: <Zap className="w-6 h-6 text-gray-300" />, label: "性能" },
+    { icon: <Bell className="w-6 h-6 text-gray-300" />, label: "通知" },
+    { icon: <MessageCircle className="w-6 h-6 text-gray-300" />, label: "消息" },
+    { icon: <Settings className="w-6 h-6 text-gray-300" />, label: "设置" },
   ];
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-tr from-[#0f172a] via-[#1e293b] to-[#334155] text-slate-300 font-sans">
+    <div className="flex min-h-screen bg-gradient-to-tr from-purple-900 via-indigo-900 to-purple-900 text-gray-100 font-sans select-none">
       {/* 侧边栏 */}
-      <aside className="w-64 bg-gradient-to-b from-[#111827] via-[#1f2937] to-[#111827] shadow-lg flex flex-col">
-        <div className="flex items-center justify-center h-16 border-b border-slate-700">
-          <Cpu className="w-8 h-8 text-cyan-400 mr-2" />
-          <span className="text-cyan-400 text-xl font-semibold tracking-wide select-none">
-            科技前端
-          </span>
+      <aside className="w-20 bg-gradient-to-b from-purple-800 to-indigo-900 shadow-xl flex flex-col items-center py-8 space-y-12 relative">
+        <div
+          className="mb-2 cursor-default font-extrabold text-3xl text-pink-400 select-none"
+          aria-label="Logo"
+          role="img"
+        >
+          ⚡
         </div>
-        <nav className="flex-1 mt-6">
-          {menuItems.map(({ icon, label }, idx) => (
-            <motion.div
+        <nav className="flex flex-col space-y-8 flex-1" role="menu" aria-label="主导航">
+          {menuItems.map(({ icon, label }) => (
+            <div
               key={label}
-              whileHover={{ backgroundColor: "rgba(14, 116, 144, 0.7)" }}
-              className="flex items-center px-6 py-3 space-x-3 cursor-pointer text-slate-300 hover:text-cyan-400 transition-colors"
-              style={{ userSelect: "none" }}
+              className="flex justify-center text-gray-300 cursor-default"
+              title={label}
               aria-label={label}
-              tabIndex={0}
+              role="menuitem"
             >
-              <div className="">{icon}</div>
-              <span className="text-base font-medium">{label}</span>
-            </motion.div>
+              {icon}
+            </div>
           ))}
         </nav>
-        <div className="p-4 border-t border-slate-700 text-sm text-slate-500 select-none">
-          © 2024 科技公司
+        <div
+          className="mb-4 text-gray-300 cursor-default"
+          aria-label="退出登录"
+          role="button"
+          tabIndex={-1}
+        >
+          <LogOut className="w-6 h-6 mx-auto" />
         </div>
       </aside>
 
       {/* 主内容区 */}
-      <main className="flex-1 p-10">
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-3xl font-extrabold text-cyan-400 mb-6 select-none"
-        >
-          欢迎来到科技感前端框架
-        </motion.h1>
-
-        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {[1, 2, 3, 4, 5, 6].map((card) => (
-            <motion.div
-              key={card}
-              whileHover={{ scale: 1.05, boxShadow: "0 12px 24px rgba(14,116,144,0.6)" }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="bg-gradient-to-tr from-[#0f172a] to-[#134e4a] rounded-xl border border-cyan-500/60 p-6 shadow-md backdrop-blur-sm"
-            >
-              <h2 className="text-xl font-semibold mb-2 text-cyan-300 select-none">
-                科技卡片 #{card}
-              </h2>
-              <p className="text-slate-400 leading-relaxed select-text">
-                这是一个静态示例卡片，展示侧边栏布局的科技感设计风格。使用渐变、阴影和现代排版营造氛围。
-              </p>
-            </motion.div>
-          ))}
-        </section>
+      <main className="flex-1 p-12 flex flex-col min-w-0 bg-gradient-to-br from-indigo-900 via-purple-950 to-indigo-900">
+        <div className="flex-1 overflow-auto">
+          <div className="bg-gradient-to-r from-pink-500 via-pink-600 to-purple-600 rounded-3xl shadow-2xl p-16 max-w-4xl w-full mx-auto select-text">
+            <h1 className="text-4xl font-bold text-white mb-6 leading-tight break-words">
+              精简科技侧边栏通用左右布局
+            </h1>
+            <p className="text-pink-200 leading-relaxed text-lg break-words">
+              这是一个通用的左右布局页面框架。左侧为固定宽度的垂直导航栏，采用紫色系渐变背景，图标居中，风格简洁无交互动画，适合静态展示。右侧为主内容区，自适应宽度，带有良好的内边距和可滚动区域，界面清爽且聚焦内容。
+            </p>
+            <section className="mt-10 text-gray-200 space-y-4 text-base leading-relaxed">
+              <p>· 采用静态UI，无任何悬浮或点击动画，展现纯粹布局效果。</p>
+              <p>· 导航栏图标颜色统一，突出清晰视觉层级。</p>
+              <p>· 主区域支持任意内容扩展，结构稳健，适用于多种场景。</p>
+            </section>
+          </div>
+        </div>
       </main>
     </div>
   );
