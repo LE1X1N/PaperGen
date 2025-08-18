@@ -70,7 +70,7 @@ class DataParser:
                                                 "module_name": module["page_name"],
                                                 "module_desc": module["page_description"],
                                                 "module_pages": [m["name"] for m in module['page']],
-                                                "tmpl": self.tmpl_manager.load_template(int(module["style"]+1))
+                                                "tmpl": self.tmpl_manager.load_template(int(module["style"]))
                         })
                     }
                 )
