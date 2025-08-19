@@ -1,9 +1,11 @@
 concurrent_log_handler==0.9.28
 dashscope==1.23.9
 Flask==2.2.5
-gradio==5.39.0
-modelscope_studio==1.4.4
-openai==1.98.0
+gradio==5.42.0
+modelscope_studio==1.4.5
+openai==1.100.1
 PyYAML==6.0.2
 PyYAML==6.0.2
-selenium==4.34.2
+Requests==2.32.5
+selenium==4.35.0
+uwsgi==2.0.30
