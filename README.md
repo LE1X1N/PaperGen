@@ -116,5 +116,13 @@ curl -X POST http://localhost:8687/v1/gen_images -H "Content-Type: application/j
 curl http://localhost:8687/v1/progress/<request_id>
 ```
 
+## 5. 镜像启动
 
+```bash
+# 创建镜像，不含业务代码
+docker build -t  leixin/coder-artifacts-dev:latest .
+
+# 将所有代码挂载并运行镜像
+docker run -itd  -v  $(pwd):/app --entrypoint /bin/bash  --network host --name leixin-coder-artifacts-dev leixin/coder-artifacts-dev:latest 
+```
 

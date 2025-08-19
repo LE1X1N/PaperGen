@@ -1,0 +1,22 @@
+services:
+  # Python Image
+  leixin-coder-artifacts:
+    build: .
+    image: leixin/coder-artifacts-dev:latest
+    container_name: leixin-coder-app
+    volumes:
+      - ./:/app   # 代码挂载
+    entrypoint: /bin/bash
+    tty: true
+    depends_on:
+      - leixin-chrome
+    environment:
+      - SELENIUM_REMOTE_URL=http://localhost:4444/wd/hub   # chrome 服务地址
+    network_mode: host
+
+  # Selenium Chrome Image
+  leixin-chrome:
+    image: swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/selenium/standalone-chrome:latest
+    container_name: leixin-selenium-chrome
+    shm_size: 2g
+    network_mode: host
