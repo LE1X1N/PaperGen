@@ -3,8 +3,8 @@
 .idea/
 __pycache__
 
-demo/log/
+config/dev.yaml
+demo/
 test/
 log/*
-
 screenshots/
