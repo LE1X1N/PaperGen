@@ -4,16 +4,12 @@ import random
 
 class TemplateManager:
     def __init__(self):
-        
-        self.base_dir = Path(__file__).parent.parent.parent / "static"
-        self.style_map = {
-            0 : ["上中下布局", "侧边布局", "顶部-侧边布局"],
-            1 : ["小程序"]
-        }
+
+        self.base_dir = Path(__file__).parent.parent.parent / "static"  
         
         self.tmpl_dirs = {
-            0 : [self.base_dir / dir for dir in self.style_map[0]], 
-            1 : [self.base_dir / dir for dir in self.style_map[1]]
+            0 : [self.base_dir / dir for dir in ["上中下布局", "侧边布局", "顶部-侧边布局"]], 
+            1 : [self.base_dir / dir for dir in ["小程序"]]
         }
         
         self.tmpl_paths = {

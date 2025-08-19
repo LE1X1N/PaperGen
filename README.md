@@ -3,48 +3,57 @@
 ## 1. 项目结构
 
 ```
-Coder-Artifacts
+coder-artifacts
+├─ Dockerfile
 ├─ README.md
 ├─ config
-│  ├─ __init__.py
-│  ├─ system_conf.yaml     # 服务参数，端口
-│  └─ uwsgi_service.ini    # uWSGI服务器参数
-├─ demo                    # 基于Gradio的demo
-│  ├─ app.py
+│  ├─ config.yaml            # 服务参数，端口
+│  └─ dev.yaml               # uWSGI服务器参数
+├─ demo                     
+│  ├─ app.py                 # 基于Gradio的可视化界面
 │  ├─ app_conf.py
-│  └─ app_style.css
+│  ├─ app_style.css
+│  └─ utils.py
+├─ docs
+│  ├─ 接口文档.md
+│  ├─ 测试输入.json
+│  └─ 测试返回.json
 ├─ requirements.txt
 ├─ src
-│  ├─ __init__.py
 │  ├─ api
-│  │  └─ routes.py         # API
-│  ├─ app.py               # Flask app初始化
+│  │  ├─ __init__.py
+│  │  └─ routes.py          # API
+│  ├─ app.py                # Flask app初始化
 │  ├─ browser
 │  │  ├─ __init__.py
-│  │  ├─ manager.py       # Selenium Driver相关
-│  │  └─ renderer.py      # Gradio界面渲染相关
+│  │  ├─ manager.py         # Selenium Driver相关
+│  │  └─ renderer.py        # Gradio界面渲染相关
+│  ├─ config
+│  │  ├─ __init__.py
+│  │  └─ loader.py
 │  ├─ core
-│  │  ├─ parser.py        # JSON解析
-│  │  └─ task_manager.py  # 任务处理核心
-│  ├─ errors.py           
+│  │  ├─ data_parser.py        # JSON解析处理
+│  │  ├─ progress_manager.py   # 流程控制，读写结果
+│  │  ├─ task_manager.py       # 请求任务分解与处理核心
+│  │  ├─ tmpl_manager.py       # 管理静态jsx模板
+│  │  └─ upload_manager.py     # 负责上传文件
+│  ├─ errors.py  
 │  ├─ llm
 │  │  ├─ __init__.py
-│  │  └─ client.py        # LLM调用
-│  ├─ tmpl
-│  │  ├─ __init__.py
-│  │  ├─ static
-│  │  │  ├─ 小程序模板.jsx
-│  │  │  ├─ 网页模板-管理系统（上下）.jsx
-│  │  │  └─ 网页模板-管理系统（左右）.jsx
-│  │  └─ tmpl_manager.py  # 代码模板管理
-│  └─ utils
+│  │  └─ client.py             # LLM调用
+│  └─ utils 
 │     ├─ __init__.py
 │     ├─ common.py
 │     └─ logger.py
+├─ static                   # 不同局部的静态jsx模板
+│  ├─ 上中下布局
+│  ├─ 侧边布局
+│  ├─ 小程序
+│  └─ 顶部-侧边布局
+├─ uwsgi_service.ini
 └─ wsgi.py
 
 ```
-
 
 ## 2. Demo测试
 
@@ -54,6 +63,7 @@ Coder-Artifacts
 # 启动前端可视化界面
 python launch_app.py
 ```
+
 
 
 ## 3. 服务启动
