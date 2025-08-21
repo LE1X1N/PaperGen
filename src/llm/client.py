@@ -31,7 +31,6 @@ def build_module_prompt(module:dict):
             
             2.4. **风格与配色**：
             - 布局与配色需与模块功能 {module["module_name"]} 匹配。
-            - 仅参考代码的布局，风格配色需要重新设计。
             
              ### 3. 参考布局代码
              {module["tmpl"]}
@@ -61,7 +60,6 @@ def build_page_prompt(page:dict):
             - 若标记对应导航栏功能：需实现当前页面在导航栏中的 “激活状态”（如高亮样式），并保留其他导航项的框架
             - 必须复用模板中的所有样式类名
             - 图标需使用模板中已导入的库（如 lucide-react），且图标风格（大小、颜色）与模板中其他导航项保持一致
-            - 风格，配色符合现代人审美。
             
             ### 3. 【{page["module_name"]}】模板代码
             ```jsx
@@ -86,7 +84,7 @@ def call_chat_completion(messages):
         response = client.chat.completions.create(
                 model=conf["model"],  
                 messages=messages,
-                stream=False,
+                stream=True,
                 extra_headers={
                     'AIMC-OrderId': "coder-test-leixin",
                     'AIMC-OrderType': "test",
@@ -94,8 +92,14 @@ def call_chat_completion(messages):
                     'DOUBAO-THINKING': "disabled"  
                 }
             )
-        res = response.choices[0].message.content
-        return res
+        
+        full_content = []
+        for chunk in response:
+            if chunk.choices:
+                content = chunk.choices[0].delta.content
+                if content:
+                    full_content.append(content) 
+        return ''.join(full_content)
     
     except APIConnectionError:
         raise
