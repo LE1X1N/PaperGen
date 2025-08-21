@@ -55,6 +55,11 @@ class DataParser:
         # Parse module JSON into tasks list
         try:
             tasks = []
+            tmpls = {}
+            # choose template for different styles
+            for module in data["web_pages"]:
+                tmpls[int(module["style"])] = self.tmpl_manager.load_template(int(module["style"]))
+            
             for mid, module in enumerate(data["web_pages"]):
                 tasks.append(
                     {
@@ -67,7 +72,7 @@ class DataParser:
                                                 "module_name": module["page_name"],
                                                 "module_desc": module["page_description"],
                                                 "module_pages": [m["name"] for m in module['page']],
-                                                "tmpl": self.tmpl_manager.load_template(int(module["style"]))
+                                                "tmpl": tmpls[int(module["style"])]
                         })
                     }
                 )
