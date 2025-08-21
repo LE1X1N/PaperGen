@@ -1,14 +1,16 @@
 # service config
-service_type : website.result
-max_workers: 5          # multithread
-max_retries: 5          # Number of retry attempts after failure
+mode : deploy
+max_workers: 10          # multithread
+max_retries: 3          # Number of retry attempts after failure
 connect_timeout: 15     # Wait the port to be listend
 render_timeout: 25      # max gradio rendering time 
+process_timeout: 200    # Processing timeout for long-running tasks
 
 # db config
 upload_url : http://10.20.171.5:32005/file/DAS_ha
-download_url_prefix: http://10.20.171.4:52003/fsdata/website/website.result
+service_type : website.result
 
+download_url_prefix: http://10.20.171.4:52003/fsdata/website/website.result
 screenshot_dir: screenshots/
 
 # openai config

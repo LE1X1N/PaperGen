@@ -51,6 +51,7 @@ class ProgressManager:
         
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(request_dict, f, indent=2, ensure_ascii=False)
+        logger.info(f"Request ID: {request_id} ->: 开始处理请求，状态文件存储路径：{file_path}")    
         return file_path
     
     

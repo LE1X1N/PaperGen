@@ -63,7 +63,7 @@ def build_page_prompt(page:dict):
             - 图标需使用模板中已导入的库（如 lucide-react），且图标风格（大小、颜色）与模板中其他导航项保持一致
             - 风格，配色符合现代人审美。
             
-            ### 3. 模块模板代码
+            ### 3. 【{page["module_name"]}】模板代码
             ```jsx
             {page["tmpl"]}
             ```

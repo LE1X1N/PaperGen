@@ -21,10 +21,11 @@ logger = get_logger()
 class TaskManager:
     def __init__(self):
         self.parser = DataParser(tmpl_manager=TemplateManager())
-        self.executor = ThreadPoolExecutor(conf["max_workers"])
         self.progress_manager = ProgressManager(base_dir=conf["screenshot_dir"])
         self.upload_manager = UploadManager()
-
+        
+        self.executor = ThreadPoolExecutor(conf["max_workers"])
+        
 
     def process_tasks(self, request_id: str, data: dict, task_id: str) -> list:
         """
@@ -37,8 +38,8 @@ class TaskManager:
         start_time = time.time()
         
         # 1. Images save dir
-        file_path = self.progress_manager.init_request(request_id, data, task_id)
-        logger.info(f"Request ID: {request_id} ->: 开始处理请求，状态文件存储路径：{file_path}")
+        self.progress_manager.init_request(request_id, data, task_id)
+        # logger.info(f"Request ID: {request_id} ->: 开始处理请求，状态文件存储路径：{file_path}")
         
         # 2. module-level tasks       
         try:
@@ -187,7 +188,6 @@ class TaskManager:
                 logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【OpenAI连接错误】{e}")
             except Exception as e:
                 logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【其他错误】{e}")
-                messages.pop()
             finally:
                 if browser:
                     browser.kill()
@@ -207,13 +207,11 @@ class TaskManager:
                 logger.info(f"Request ID: {request_id} -> Task_{page_id}: 第 {turn + 1} 轮失败！")
 
         
-        
-        # module level task
-        if return_code:
-            return {"page_id": page_id, "status": True, "message": react_code}
-
-        # page level task
         if not render_success:
             return {"page_id": page_id, "status": False, "message": "任务超过最大重试次数"}
-            
-        return {"page_id": page_id, "status": True, "message": img_path}        
+        
+        if return_code:
+            return {"page_id": page_id, "status": True, "message": react_code}    # module level task
+
+        else:
+            return {"page_id": page_id, "status": True, "message": img_path}      # page level task  
