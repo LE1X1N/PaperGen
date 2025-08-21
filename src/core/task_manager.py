@@ -1,7 +1,7 @@
 import time
 from concurrent.futures import ThreadPoolExecutor, TimeoutError
 from multiprocessing import Process, Lock, Queue
-from openai import APIConnectionError
+from openai import APIConnectionError, InternalServerError
 from requests.exceptions import ConnectTimeout
 
 from src.errors import *
@@ -75,7 +75,7 @@ class TaskManager:
                         raise UploadError(res["message"])
                 
             except TimeoutError as e:
-                error_msg = f"【超时错误】TimeoutError: {str(e)}"
+                error_msg = f"【超时错误】TimeoutError： 超过任务最大时间：{conf["process_timeout"]} s"
                 self.progress_manager.update_task_status(request_id, task["page_id"], ProcessStatus.FAILED, "", error_msg)
 
             except UploadError as e:
@@ -126,7 +126,7 @@ class TaskManager:
                 browser_lock = Lock()
 
                 browser = Process(target=launch_sandbox_demo,
-                                  args=(request_id, page_id, res, port, browser_registry, browser_lock, logger))
+                                  args=(request_id, page_id, res, port, browser_registry, browser_lock, logger), name="Browser Process")
                 browser.start()
 
                 # wait port connected (15s)
@@ -184,8 +184,8 @@ class TaskManager:
                 messages.pop()  # exclude assistant generated code
             except ConnectionRefusedError as e:
                 logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【Gradio端口连接错误】{e}")
-            except APIConnectionError as e:
-                logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【OpenAI连接错误】{e}")
+            except (APIConnectionError, InternalServerError)  as e:
+                logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【OpenAI服务端连接错误】{e}")
             except Exception as e:
                 logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【其他错误】{e}")
             finally:

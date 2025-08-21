@@ -28,7 +28,7 @@ def setup_logger(service_type):
         logger_file_path, maxBytes=500 * 1024 * 1024, backupCount=180, encoding="utf-8"
     )
     service_handler.setFormatter(logging.Formatter(
-        "%(asctime)s - %(name)s - %(threadName)s - %(filename)s[line:%(lineno)d] - %(levelname)s - %(message)s"
+        "%(asctime)s - %(name)s - %(processName)s - %(threadName)s - %(filename)s[line:%(lineno)d] - %(levelname)s - %(message)s"
         ))
     logger.addHandler(service_handler)
     return logger

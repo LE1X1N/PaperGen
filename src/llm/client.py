@@ -1,5 +1,5 @@
 from openai import OpenAI
-from openai import APIConnectionError
+from openai import APIConnectionError, InternalServerError
 
 from src.config import conf
 
@@ -98,4 +98,10 @@ def call_chat_completion(messages):
         return res
     
     except APIConnectionError:
+        raise
+    
+    except InternalServerError:
+        raise
+    
+    except Exception:
         raise
