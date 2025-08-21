@@ -9,6 +9,12 @@ from .data_parser import DataParser
 
 logger = get_logger()
 
+class ProcessStatus:
+    SUCCESS = "success"
+    FAILED = "failed"
+    PENDING = "pending"
+
+
 class ProgressManager:
     def __init__(self, base_dir: str):
         
@@ -39,7 +45,7 @@ class ProgressManager:
             "create_time": datetime.now().isoformat(),
             "total_tasks": len(task_ids),
             "tasks": [
-                {"id": task_id, "status": "pending", "url": ""} for task_id in task_ids
+                {"id": task_id, "status": ProcessStatus.PENDING, "url": ""} for task_id in task_ids
             ]
         }
         
@@ -48,7 +54,7 @@ class ProgressManager:
         return file_path
     
     
-    def update_task_status(self, request_id: str, task_id:str, status:str, url:str="", error: str=""):
+    def update_task_status(self, request_id: str, page_id:str, status:str, url:str="", error: str=""):
         # update corresponding request dict
         file_path = self._get_request_dict_path(request_id)
         if not file_path.exists():
@@ -60,7 +66,7 @@ class ProgressManager:
         
         # updata field
         for task in data.get("tasks", []):
-            if task.get("id") == task_id:
+            if task.get("id") == page_id:
                 task["status"] = status
                 task["url"] = url
                 if error:
@@ -71,6 +77,13 @@ class ProgressManager:
         
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
+        
+        # log
+        if status == ProcessStatus.SUCCESS:
+            logger.info(f"Request ID: {request_id} -> Task_{page_id}: 【任务成功】上传文件访问路径：{url}")
+        elif status == ProcessStatus.FAILED:
+            logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【任务失败】{error}")
+            
         return True
     
 
@@ -94,6 +107,10 @@ class ProgressManager:
         # write JSON
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
+        
+        if status == ProcessStatus.FAILED:
+            logger.error(f"Request ID: {request_id}: 【任务失败】{error}")
+            
         return True
         
     

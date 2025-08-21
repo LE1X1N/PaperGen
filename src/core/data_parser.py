@@ -62,7 +62,7 @@ class DataParser:
                 tasks.append(
                     {
                         "request_id": request_id,
-                        "task_id": f'module-{mid}',
+                        "page_id": f'module-{mid}',
                         "return_code": True,
                         "query": build_module_prompt({
                                                 "web_title": data["title"], 
@@ -88,7 +88,7 @@ class DataParser:
                     tasks.append(
                         {
                             "request_id": request_id,
-                            "task_id": f"{page["id"]}",
+                            "page_id": f"{page["id"]}",
                             "return_code": False,
                             "query": build_page_prompt({
                                         "web_title": data["title"], 
@@ -96,7 +96,7 @@ class DataParser:
                                         "module_name": module["page_name"],
                                         "page_name": page["name"],
                                         "page_desc": page["text"],
-                                        "tmpl": gen_tmpls[mid]["code"] if gen_tmpls[mid]["status"] else self.tmpl_manager.load_template(int(module["style"]))
+                                        "tmpl": gen_tmpls[mid]["message"] if gen_tmpls[mid]["status"] else self.tmpl_manager.load_template(int(module["style"]))
                             })
 
                         }
