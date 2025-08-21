@@ -1,6 +1,5 @@
 # service config
-mode : deploy
-max_workers: 10          # multithread
+max_workers: 5          # multithread
 max_retries: 3          # Number of retry attempts after failure
 connect_timeout: 15     # Wait the port to be listend
 render_timeout: 25      # max gradio rendering time 

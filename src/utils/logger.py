@@ -15,8 +15,7 @@ def setup_logger(service_type):
         os.makedirs(log_dir)
     
     # log file
-    logger_file_name = f"service_{conf['mode']}.log"
-    # logger_file_name = f"service.log"
+    logger_file_name = "service.log"
     logger_file_path = os.path.join(log_dir, logger_file_name)
 
     # init logger
