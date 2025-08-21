@@ -51,13 +51,10 @@ class DataParser:
         return True, "所有必需字段检查通过"
                     
 
-    
-
     def parse_module(self, request_id: str, data:dict) -> list[dict]:
         # Parse module JSON into tasks list
-        tasks = []
-        
         try:
+            tasks = []
             for mid, module in enumerate(data["web_pages"]):
                 tasks.append(
                     {
@@ -74,15 +71,16 @@ class DataParser:
                         })
                     }
                 )
+            return tasks
+        
         except KeyError:
             raise
         
-        return tasks
-
+        
     def parse_page(self, request_id: str, data: dict, gen_tmpls: dict) -> list[dict]:
         # Parse page JSON into tasks list
-        tasks = []
         try:
+            tasks = []
             for mid, module in enumerate(data["web_pages"]):
                 for pid, page in enumerate(module['page']):
                     tasks.append(
@@ -96,14 +94,16 @@ class DataParser:
                                         "module_name": module["page_name"],
                                         "page_name": page["name"],
                                         "page_desc": page["text"],
-                                        "tmpl": gen_tmpls[mid]["message"] if gen_tmpls[mid]["status"] else self.tmpl_manager.load_template(int(module["style"]))
+                                        "tmpl": gen_tmpls[mid]
                             })
 
                         }
                     )
+            return tasks
+        
         except KeyError:
             raise
-        return tasks
+        
 
     @staticmethod
     def parse_task_ids(data:dict) -> list[str]:

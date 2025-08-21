@@ -5,3 +5,11 @@ class FrontendError(Exception):
 class UploadError(Exception):
     # error when upload files
     pass
+
+class MaxRetriesExceededError(Exception):
+    # max retries of one task
+    pass
+
+class RenderTimeoutError(Exception):
+    # time limit for gradio rendering
+    pass

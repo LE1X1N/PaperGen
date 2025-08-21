@@ -1,6 +1,7 @@
 import requests
 from requests.exceptions import ConnectTimeout
 
+from src.errors import *
 from src.config import conf
 
 class UploadManager:
@@ -19,9 +20,17 @@ class UploadManager:
             files = {'file': open(file_path, 'rb')}
             data = {'service_type': self.service_type}
             response = requests.post(self.url, files=files, data=data).json()
+
+            if response['code'] != 0:
+                raise UploadError(response["message"])
+            
+            return response
+        
         except ConnectTimeout:
+            raise    
+        except UploadError:
             raise
         
-        return response
+        
 
 

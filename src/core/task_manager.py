@@ -39,7 +39,6 @@ class TaskManager:
         
         # 1. Images save dir
         self.progress_manager.init_request(request_id, data, task_id)
-        # logger.info(f"Request ID: {request_id} ->: 开始处理请求，状态文件存储路径：{file_path}")
         
         # 2. module-level tasks       
         try:
@@ -61,27 +60,21 @@ class TaskManager:
         for future, task in zip(futures, tasks):
             try:
                 result = future.result(timeout=conf["process_timeout"])
-                
-                if not result["status"]:
-                    # fail
-                    self.progress_manager.update_task_status(request_id, task["page_id"], ProcessStatus.FAILED, url="", error=result["message"])  
-                else:
-                    # try upload image
-                    res = self.upload_manager.upload_single_file(result["message"])   #  upload image to file system
-                    if res['code'] == 0:
-                        download_url = conf["download_url_prefix"] + res["result"]
-                        self.progress_manager.update_task_status(request_id,  task["page_id"],  ProcessStatus.SUCCESS, url=download_url)
-                    else:
-                        raise UploadError(res["message"])
+                res = self.upload_manager.upload_single_file(result)   #  upload image to file system
+                self.progress_manager.update_task_status(request_id,  task["page_id"],  ProcessStatus.SUCCESS, url=(conf["download_url_prefix"] + res["result"]))
+                error_msg = None
                 
             except TimeoutError as e:
-                error_msg = f"【超时错误】TimeoutError： 超过任务最大时间：{conf["process_timeout"]} s"
-                self.progress_manager.update_task_status(request_id, task["page_id"], ProcessStatus.FAILED, "", error_msg)
-
+                error_msg = f"【超时错误】TimeoutError： 超过任务最大时间 {conf["process_timeout"]} s"
             except UploadError as e:
                 error_msg = f"【上传错误】UploadError: {str(e)}"
-                self.progress_manager.update_task_status(request_id, task["page_id"], ProcessStatus.FAILED, "", error_msg)
-                
+            except MaxRetriesExceededError as e:
+                error_msg = f"【重试次数超限错误】MaxRetriesExceededError: {str(e)}"
+            finally:
+                # update task status
+                if error_msg:
+                    self.progress_manager.update_task_status(request_id, task["page_id"], ProcessStatus.FAILED, url="", error=error_msg)
+                        
         logger.info(f"Request ID: {request_id} -> 处理请求完成！共耗时 {time.time() - start_time} s")
         return results
     
@@ -111,14 +104,13 @@ class TaskManager:
                 # 3. code generation
                 res = call_chat_completion(messages)
                 messages.append({"role": "assistant", "content": res})
-                logger.info(
-                    f"Request ID: {request_id} -> Task_{page_id}: 代码生成成功！耗时：{time.time() - start_time} s")
+                logger.info(f"Request ID: {request_id} -> Task_{page_id}: 代码生成成功！耗时：{time.time() - start_time} s")
 
                 # 4. Code check
                 generated_files = get_generated_files(res)
                 react_code = generated_files.get("index.tsx") or generated_files.get("index.jsx")
 
-                # 4. Launch browser to render react
+                # 5. Launch browser to render react
                 port = get_random_available_port()  # a random port to bind with gradio
                 logger.info(f"Request ID: {request_id} ->, Task ID: {page_id}, Gradio Port: {port}")
 
@@ -174,12 +166,12 @@ class TaskManager:
                     time.sleep(1)
 
                 if not render_success:
-                    raise TimeoutError("Gradio渲染超时！")
+                    raise RenderTimeoutError("Gradio渲染超时！")
 
             except FrontendError as e:
                 logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【前端代码错误】{e}")
                 messages.append({"role": "user", "content": str(e)})
-            except TimeoutError as e:
+            except RenderTimeoutError as e:
                 logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【Gradio渲染超时错误】{e}")
                 messages.pop()  # exclude assistant generated code
             except ConnectionRefusedError as e:
@@ -208,10 +200,9 @@ class TaskManager:
 
         
         if not render_success:
-            return {"page_id": page_id, "status": False, "message": "任务超过最大重试次数"}
+            raise MaxRetriesExceededError(f"任务超过最大重试次数: {conf["max_retries"]}")
         
         if return_code:
-            return {"page_id": page_id, "status": True, "message": react_code}    # module level task
-
-        else:
-            return {"page_id": page_id, "status": True, "message": img_path}      # page level task  
+            return react_code  # module level task
+        else:  
+            return img_path     # page level task  
