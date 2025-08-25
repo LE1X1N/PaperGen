@@ -171,13 +171,13 @@ class TaskManager:
                 messages.append({"role": "user", "content": str(e)})
             except RenderTimeoutError as e:
                 logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【Gradio渲染超时错误】{e}")
-                messages.pop()      # exclude assistant generated code
             except ConnectionRefusedError as e:
                 logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【Gradio端口连接错误】{e}")
             except (APIConnectionError, InternalServerError)  as e:
                 logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【OpenAI服务端连接错误】{e}")
             except Exception as e:
                 logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【其他错误】{e}")
+                
             finally:
                 if browser:
                     browser.kill()
