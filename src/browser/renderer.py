@@ -4,18 +4,14 @@ import modelscope_studio.components.base as ms
 import modelscope_studio.components.pro as pro
 
 from src.config import conf
-from src.utils import get_generated_files
 
 
-def launch_sandbox_demo(request_id, task_id, res, port, browser_registry=None, browser_lock=None, logger=None, *args):
+def launch_sandbox_demo(request_id, task_id, react_code, port, browser_registry=None, browser_lock=None, logger=None, *args):
     """
         Sandbox based on modelscope_studio sandboxs
         
     """
-    generated_files = get_generated_files(res)
-    react_code = generated_files.get("index.tsx") or generated_files.get("index.jsx")
-    html_code = generated_files.get("index.html")
-
+    
     # compile / render 
     def handle_compile_error(e: gr.EventData):
         """ Compile Error """
@@ -50,7 +46,7 @@ def launch_sandbox_demo(request_id, task_id, res, port, browser_registry=None, b
                 # init sandbox
                 sandbox = pro.WebSandbox(
                     height=1080,
-                    template="react" if react_code else "html",
+                    template="react",
                     imports=conf["react_import"],
                     value={
                         "./index.tsx": """import Demo from './demo.tsx'
@@ -58,7 +54,7 @@ def launch_sandbox_demo(request_id, task_id, res, port, browser_registry=None, b
                                             export default Demo
                                             """,
                         "./demo.tsx": react_code
-                    } if react_code else {"./index.html": html_code},
+                    },
                 )
                 # trigger
                 sandbox.compile_error(handle_compile_error)

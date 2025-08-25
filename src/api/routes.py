@@ -18,7 +18,7 @@ def gen_images():
         task_id = req['task_id']
         data = req['data']
         
-        valid, msg = task_manager.parser.check_field(data)   # check whether JSON is correct
+        valid, msg = task_manager.parser.check_field(data)   # valid check
         if not valid:
             return jsonify({"code": -1, "message": f"任务创建失败! {msg}"}), 500
     

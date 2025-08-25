@@ -2,10 +2,11 @@ import re
 import time
 import socket
 
+from src.errors import FormatError
 
 def get_generated_files(text):
     patterns = {
-        'html': r'```html\n(.+?)\n```',
+        # 'html': r'```html\n(.+?)\n```',
         'jsx': r'```jsx\n(.+?)\n```',
         'tsx': r'```tsx\n(.+?)\n```',
     }
@@ -18,7 +19,7 @@ def get_generated_files(text):
             result[f'index.{ext}'] = content
 
     if len(result) == 0:
-        result["index.html"] = text.strip()
+        raise FormatError("response中未检测到 ```jsx ``` 或 ```tsx ```代码块")
     return result
 
 

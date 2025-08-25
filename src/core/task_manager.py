@@ -104,7 +104,7 @@ class TaskManager:
                 # 4. Code check
                 generated_files = get_generated_files(res)
                 react_code = generated_files.get("index.tsx") or generated_files.get("index.jsx")
-
+                
                 # 5. Launch browser to render react
                 port = get_random_available_port()  # a random port to bind with gradio
                 logger.info(f"Request ID: {request_id} ->, Task ID: {page_id}, Gradio Port: {port}")
@@ -113,7 +113,7 @@ class TaskManager:
                 browser_lock = Lock()
 
                 browser = Process(target=launch_sandbox_demo,
-                                  args=(request_id, page_id, res, port, browser_registry, browser_lock, logger), name="Browser Process")
+                                  args=(request_id, page_id, react_code, port, browser_registry, browser_lock, logger), name="Browser Process")
                 browser.start()
 
                 # wait port connected (15s)
@@ -163,12 +163,15 @@ class TaskManager:
                 if not render_success:
                     raise RenderTimeoutError("Gradio渲染超时！")
 
+            except FormatError as e:
+                logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【输出格式错误】{e}")
+                messages.append({"role": "user", "content": str(e)})
             except FrontendError as e:
                 logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【前端代码错误】{e}")
                 messages.append({"role": "user", "content": str(e)})
             except RenderTimeoutError as e:
                 logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【Gradio渲染超时错误】{e}")
-                messages.pop()  # exclude assistant generated code
+                messages.pop()      # exclude assistant generated code
             except ConnectionRefusedError as e:
                 logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【Gradio端口连接错误】{e}")
             except (APIConnectionError, InternalServerError)  as e:
