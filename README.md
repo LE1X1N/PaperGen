@@ -149,9 +149,9 @@ docker compose ps
 # 进入 Python容器测试
 docker compose exec leixin-coder-artifacts bash
 
+# 服务启动
+uwsgi --ini uwsgi_service.ini
+
 # 停止容器
 docker compose down
 ```
-
-
-

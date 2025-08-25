@@ -17,12 +17,13 @@ class ProcessStatus:
 
 class ProgressManager:
     def __init__(self, base_dir: str):
-        
         self.base_dir = Path(base_dir)
-        self.base_dir.mkdir(exist_ok=True)
-        logger.info(f"创建文件存储路径：{self.base_dir}")
         self.request_dict_name = "request_status.json"
         
+        if not self.base_dir.exists():
+            self.base_dir.mkdir(exist_ok=True)
+            logger.info(f"创建文件存储路径：{self.base_dir}")
+            
     def _get_request_dir(self, request_id):
         return self.base_dir / request_id
     

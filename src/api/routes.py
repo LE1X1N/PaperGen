@@ -4,11 +4,11 @@ import uuid
 
 from src.core.task_manager import TaskManager
 from src.utils import get_logger
+from src.config import conf
 
 logger = get_logger()
 api_bp = Blueprint('v1', __name__)
-task_manager = TaskManager()
-
+task_manager = TaskManager()  # global task manager
 
 @api_bp.route('/gen_images', methods=['POST'])
 def gen_images():

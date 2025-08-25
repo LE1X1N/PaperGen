@@ -2,7 +2,6 @@ import time
 from concurrent.futures import ThreadPoolExecutor, TimeoutError
 from multiprocessing import Process, Lock, Queue
 from openai import APIConnectionError, InternalServerError
-from requests.exceptions import ConnectTimeout
 
 from src.errors import *
 from src.config import conf
@@ -19,15 +18,17 @@ from .upload_manager import UploadManager
 logger = get_logger()
 
 class TaskManager:
-    def __init__(self):
+    def __init__(self, num_workers=conf["max_workers"]):
         self.parser = DataParser(tmpl_manager=TemplateManager())
         self.progress_manager = ProgressManager(base_dir=conf["screenshot_dir"])
         self.upload_manager = UploadManager()
         
-        self.executor = ThreadPoolExecutor(conf["max_workers"])
+        # global thread pool
+        if not hasattr(TaskManager, 'global_executor'):
+            TaskManager.global_executor = ThreadPoolExecutor(num_workers, thread_name_prefix="GlobalThreadPool-")
         
 
-    def process_tasks(self, request_id: str, data: dict, task_id: str) -> list:
+    def process_tasks(self, request_id: str, data: dict, task_id: str):
         """
             Multi-thread processing tasks
             
@@ -36,26 +37,21 @@ class TaskManager:
             -> MainThread(结果保存)
         """
         start_time = time.time()
-        
+
         # 1. Images save dir
         self.progress_manager.init_request(request_id, data, task_id)
-        
+            
         # 2. module-level tasks       
-        try:
-            tasks = self.parser.parse_module(request_id, data)
-            logger.info(f"Request ID: {request_id}: 开始模块级别模板生成! 任务数量：{len(tasks)}")
-            futures = [self.executor.submit(self._process_single_task, task) for task in tasks]
-            gen_tmpls = [future.result() for future in futures]
-        except KeyError as e:
-            error_msg = f"【JSON解析错误】KeyError: {str(e)}"
-            self.progress_manager.update_all_tasks(request_id, status=ProcessStatus.FAILED, url="", error=error_msg)
+        tasks = self.parser.parse_module(request_id, data)
+        logger.info(f"Request ID: {request_id}: 开始模块级别模板生成! 任务数量：{len(tasks)}")
+        futures = [TaskManager.global_executor.submit(self._process_single_task, task) for task in tasks]
+        gen_tmpls = [future.result() for future in futures]
 
         # 3. page-level tasks
         tasks = self.parser.parse_page(request_id, data, gen_tmpls)
-        futures = [self.executor.submit(self._process_single_task, task) for task in tasks]
-        
+        futures = [TaskManager.global_executor.submit(self._process_single_task, task) for task in tasks]
+            
         # traverse all tasks
-        results = []  
         logger.info(f"Request ID: {request_id}: 开始页面级别代码生成！任务数量：{len(tasks)}")
         for future, task in zip(futures, tasks):
             try:
@@ -63,7 +59,7 @@ class TaskManager:
                 res = self.upload_manager.upload_single_file(result)   #  upload image to file system
                 self.progress_manager.update_task_status(request_id,  task["page_id"],  ProcessStatus.SUCCESS, url=(conf["download_url_prefix"] + res["result"]))
                 error_msg = None
-                
+                    
             except TimeoutError as e:
                 error_msg = f"【超时错误】TimeoutError： 超过任务最大时间 {conf["process_timeout"]} s"
             except UploadError as e:
@@ -74,9 +70,8 @@ class TaskManager:
                 # update task status
                 if error_msg:
                     self.progress_manager.update_task_status(request_id, task["page_id"], ProcessStatus.FAILED, url="", error=error_msg)
-                        
+                    
         logger.info(f"Request ID: {request_id} -> 处理请求完成！共耗时 {time.time() - start_time} s")
-        return results
     
 
     def _process_single_task(self, task: dict) -> dict:
