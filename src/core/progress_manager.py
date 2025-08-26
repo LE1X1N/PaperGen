@@ -9,7 +9,7 @@ from .data_parser import DataParser
 
 logger = get_logger()
 
-class ProcessStatus:
+class ProgressStatus:
     SUCCESS = "success"
     FAILED = "failed"
     PENDING = "pending"
@@ -46,7 +46,7 @@ class ProgressManager:
             "create_time": datetime.now().isoformat(),
             "total_tasks": len(task_ids),
             "tasks": [
-                {"id": task_id, "status": ProcessStatus.PENDING, "url": ""} for task_id in task_ids
+                {"id": task_id, "status": ProgressStatus.PENDING, "url": ""} for task_id in task_ids
             ]
         }
         
@@ -81,9 +81,9 @@ class ProgressManager:
             json.dump(data, f, indent=2, ensure_ascii=False)
         
         # log
-        if status == ProcessStatus.SUCCESS:
+        if status == ProgressStatus.SUCCESS:
             logger.info(f"Request ID: {request_id} -> Task_{page_id}: 【任务成功】上传文件访问路径：{url}")
-        elif status == ProcessStatus.FAILED:
+        elif status == ProgressStatus.FAILED:
             logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【任务失败】{error}")
             
         return True
@@ -110,7 +110,7 @@ class ProgressManager:
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
         
-        if status == ProcessStatus.FAILED:
+        if status == ProgressStatus.FAILED:
             logger.error(f"Request ID: {request_id}: 【任务失败】{error}")
             
         return True

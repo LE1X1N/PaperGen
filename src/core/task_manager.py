@@ -12,7 +12,7 @@ from src.utils import get_random_available_port, wait_for_port, get_logger, get_
 
 from .data_parser import DataParser
 from .tmpl_manager import TemplateManager
-from .progress_manager import ProgressManager, ProcessStatus
+from .progress_manager import ProgressManager, ProgressStatus
 from .upload_manager import UploadManager
 
 logger = get_logger()
@@ -57,7 +57,7 @@ class TaskManager:
             try:
                 result = future.result(timeout=conf["process_timeout"])
                 res = self.upload_manager.upload_single_file(result)   #  upload image to file system
-                self.progress_manager.update_task_status(request_id,  task["page_id"],  ProcessStatus.SUCCESS, url=(conf["download_url_prefix"] + res["result"]))
+                self.progress_manager.update_task_status(request_id,  task["page_id"],  ProgressStatus.SUCCESS, url=(conf["download_url_prefix"] + res["result"]))
                 error_msg = None
                     
             except TimeoutError as e:
@@ -69,7 +69,7 @@ class TaskManager:
             finally:
                 # update task status
                 if error_msg:
-                    self.progress_manager.update_task_status(request_id, task["page_id"], ProcessStatus.FAILED, url="", error=error_msg)
+                    self.progress_manager.update_task_status(request_id, task["page_id"], ProgressStatus.FAILED, url="", error=error_msg)
                     
         logger.info(f"Request ID: {request_id} -> 处理请求完成！共耗时 {time.time() - start_time} s")
     
