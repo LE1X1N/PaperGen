@@ -28,7 +28,7 @@ react_import: {
     # 图标库
     "lucide-react": "https://esm.sh/lucide-react@0.525.0",
     # 动画引擎
-    "framer-motion": "https://esm.sh/framer-motion@12.23.6",
+    # "framer-motion": "https://esm.sh/framer-motion@12.23.6",
     "matter-js": "https://esm.sh/matter-js@0.20.0",
     # 3D 引擎  
     "three": "https://esm.sh/three@0.178.0",
