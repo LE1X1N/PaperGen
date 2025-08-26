@@ -207,6 +207,7 @@ class TaskManager:
             raise MaxRetriesExceededError(f"任务超过最大重试次数: {conf["max_retries"]}")
         
         if return_code:
-            return react_code  # module level task
+            return react_code   # module level task
         else:  
             return img_path     # page level task  
+        
