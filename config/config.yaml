@@ -1,6 +1,6 @@
 # service config
 max_workers: 150          # multithread
-max_retries: 3          # Number of retry attempts after failure
+max_retries: 5          # Number of retry attempts after failure
 connect_timeout: 15     # Wait the port to be listend
 render_timeout: 25      # max gradio rendering time 
 process_timeout: 300    # Processing timeout for long-running tasks

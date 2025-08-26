@@ -10,6 +10,7 @@ from src.browser import launch_sandbox_demo
 from src.browser import  init_driver, capture_screenshot
 from src.utils import get_random_available_port, wait_for_port, get_logger, get_generated_files
 
+
 from .data_parser import DataParser
 from .tmpl_manager import TemplateManager
 from .progress_manager import ProgressManager, ProgressStatus
@@ -27,7 +28,6 @@ class TaskManager:
         if not hasattr(TaskManager, 'global_executor'):
             TaskManager.global_executor = ThreadPoolExecutor(num_workers, thread_name_prefix="GlobalThreadPool-")
         
-
     def process_tasks(self, request_id: str, data: dict, task_id: str):
         """
             Multi-thread processing tasks
@@ -88,6 +88,7 @@ class TaskManager:
 
         # Multi-turn generation
         render_success = False
+        
         for turn in range(conf["max_retries"]):
             logger.info(f"Request ID: {request_id} -> Task_{page_id}: 进行第 {turn + 1} 轮尝试...")
 
@@ -142,8 +143,7 @@ class TaskManager:
                                 # compile success
                                 wait_rounds = 0
                                 while wait_rounds < 3:
-                                    logger.info(
-                                        f"Request ID: {request_id} -> Task_{page_id}: 编译成功，等待渲染成功信号...")
+                                    logger.info(f"Request ID: {request_id} -> Task_{page_id}: 编译成功，等待渲染成功信号...")
                                     if not browser_registry.empty():
                                         new_flag = browser_registry.get()
                                         if new_flag != page_id:
@@ -176,18 +176,20 @@ class TaskManager:
             except RenderTimeoutError as e:
                 logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【Gradio渲染超时错误】{e}")
             except ConnectionRefusedError as e:
-                logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【Gradio端口连接错误】{e}")
-            except (APIConnectionError, InternalServerError)  as e:
-                logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【OpenAI服务端连接错误】{e}")
-            except Exception as e:
-                logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【其他错误】{e}")
-                
+                logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【Gradio端口连接错误】{e}")                 
+            # except OpenAIError as e:
+            #     logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【OpenAI错误】{e}")
+            # except ChromeError as e:    
+            #     logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【Chrome错误】{e}")
+            # except Exception as e:
+            #     logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【其他错误】{e}")
+             
             finally:
                 if browser:
                     browser.kill()
                     logger.info(
                         f"Request ID: {request_id} -> Task_{page_id}: Gradio浏览器 退出! 错误码: {browser.exitcode}")
-
+                    
                 if driver:
                     driver.close()
                     driver.quit()

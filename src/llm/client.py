@@ -1,80 +1,7 @@
 from openai import OpenAI
-from openai import APIConnectionError, InternalServerError
 
+from src.errors import OpenAIError
 from src.config import conf
-
-
-def build_module_prompt(module:dict):
-    prompt = f"""
-            你需要为【{module["web_title"]}】系统的【{module["module_name"]}】模块生成对应 React 代码模板（JSX），请参考以下参考模板代码，同时严格遵循以下规则，确保后续的所有页面级实现可以直接复用此模板的导航栏与风格：。
-
-            ### 1. 模块基本信息
-            - 系统名称：{module["web_title"]}
-            - 模块名称：{module["module_name"]}
-            - 包含页面（导航项）：{", ".join(module["module_pages"])}
-
-            ### 2. 核心设计原则
-            2.1. **页面设计**：
-            - 页面包括两部分：【导航栏】（顶部/左侧，与参考模板位置一致）+ 【主内容区】（导航栏右侧/下方）
-            - 当前仅实现【导航栏】的完整UI，【主内容区】仅留空占位，不做任何功能设计
-
-            2.2. **导航栏设计**
-            - 导航栏需要包括：（{", ".join(module["module_pages"])}），但仅展示导航项【名称】与【图标】，不实现具体跳转逻辑
-            - 不实现导航项的点击、hover 等任何交互逻辑，导航项仅为静态展示（无 `onClick`、`active` 状态）
-            
-            2.3. **主内容区设计**
-            - 所有需要后续页面级实现的部分全部留空
-
-            2.4. **其他要求**：
-            - 依赖导入：根据该模块的功能，导入所需的包，包含`React`、图标库（如`lucide-react`）等必要依赖
-            - 所有JSX代码务必使用 ```jsx ``` 代码块，无多余文本。
-            - 布局与配色参考模板代码
-            
-             ### 3. 参考模板代码
-             ``` jsx
-             {module["tmpl"]}
-             ```
-        """
-    return prompt
-
-
-def build_page_prompt(page:dict):
-    """
-        Build prompt based on JSON
-    """
-    prompt = f"""
-            你需要基于【{page["module_name"]}】模块的模板代码，为【{page["page_name"]}】页面生成具体功能实现。
-            
-            ### 1. 页面基本信息
-            - 系统名称：{page["web_title"]}
-            - 页面所属模块：{page["module_name"]} （模板已包含统一导航栏）
-            - 页面名称：{page["page_name"]}  （需在导航栏中激活对应项）
-            - 页面功能描述：{page["page_desc"]}
-          
-            ### 2. 核心设计原则
-            2.1. **页面设计**
-            - 页面包括两部分：【导航栏】和【主内容区】  
-            
-            2.2. **导航栏设计**
-            - 导航栏完全复用模板代码, 禁止修改导航栏的颜色、图标、间距、布局（包括新增/删除导航项）。
-            - 需要为【{page["page_name"]}】导航项【导航栏】中的 “激活状态”（如高亮样式），
-            
-            2.3. **主内容区设计**
-            - 需要完全实现页面功能描述当中的所有功能点，允许扩展所需的其他的功能点。
-            - 所有元素（按钮、输入框、下拉框等）仅实现静态 UI，**不绑定任何事件**（如 `onClick`、`onChange`、`onSubmit`）
-            
-            2.4. **其他要求**     
-            - 图标需使用模板中已导入的库（如 lucide-react），且图标风格（大小、颜色）与模板中其他导航项保持一致 
-            - 删除掉页面当中无关的注释或说明
-            - 确保在浏览器当中可直接渲染，无大面积显示空白
-            - 所有代码必须包裹在 ```jsx ``` 代码块中，代码块外无多余文本
-            
-            ### 3. 【{page["module_name"]}】模板代码
-            ```jsx
-            {page["tmpl"]}
-            ```
-        """
-    return prompt
 
  # OpenAI client
 client = OpenAI(
@@ -102,17 +29,18 @@ def call_chat_completion(messages):
         
         full_content = []
         for chunk in response:
-            if chunk.choices:
-                content = chunk.choices[0].delta.content
-                if content:
-                    full_content.append(content) 
+            if chunk.choices and chunk.choices[0].delta.content:
+                full_content.append(chunk.choices[0].delta.content) 
         return ''.join(full_content)
     
-    except APIConnectionError:
-        raise
+    except Exception as e:
+        error_msg = f"{type(e).__name__}: {str(e)}"
+        raise OpenAIError(f"OpenAI 接口调用失败: {error_msg}") from e
     
-    except InternalServerError:
-        raise
-    
-    except Exception:
+
+def check_openai_health():
+    messages=[{"role": "user", "content": "ping"}]
+    try:
+        call_chat_completion(messages)
+    except OpenAIError:
         raise

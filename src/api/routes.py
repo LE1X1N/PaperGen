@@ -3,37 +3,40 @@ from flask import Blueprint, request, jsonify
 import uuid
 
 from src.core.task_manager import TaskManager
+
+from src.errors import InvalidJSONError, OpenAIError, ChromeError
+from src.llm import check_openai_health
+from src.browser import check_driver_health
 from src.utils import get_logger
-from src.config import conf
 
 logger = get_logger()
 api_bp = Blueprint('v1', __name__)
+
 task_manager = TaskManager()  # global task manager
 
 @api_bp.route('/gen_images', methods=['POST'])
 def gen_images():
     request_id = str(uuid.uuid4())
+    req = request.get_json()      
+    logger.info(f"Request ID: {request_id} -> 接收请求：{req}")
+      
+    task_id = req['task_id']
+    data = req['data']
+  
     try:
-        req = request.get_json()        
-        task_id = req['task_id']
-        data = req['data']
+        task_manager.parser.check_field(data)  # check JSON field
+        check_openai_health()                  # check OpenAI
+        check_driver_health()                  # check chrome driver
         
-        valid, msg = task_manager.parser.check_field(data)   # valid check
-        if not valid:
-            return jsonify({"code": -1, "message": f"任务创建失败! {msg}"}), 500
-    
-        logger.info(f"接收请求. 【任务ID】{task_id} 【请求ID】{request_id}")
-        logger.info(req)
-
         task_thread = threading.Thread(target=task_manager.process_tasks, args=(request_id, data, task_id))  
         task_thread.start()
+        logger.info(f"Request ID: {request_id} -> 创建任务成功！")
         return jsonify({"code": 0, "message": "任务创建成功!", "task_id": task_id,  "request_id": request_id})
-
-    except Exception as e:
-        error_msg = f"请求处理失败: {str(e)}"
-        logger.error(f"Request ID: {request_id} -> {error_msg}")
-        return jsonify({"code": -1, "message": error_msg}), 500
-
+        
+    except (InvalidJSONError, OpenAIError, ChromeError) as e:
+        logger.info(f"Request ID: {request_id} -> 创建任务失败：{e} ")
+        return jsonify({"code": -1, "message": f"任务创建失败! {e}"}), 500
+    
 
 @api_bp.route('/progress/<request_id>', methods=['GET'])
 def get_progress(request_id: str):
