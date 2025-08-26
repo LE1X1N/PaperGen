@@ -152,10 +152,14 @@ class TaskManager:
                                     time.sleep(1)
 
                                 logger.info(f"Request ID: {request_id} -> Task_{page_id}: 【渲染成功】 前端代码渲染成功！")
+                                
+                                # save screenshot
                                 if not return_code:
                                     img_path = capture_screenshot(request_id, page_id, driver, save_dir=self.progress_manager._get_request_dir(request_id))
                                     logger.info(f"Request ID: {request_id} -> Task_{page_id}: Selenium 截图已保存至 {img_path}")
-                                
+                                # save code
+                                self.progress_manager.save_code(request_id, page_id, react_code)
+                            
                                 render_success = True
                                 break
                     time.sleep(1)

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { Home, List, AppWindow, Menu as MenuIcon, User, Settings, LogOut } from "lucide-react";
-import { motion } from "framer-motion";
+import { Home, List, AppWindow, User, Settings, LogOut } from "lucide-react";
 
 const navItems = Array.from({ length: 7 }).map((_, i) => ({
   key: i + 1,
@@ -25,6 +24,7 @@ export default function App() {
     setSelectedNav(key);
     setBreadcrumb([navItems.find((item) => item.key.toString() === key)?.label || "首页"]);
   }
+  
   function handleSideMenuClick(key) {
     setSelectedSide(key);
     setBreadcrumb((prev) => [...prev.slice(0, 1), sideMenuItems.find((item) => item.key === key)?.label || ""]);
@@ -37,23 +37,21 @@ export default function App() {
         <div className="text-white font-extrabold text-xl tracking-widest mr-12">LOGO</div>
         <nav className="flex space-x-6 flex-1 overflow-x-auto scrollbar-hide">
           {navItems.map(({ key, label }) => (
-            <motion.button
+            <button
               key={key}
               onClick={() => handleTopNavClick(key.toString())}
               className={`relative px-4 py-2 rounded-md font-medium text-white whitespace-nowrap transition-colors duration-300 ${
                 selectedNav === key.toString() ? "bg-indigo-900 shadow-lg" : "hover:bg-indigo-600"
               }`}
-              whileHover={{ scale: 1.05 }}
               aria-current={selectedNav === key.toString() ? "page" : undefined}
             >
               {label}
               {selectedNav === key.toString() && (
-                <motion.div
-                  layoutId="underline"
+                <div
                   className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 rounded-t"
                 />
               )}
-            </motion.button>
+            </button>
           ))}
         </nav>
       </header>
@@ -95,9 +93,7 @@ export default function App() {
           </nav>
 
           {/* 内容卡片 */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+          <div
             className="bg-white rounded-md shadow-lg p-8 min-h-[300px] max-w-5xl mx-auto text-gray-800 text-lg leading-relaxed"
           >
             <h2 className="text-indigo-700 font-semibold text-2xl mb-4">内容区域</h2>
@@ -109,7 +105,7 @@ export default function App() {
             <div className="mt-6 bg-indigo-50 border border-indigo-200 rounded p-4 text-indigo-600 text-sm select-text">
               这是用于占位的内容区域示例。未来可根据业务需求灵活替换为实际组件或内容。
             </div>
-          </motion.div>
+          </div>
         </section>
       </main>
 

@@ -7,7 +7,6 @@ import {
   Grid,
   LayoutDashboard,
 } from "lucide-react";
-import { motion } from "framer-motion";
 
 const navItems = ["导航1", "导航2", "导航3"];
 
@@ -43,10 +42,8 @@ export default function App() {
         </div>
         <nav className="flex space-x-6 flex-1 min-w-0">
           {navItems.map((item, i) => (
-            <motion.button
+            <button
               key={i}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
               className={`whitespace-nowrap font-medium transition-colors ${
                 i === 1
                   ? "border-b-2 border-white"
@@ -55,7 +52,7 @@ export default function App() {
               style={{ minWidth: 60 }}
             >
               {item}
-            </motion.button>
+            </button>
           ))}
         </nav>
       </header>
@@ -112,14 +109,9 @@ export default function App() {
 
         {/* Content Area */}
         <section className="flex-1 bg-white rounded-lg shadow-inner ml-8 p-6 text-gray-700 min-h-[280px]">
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="text-lg font-semibold"
-          >
+          <div className="text-lg font-semibold">
             内容区域
-          </motion.div>
+          </div>
         </section>
       </main>
 

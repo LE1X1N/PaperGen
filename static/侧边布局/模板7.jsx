@@ -1,6 +1,5 @@
 import React from "react";
 import { Cpu, LayoutDashboard, Activity, Settings, Users, ChartBar } from "lucide-react";
-import { motion } from "framer-motion";
 
 export default function App() {
   const menuItems = [
@@ -24,42 +23,36 @@ export default function App() {
         </div>
         <nav className="flex-1 mt-6">
           {menuItems.map(({ icon, label }, idx) => (
-            <motion.div
+            <div
               key={label}
-              whileHover={{ backgroundColor: "rgba(14, 116, 144, 0.7)" }}
-              className="flex items-center px-6 py-3 space-x-3 cursor-pointer text-slate-300 hover:text-cyan-400 transition-colors"
+              className="flex items-center px-6 py-3 space-x-3 cursor-pointer text-slate-300 hover:text-cyan-400 hover:bg-[rgba(14,116,144,0.7)] transition-colors duration-200"
               style={{ userSelect: "none" }}
               aria-label={label}
               tabIndex={0}
             >
               <div className="">{icon}</div>
               <span className="text-base font-medium">{label}</span>
-            </motion.div>
+            </div>
           ))}
         </nav>
         <div className="p-4 border-t border-slate-700 text-sm text-slate-500 select-none">
-          © 2024 科技公司
+          © 2025 科技公司
         </div>
       </aside>
 
       {/* 主内容区 */}
       <main className="flex-1 p-10">
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+        <h1
           className="text-3xl font-extrabold text-cyan-400 mb-6 select-none"
         >
           欢迎来到科技感前端框架
-        </motion.h1>
+        </h1>
 
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {[1, 2, 3, 4, 5, 6].map((card) => (
-            <motion.div
+            <div
               key={card}
-              whileHover={{ scale: 1.05, boxShadow: "0 12px 24px rgba(14,116,144,0.6)" }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="bg-gradient-to-tr from-[#0f172a] to-[#134e4a] rounded-xl border border-cyan-500/60 p-6 shadow-md backdrop-blur-sm"
+              className="bg-gradient-to-tr from-[#0f172a] to-[#134e4a] rounded-xl border border-cyan-500/60 p-6 shadow-md backdrop-blur-sm hover:scale-105 hover:shadow-[0_12px_24px_rgba(14,116,144,0.6)] transition-all duration-300"
             >
               <h2 className="text-xl font-semibold mb-2 text-cyan-300 select-none">
                 科技卡片 #{card}
@@ -67,10 +60,11 @@ export default function App() {
               <p className="text-slate-400 leading-relaxed select-text">
                 这是一个静态示例卡片，展示侧边栏布局的科技感设计风格。使用渐变、阴影和现代排版营造氛围。
               </p>
-            </motion.div>
+            </div>
           ))}
         </section>
       </main>
     </div>
   );
 }
+    

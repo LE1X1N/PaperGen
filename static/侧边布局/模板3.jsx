@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Home, Users, Settings, Menu, Layout } from "lucide-react";
-import { motion } from "framer-motion";
 
 export default function App() {
   const [active, setActive] = useState("home");
@@ -19,10 +18,9 @@ export default function App() {
         </div>
         <nav className="flex flex-col flex-1 px-2 py-6 space-y-1">
           {menuItems.map(({ id, label, icon }) => (
-            <motion.button
+            <button
               key={id}
               onClick={() => setActive(id)}
-              whileTap={{ scale: 0.95 }}
               className={`group flex items-center px-4 py-2 rounded-md text-sm font-medium gap-3 transition-colors duration-200
                 ${
                   active === id
@@ -39,7 +37,7 @@ export default function App() {
                 {icon}
               </span>
               {label}
-            </motion.button>
+            </button>
           ))}
         </nav>
         <div className="px-6 py-4 border-t border-gray-200 text-sm text-gray-500 select-none flex items-center gap-2">

@@ -1,6 +1,5 @@
 import React from "react";
 import { Laptop, Bell, User } from "lucide-react";
-import { motion } from "framer-motion";
 
 const navItems = [
   { key: "1", label: "导航 1" },
@@ -52,18 +51,16 @@ export default function App() {
         <div className="text-lg font-bold select-none">应用网站</div>
         <nav className="flex flex-1 justify-center space-x-10 text-sm font-medium">
           {navItems.map((item) => (
-            <motion.button
+            <button
               key={item.key}
-              whileHover={{ scale: 1.1 }}
               className="relative px-3 py-1 rounded-md hover:bg-white/20 transition-colors"
               type="button"
             >
               {item.label}
-              <motion.span
-                layoutId="underline"
-                className="absolute bottom-0 left-0 right-0 h-0.5 bg-white rounded"
+              <span
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-white rounded transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"
               />
-            </motion.button>
+            </button>
           ))}
         </nav>
         <button className="text-sm px-3 py-1 rounded bg-white/20 hover:bg-white/30 transition-colors select-none">

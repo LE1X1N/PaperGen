@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Home,
   PieChart,
@@ -7,7 +7,6 @@ import {
   Layout as LayoutIcon,
   Menu as MenuIcon,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 
 const menuItems = [
   {
@@ -46,40 +45,51 @@ const menuItems = [
   },
 ];
 
-const sidebarVariants = {
-  expanded: { width: 240, transition: { type: "spring", stiffness: 200 } },
-  collapsed: { width: 64, transition: { type: "spring", stiffness: 200 } },
-};
-
-const submenuVariants = {
-  open: { height: "auto", opacity: 1, transition: { duration: 0.3 } },
-  closed: { height: 0, opacity: 0, transition: { duration: 0.2 } },
-};
-
 export default function App() {
   const [collapsed, setCollapsed] = useState(false);
   const [activeKey, setActiveKey] = useState("1");
   const [openSubmenus, setOpenSubmenus] = useState([]);
+  const submenuRefs = useRef({});
 
-  const toggleCollapse = () => setCollapsed((v) => !v);
+  // 初始化子菜单高度
+  useEffect(() => {
+    Object.keys(submenuRefs.current).forEach(key => {
+      const ref = submenuRefs.current[key];
+      if (ref && openSubmenus.includes(key)) {
+        ref.style.height = `${ref.scrollHeight}px`;
+      }
+    });
+  }, [openSubmenus]);
+
+  const toggleCollapse = () => setCollapsed(prev => !prev);
 
   const onMenuClick = (key, hasChildren) => {
     if (hasChildren) {
-      setOpenSubmenus((prev) =>
-        prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
-      );
+      setOpenSubmenus(prev => {
+        const isOpen = prev.includes(key);
+        // 更新子菜单高度
+        const ref = submenuRefs.current[key];
+        if (ref) {
+          if (isOpen) {
+            ref.style.height = "0px";
+          } else {
+            ref.style.height = `${ref.scrollHeight}px`;
+          }
+        }
+        return isOpen ? prev.filter(k => k !== key) : [...prev, key];
+      });
     } else {
       setActiveKey(key);
     }
   };
 
-  // Find breadcrumb based on activeKey
+  // 计算面包屑
   let breadcrumb = ["首页"];
-  menuItems.forEach((item) => {
+  menuItems.forEach(item => {
     if (item.key === activeKey) {
       breadcrumb = ["首页", item.label];
     } else if (item.children) {
-      const child = item.children.find((c) => c.key === activeKey);
+      const child = item.children.find(c => c.key === activeKey);
       if (child) {
         breadcrumb = ["首页", item.label, child.label];
       }
@@ -89,16 +99,16 @@ export default function App() {
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-cyan-50 to-blue-50">
       {/* 侧边栏 */}
-      <motion.aside
-        animate={collapsed ? "collapsed" : "expanded"}
-        variants={sidebarVariants}
-        className="bg-gradient-to-b from-blue-700 to-blue-900 shadow-lg text-white flex flex-col"
+      <aside
+        className={`bg-gradient-to-b from-blue-700 to-blue-900 shadow-lg text-white flex flex-col transition-all duration-300 ease-in-out ${
+          collapsed ? "w-16" : "w-60"
+        }`}
       >
         <div className="flex items-center justify-between px-4 py-4 border-b border-blue-600">
           <h1
-            className={`font-bold text-lg whitespace-nowrap truncate ${
-              collapsed ? "opacity-0" : "opacity-100"
-            } transition-opacity duration-300`}
+            className={`font-bold text-lg whitespace-nowrap truncate transition-opacity duration-300 ${
+              collapsed ? "opacity-0 w-0" : "opacity-100"
+            }`}
           >
             我的管理系统
           </h1>
@@ -116,7 +126,7 @@ export default function App() {
             {menuItems.map(({ key, label, icon, children }) => {
               const isActive =
                 activeKey === key ||
-                (children && children.some((c) => c.key === activeKey));
+                (children && children.some(c => c.key === activeKey));
               const isOpen = openSubmenus.includes(key);
 
               return (
@@ -132,42 +142,38 @@ export default function App() {
                       <span className="flex-1 text-sm">{label}</span>
                     )}
                     {!collapsed && children && (
-                      <motion.span
-                        animate={{ rotate: isOpen ? 90 : 0 }}
-                        className="inline-block transition-transform"
+                      <span
+                        className={`inline-block transition-transform duration-300 ease-in-out ${
+                          isOpen ? "rotate-90" : ""
+                        }`}
                       >
                         ▶
-                      </motion.span>
+                      </span>
                     )}
                   </div>
-                  {children && (
-                    <AnimatePresence initial={false}>
-                      {isOpen && !collapsed && (
-                        <motion.ul
-                          key="submenu"
-                          initial="closed"
-                          animate="open"
-                          exit="closed"
-                          variants={submenuVariants}
-                          className="pl-10 flex flex-col gap-1 overflow-hidden"
-                        >
-                          {children.map(({ key: cKey, label: cLabel }) => (
-                            <li key={cKey}>
-                              <button
-                                onClick={() => setActiveKey(cKey)}
-                                className={`w-full text-left rounded-md px-3 py-2 text-sm hover:bg-blue-600 transition-colors ${
-                                  activeKey === cKey
-                                    ? "bg-blue-700 font-semibold shadow-inner"
-                                    : ""
-                                }`}
-                              >
-                                {cLabel}
-                              </button>
-                            </li>
-                          ))}
-                        </motion.ul>
-                      )}
-                    </AnimatePresence>
+                  {children && !collapsed && (
+                    <ul
+                      ref={el => submenuRefs.current[key] = el}
+                      className={`pl-10 flex flex-col gap-1 overflow-hidden transition-all duration-300 ease-in-out ${
+                        !isOpen ? "h-0 opacity-0" : "opacity-100"
+                      }`}
+                      style={{ height: isOpen ? 'auto' : '0px' }}
+                    >
+                      {children.map(({ key: cKey, label: cLabel }) => (
+                        <li key={cKey}>
+                          <button
+                            onClick={() => setActiveKey(cKey)}
+                            className={`w-full text-left rounded-md px-3 py-2 text-sm hover:bg-blue-600 transition-colors ${
+                              activeKey === cKey
+                                ? "bg-blue-700 font-semibold shadow-inner"
+                                : ""
+                            }`}
+                          >
+                            {cLabel}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
                   )}
                 </li>
               );
@@ -176,13 +182,13 @@ export default function App() {
         </nav>
 
         <div
-          className={`text-xs text-blue-300 px-4 py-3 border-t border-blue-600 select-none ${
+          className={`text-xs text-blue-300 px-4 py-3 border-t border-blue-600 select-none transition-all duration-300 ${
             collapsed ? "text-center" : ""
           }`}
         >
           {collapsed ? "© 23" : "© 2023 前端设计框架"}
         </div>
-      </motion.aside>
+      </aside>
 
       {/* 主体内容 */}
       <main className="flex-1 flex flex-col px-6 py-6">
@@ -230,7 +236,7 @@ export default function App() {
 
         {/* 页脚 */}
         <footer className="mt-6 text-center text-gray-400 text-xs select-none">
-          © 2023 前端设计框架 版权所有
+          © 2025 前端设计框架 版权所有
         </footer>
       </main>
     </div>

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Home, User, Folder, Settings, Bell, LogOut, Menu } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 
 const tabs = [
   { id: "home", label: "首页", icon: Home },
@@ -22,22 +21,66 @@ const App = () => {
     return () => clearInterval(timer);
   }, []);
 
+  // 当切换标签时添加过渡动画类
+  useEffect(() => {
+    const content = document.getElementById('tab-content');
+    if (content) {
+      // 触发重排
+      content.classList.remove('animate-fade-in');
+      void content.offsetWidth; // 强制重绘
+      content.classList.add('animate-fade-in');
+    }
+  }, [activeTab]);
+
   const renderContent = () => {
     switch (activeTab) {
       case "home":
         return (
-          <motion.div
-            key="home"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 12 }}
-            className="bg-white rounded-2xl shadow-md border border-gray-200 p-8"
+          <div
+            id="tab-content"
+            className="bg-white rounded-2xl shadow-md border border-gray-200 p-8 transition-all duration-300"
           >
             <h2 className="text-3xl font-extrabold text-gray-900 mb-4">系统概览</h2>
             <p className="text-gray-700 leading-relaxed text-lg">
               欢迎使用现代智能管理系统！界面设计简洁大方，功能丰富且操作便捷，助您高效管理各项任务。
             </p>
-          </motion.div>
+          </div>
+        );
+      case "user":
+        return (
+          <div
+            id="tab-content"
+            className="bg-white rounded-2xl shadow-md border border-gray-200 p-8 transition-all duration-300"
+          >
+            <h2 className="text-3xl font-extrabold text-gray-900 mb-4">用户管理</h2>
+            <p className="text-gray-700 leading-relaxed text-lg">
+              在这里可以管理系统所有用户，包括添加新用户、编辑用户信息和设置用户权限。
+            </p>
+          </div>
+        );
+      case "folder":
+        return (
+          <div
+            id="tab-content"
+            className="bg-white rounded-2xl shadow-md border border-gray-200 p-8 transition-all duration-300"
+          >
+            <h2 className="text-3xl font-extrabold text-gray-900 mb-4">资料库</h2>
+            <p className="text-gray-700 leading-relaxed text-lg">
+              系统所有文档和资料的存储中心，可以上传、下载和管理各类文件。
+            </p>
+          </div>
+        );
+      case "settings":
+        return (
+          <div
+            id="tab-content"
+            className="bg-white rounded-2xl shadow-md border border-gray-200 p-8 transition-all duration-300"
+          >
+            <h2 className="text-3xl font-extrabold text-gray-900 mb-4">系统设置</h2>
+            <p className="text-gray-700 leading-relaxed text-lg">
+              配置系统参数、安全选项和个性化设置，定制符合您需求的系统环境。
+            </p>
+          </div>
         );
       default:
         return null;
@@ -46,6 +89,24 @@ const App = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-gray-100">
+      {/* 添加全局样式 */}
+      <style jsx global>{`
+        .animate-fade-in {
+          animation: fadeIn 0.3s ease-out forwards;
+        }
+        
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(12px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
+      
       {/* 上部 Header */}
       <header className="bg-white shadow-md border-b border-gray-300 px-6 h-16 flex items-center justify-between select-none">
         <h1 className="text-2xl font-bold text-gray-900">智能管理系统</h1>
@@ -101,7 +162,7 @@ const App = () => {
 
       {/* 下方主内容区 */}
       <main className="flex-1 overflow-y-auto p-8 max-w-7xl mx-auto w-full">
-        <AnimatePresence mode="wait">{renderContent()}</AnimatePresence>
+        {renderContent()}
       </main>
 
       {/* 底部 Footer */}

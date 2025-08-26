@@ -1,6 +1,5 @@
 import React from 'react';
 import { Home, User, Folder, Settings, LogOut } from 'lucide-react';
-import { motion } from 'framer-motion';
 import dayjs from 'dayjs';
 
 const App = () => {
@@ -10,11 +9,8 @@ const App = () => {
   return (
     <div className="min-h-screen flex bg-slate-50">
       {/* 左侧侧边栏（框架固定，内容可动态替换） */}
-      <motion.aside 
-        className="bg-slate-800 text-slate-100 w-64 flex flex-col items-center justify-start p-4 shadow-md" 
-        initial={{ x: 0 }} 
-        animate={{ x: 0 }} 
-        transition={{ duration: 0.3 }}
+      <aside 
+        className="bg-slate-800 text-slate-100 w-64 flex flex-col items-center justify-start p-4 shadow-md transition-all duration-300"
       >
         {/* 顶部系统名称（可替换为实际系统名） */}
         <div className="w-full py-4 mb-8 border-b border-slate-700">
@@ -49,7 +45,7 @@ const App = () => {
             退出登录
           </button>
         </div>
-      </motion.aside>
+      </aside>
 
 
       {/* 右侧主内容区（框架固定，内容可动态替换） */}

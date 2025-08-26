@@ -1,6 +1,5 @@
 import React from "react";
 import { Home, User, MessageCircle, Settings } from "lucide-react";
-import { motion } from "framer-motion";
 
 const navItems = [
   { id: "home", label: "首页", icon: <Home className="w-5 h-5" /> },
@@ -72,10 +71,10 @@ export default function App() {
             <h2 className="text-xl font-bold mb-3 px-1">首页精选</h2>
             <div className="space-y-4">
               {mockContent.home.map((item) => (
-                <motion.div
+                // 移除motion包裹，保留原div结构和基础样式
+                <div
                   key={item.id}
                   className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
-                  whileHover={{ scale: 1.03 }}
                 >
                   <img
                     src={item.img}
@@ -88,7 +87,7 @@ export default function App() {
                     <h3 className="text-lg font-semibold mb-1 truncate">{item.title}</h3>
                     <p className="text-gray-600 text-sm truncate">{item.description}</p>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
           </section>
@@ -99,10 +98,10 @@ export default function App() {
             <h2 className="text-xl font-bold mb-3 px-1">消息列表</h2>
             <ul className="space-y-2">
               {mockContent.messages.map(({ id, user, message, avatar }) => (
-                <motion.li
+                // 移除motion包裹，保留原li结构和基础样式
+                <li
                   key={id}
                   className="bg-white rounded-lg shadow flex items-center px-3 py-2 cursor-pointer hover:bg-green-50 transition-colors"
-                  whileHover={{ x: 5 }}
                 >
                   <img
                     src={avatar}
@@ -115,7 +114,7 @@ export default function App() {
                     <p className="font-semibold text-gray-900 truncate">{user}</p>
                     <p className="text-gray-700 text-sm truncate">{message}</p>
                   </div>
-                </motion.li>
+                </li>
               ))}
             </ul>
           </section>
@@ -145,10 +144,10 @@ export default function App() {
             <h2 className="text-xl font-bold mb-3">设置</h2>
             <ul className="bg-white rounded-lg shadow divide-y divide-gray-200">
               {mockContent.settings.map(({ id, label }) => (
-                <motion.li
+                // 移除motion包裹，保留原li结构和基础样式
+                <li
                   key={id}
                   className="px-5 py-3 cursor-pointer hover:bg-green-50 flex justify-between items-center"
-                  whileTap={{ scale: 0.95 }}
                 >
                   <span className="truncate">{label}</span>
                   <svg
@@ -163,7 +162,7 @@ export default function App() {
                   >
                     <path d="M9 18l6-6-6-6"></path>
                   </svg>
-                </motion.li>
+                </li>
               ))}
             </ul>
           </section>

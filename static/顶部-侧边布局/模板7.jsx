@@ -1,6 +1,5 @@
 import React from "react";
 import { Laptop, Bell, User, Menu, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 
 const navItems = ["首页", "产品", "关于我们"];
 const sidebarItems = [
@@ -29,6 +28,12 @@ export default function App() {
   const [selectSubMenu, setSelectSubMenu] = React.useState("sub1");
   const [selectSubItem, setSelectSubItem] = React.useState(0);
   const [sidebarOpen, setSidebarOpen] = React.useState(true);
+  const [contentKey, setContentKey] = React.useState(`${selectSubMenu}-${selectSubItem}`);
+
+  // 处理子菜单切换时更新内容区动画
+  React.useEffect(() => {
+    setContentKey(`${selectSubMenu}-${selectSubItem}`);
+  }, [selectSubMenu, selectSubItem]);
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-indigo-50 via-indigo-100 to-white text-gray-900 select-none">
@@ -46,14 +51,9 @@ export default function App() {
               <Menu size={24} className="text-white" />
             )}
           </button>
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0.7 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="text-white font-extrabold text-3xl tracking-widest select-text"
-          >
+          <div className="text-white font-extrabold text-3xl tracking-widest select-text animate-fade-in">
             LOGO
-          </motion.div>
+          </div>
         </div>
 
         <nav className="hidden md:flex space-x-12 text-indigo-200 text-xl font-semibold tracking-wide">
@@ -68,10 +68,8 @@ export default function App() {
             >
               {item}
               {selectNav === idx && (
-                <motion.span
-                  layoutId="nav-underline"
-                  className="absolute left-0 -bottom-1 w-full h-1 bg-gradient-to-r from-pink-400 via-red-400 to-yellow-400 rounded-full shadow-xl"
-                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                <span
+                  className="absolute left-0 -bottom-1 w-full h-1 bg-gradient-to-r from-pink-400 via-red-400 to-yellow-400 rounded-full shadow-xl transition-all duration-300 ease-in-out"
                 />
               )}
             </button>
@@ -90,58 +88,50 @@ export default function App() {
       {/* 主体部分：侧边栏 + 内容 */}
       <div className="flex flex-1 max-w-[1280px] mx-auto mt-8 mb-12 px-4 sm:px-6 lg:px-8 w-full min-h-[calc(100vh-4rem-6rem)]">
         {/* 侧边栏 */}
-        <AnimatePresence>
-          {sidebarOpen && (
-            <motion.aside
-              initial={{ x: -300, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -300, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="w-72 bg-gradient-to-b from-indigo-900 via-indigo-800 to-indigo-900 rounded-2xl shadow-2xl border border-indigo-700 sticky top-20 h-[calc(100vh-5rem)] overflow-y-auto py-8 custom-scrollbar"
-            >
-              {sidebarItems.map(({ key, icon, label, children }) => (
-                <div key={key} className="mb-10 last:mb-0 px-6">
-                  <div className="flex items-center mb-4 text-indigo-300 font-bold text-lg tracking-wide select-none">
-                    <span className="mr-3">{icon}</span>
-                    {label}
-                  </div>
-                  <ul role="list" className="space-y-2">
-                    {children.map((child, i) => {
-                      const isSelected = selectSubMenu === key && selectSubItem === i;
-                      return (
-                        <li key={child} className="list-none">
-                          <button
-                            onClick={() => {
-                              setSelectSubMenu(key);
-                              setSelectSubItem(i);
-                            }}
-                            className={`flex items-center w-full text-indigo-300 hover:text-white text-base rounded-lg py-2 px-5 transition-all duration-300 shadow-md hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 ${
-                              isSelected
-                                ? "bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 font-semibold text-white shadow-xl scale-105"
-                                : ""
-                            }`}
-                            aria-current={isSelected ? "true" : undefined}
-                          >
-                            {child}
-                          </button>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-              ))}
-            </motion.aside>
-          )}
-        </AnimatePresence>
+        <aside
+          className={`w-72 bg-gradient-to-b from-indigo-900 via-indigo-800 to-indigo-900 rounded-2xl shadow-2xl border border-indigo-700 sticky top-20 h-[calc(100vh-5rem)] overflow-y-auto py-8 custom-scrollbar transition-all duration-300 ease-in-out ${
+            sidebarOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0 md:translate-x-0 md:opacity-100'
+          }`}
+          style={{ display: sidebarOpen || window.innerWidth >= 768 ? 'block' : 'none' }}
+        >
+          {sidebarItems.map(({ key, icon, label, children }) => (
+            <div key={key} className="mb-10 last:mb-0 px-6">
+              <div className="flex items-center mb-4 text-indigo-300 font-bold text-lg tracking-wide select-none">
+                <span className="mr-3">{icon}</span>
+                {label}
+              </div>
+              <ul role="list" className="space-y-2">
+                {children.map((child, i) => {
+                  const isSelected = selectSubMenu === key && selectSubItem === i;
+                  return (
+                    <li key={child} className="list-none">
+                      <button
+                        onClick={() => {
+                          setSelectSubMenu(key);
+                          setSelectSubItem(i);
+                        }}
+                        className={`flex items-center w-full text-indigo-300 hover:text-white text-base rounded-lg py-2 px-5 transition-all duration-300 shadow-md hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 ${
+                          isSelected
+                            ? "bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 font-semibold text-white shadow-xl scale-105"
+                            : ""
+                        }`}
+                        aria-current={isSelected ? "true" : undefined}
+                      >
+                        {child}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+        </aside>
 
         {/* 内容区 */}
         <main className="flex-1 bg-white rounded-3xl shadow-2xl border border-gray-200 p-10 min-h-[520px] select-text relative overflow-hidden">
-          <motion.div
-            key={`${selectSubMenu}-${selectSubItem}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className="max-w-4xl"
+          <div
+            key={contentKey}
+            className="max-w-4xl transition-all duration-500 ease-out opacity-0 translate-y-4 animate-fade-in-up"
           >
             <h1 className="text-4xl font-extrabold text-gray-900 mb-8 tracking-tight select-text drop-shadow-lg">
               {sidebarItems.find((item) => item.key === selectSubMenu)?.children[
@@ -159,7 +149,7 @@ export default function App() {
                 导航栏响应式显示菜单切换按钮，支持移动端良好体验，整体设计兼顾视觉冲击和实用功能，适用于管理系统、内容平台及展示型应用。
               </p>
             </section>
-          </motion.div>
+          </div>
           {/* 底部发光渐变 */}
           <div className="pointer-events-none absolute bottom-8 left-1/2 -translate-x-1/2 w-3/4 h-48 rounded-3xl bg-gradient-to-r from-pink-500 via-red-400 to-yellow-400 opacity-30 blur-3xl" />
         </main>
@@ -170,7 +160,7 @@ export default function App() {
         版权所有 © 2024 优秀团队倾情打造
       </footer>
 
-      {/* scrollbar styles */}
+      {/* 样式定义 */}
       <style>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 8px;
@@ -193,6 +183,32 @@ export default function App() {
             bottom: 0;
             z-index: 100;
             box-shadow: 8px 0 20px rgb(0 0 0 / 0.15);
+          }
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.6s ease-out forwards;
+        }
+        @keyframes fadeIn {
+          from {
+            transform: scale(0.9);
+            opacity: 0.7;
+          }
+          to {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+        .animate-fade-in-up {
+          animation: fadeInUp 0.7s ease-out forwards;
+        }
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
           }
         }
       `}</style>
