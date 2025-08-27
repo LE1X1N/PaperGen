@@ -11,8 +11,6 @@ class DataParser:
         try:
             if "title" not in data:
                 raise InvalidJSONError("缺少必需字段: title")
-            if "page_detail" not in data:
-                raise InvalidJSONError("缺少必需字段: page_detail") 
             if "web_pages" not in data:
                 raise InvalidJSONError("缺少必需字段: web_pages") 
                 
@@ -27,8 +25,6 @@ class DataParser:
                     
                 if "page_name" not in module:
                     raise InvalidJSONError("web_pages[{mid}]缺少必需字段: page_name")
-                if "page_description" not in module:
-                    raise InvalidJSONError("web_pages[{mid}]缺少必需字段: page_description")
                 if "page" not in module:
                     raise InvalidJSONError("web_pages[{mid}]缺少必需字段: page")
                     
@@ -68,9 +64,7 @@ class DataParser:
                         "return_code": True,
                         "query": build_module_prompt({
                                                 "web_title": data["title"], 
-                                                "web_detail": data["page_detail"] ,
                                                 "module_name": module["page_name"],
-                                                "module_desc": module["page_description"],
                                                 "module_pages": [m["name"] for m in module['page']],
                                                 "tmpl": tmpls[int(module["style"])]
                         })
@@ -95,7 +89,6 @@ class DataParser:
                             "return_code": False,
                             "query": build_page_prompt({
                                         "web_title": data["title"], 
-                                        "web_detail": data["page_detail"] ,
                                         "module_name": module["page_name"],
                                         "page_name": page["name"],
                                         "page_desc": page["text"],

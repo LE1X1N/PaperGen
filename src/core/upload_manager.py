@@ -28,9 +28,4 @@ class UploadManager:
         for res in data:
             paths.append(res["path"])
         return [UploadManager.upload_single_file(path) for path in paths]
-
-
-        
-        
-
-
+    
