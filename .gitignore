@@ -1,6 +1,8 @@
 .gradio
 .vscode
 .idea/
+.VSCodeCounter
+
 __pycache__
 
 config/dev.yaml
