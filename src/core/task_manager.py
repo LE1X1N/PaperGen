@@ -56,7 +56,6 @@ class TaskManager:
             try:
                 result = future.result(timeout=conf["service"]["process_timeout_sec"])
                 res = self.upload_manager.upload_single_file(result)   #  upload image to file system
-                self.progress_manager.update_task_status(request_id,  task["page_id"],  ProgressStatus.SUCCESS, url=res)
                 error_msg = None
                     
             except TimeoutError as e:
@@ -69,6 +68,8 @@ class TaskManager:
                 # update task status
                 if error_msg:
                     self.progress_manager.update_task_status(request_id, task["page_id"], ProgressStatus.FAILED, url="", error=error_msg)
+                else:
+                    self.progress_manager.update_task_status(request_id,  task["page_id"],  ProgressStatus.SUCCESS, url=res)
                     
         logger.info(f"Request ID: {request_id} -> 处理请求完成！共耗时 {time.time() - start_time} s")
     
