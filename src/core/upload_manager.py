@@ -26,10 +26,9 @@ class UploadManager:
             
             return conf["dfs"]["download_prefix"] + res["result"]
         
-        except ConnectTimeout:
-            raise    
-        except UploadError:
-            raise
+        except Exception as e:
+            error_msg = f"{type(e).__name__}: {str(e)}"
+            raise FileSystemError(f"文件上传失败: {error_msg}") from e
         
         
 

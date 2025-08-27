@@ -27,7 +27,6 @@ def gen_images():
         task_manager.parser.check_field(data)  # check JSON field
         check_openai_health()                  # check OpenAI
         check_driver_health()                  # check chrome driver
-        
         task_thread = threading.Thread(target=task_manager.process_tasks, args=(request_id, data, task_id))  
         task_thread.start()
         logger.info(f"Request ID: {request_id} -> 创建任务成功！")

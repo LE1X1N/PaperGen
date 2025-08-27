@@ -5,7 +5,7 @@ from multiprocessing import Process, Lock, Queue
 from src.errors import *
 from src.config import conf
 from src.llm import call_chat_completion, SYSTEM_PROMPT
-from src.browser import launch_sandbox_demo
+from src.browser import launch_sandbox_demo, wait_for_render
 from src.browser import  init_driver, capture_screenshot
 from src.utils import get_random_available_port, wait_for_port, get_logger, get_generated_files
 
@@ -54,16 +54,22 @@ class TaskManager:
         logger.info(f"Request ID: {request_id}: 开始页面级别代码生成！任务数量：{len(tasks)}")
         for future, task in zip(futures, tasks):
             try:
-                result = future.result(timeout=conf["service"]["process_timeout_sec"])
-                res = self.upload_manager.upload_single_file(result)   #  upload image to file system
+                res = future.result(timeout=conf["service"]["process_timeout_sec"])
                 error_msg = None
-                    
+            
+            except OpenAIError as e:
+                error_msg = f"【OpenAI错误】{e}"
+            except ChromeError as e:    
+                error_msg = f"【Chrome错误】{e}"  
+            except FileSystemError as e:
+                error_msg = f"【DFS错误】{e}"  
             except TimeoutError as e:
-                error_msg = f"【超时错误】TimeoutError： 超过任务最大时间 {conf["service"]["process_timeout_sec"]} s"
+                error_msg = f"【超时错误】： 生成超过任务最大时间 {conf["service"]["process_timeout_sec"]} s"
             except UploadError as e:
-                error_msg = f"【上传错误】UploadError: {str(e)}"
+                error_msg = f"【上传错误】{e}"
             except MaxRetriesExceededError as e:
-                error_msg = f"【重试次数超限错误】MaxRetriesExceededError: {str(e)}"
+                error_msg = f"【重试次数超限错误】{e}"
+          
             finally:
                 # update task status
                 if error_msg:
@@ -75,7 +81,7 @@ class TaskManager:
     
 
     def _process_single_task(self, task: dict) -> dict:
-        # 1.  parse data
+        # 1. parse data
         request_id = task["request_id"]
         page_id = task["page_id"]
         return_code = task["return_code"]
@@ -87,8 +93,6 @@ class TaskManager:
         messages.append({"role": "user", "content": query})
 
         # Multi-turn generation
-        render_success = False
-        
         for turn in range(conf["service"]["max_retries"]):
             logger.info(f"Request ID: {request_id} -> Task_{page_id}: 进行第 {turn + 1} 轮尝试...")
 
@@ -106,108 +110,67 @@ class TaskManager:
                 generated_files = get_generated_files(res)
                 react_code = generated_files.get("index.tsx") or generated_files.get("index.jsx")
                 
-                # 5. Launch browser to render react
-                port = get_random_available_port()  # a random port to bind with gradio
-                logger.info(f"Request ID: {request_id} ->, Task ID: {page_id}, Gradio Port: {port}")
-
-                browser_registry = Queue()  #  communication between main process and browser process
+                # 5. Launch browser to render react code
+                browser_registry = Queue()      #  communication between main process and browser process
                 browser_lock = Lock()
 
+                port = get_random_available_port()        # random port
                 browser = Process(target=launch_sandbox_demo,
                                   args=(request_id, page_id, react_code, port, browser_registry, browser_lock, logger), name="Browser Process")
                 browser.start()
 
-                # wait port connected (15s)
-                if not wait_for_port(port, timeout=conf["service"]["connect_timeout_sec"]):
-                    raise ConnectionRefusedError("Gradio端口连接失败")
-                logger.info(f"Request ID: {request_id} -> Task_{page_id}: Gradio 初始化成功！")
+                # 6. wait port connected (15s)
+                wait_for_port(port, timeout=conf["service"]["connect_timeout_sec"])
+                logger.info(f"Request ID: {request_id} -> Task_{page_id}: Gradio 初始化成功！绑定端口: {port}")
 
-                # 5. Try screenshot
+                # 7. init chrome driver
                 driver = init_driver()
                 driver.get(f'http://localhost:{port}')
                 logger.info(f"Request ID: {request_id} -> Task_{page_id}: Chrome driver 初始化成功！")
 
-                # wait rendering (25s)
-                for _ in range(conf["service"]["render_timeout_sec"]):
-                    with browser_lock:
-                        logger.info(f"Request ID: {request_id} -> Task_{page_id}: 检查渲染状态...")
-                        if not browser_registry.empty():
-                            completed_flag = browser_registry.get()
-
-                            if completed_flag != page_id:
-                                # render / compile error
-                                render_success = False
-                                raise FrontendError(completed_flag)
-
-                            if completed_flag == page_id:
-                                # compile success
-                                wait_rounds = 0
-                                while wait_rounds < 3:
-                                    logger.info(f"Request ID: {request_id} -> Task_{page_id}: 编译成功，等待渲染成功信号...")
-                                    if not browser_registry.empty():
-                                        new_flag = browser_registry.get()
-                                        if new_flag != page_id:
-                                            raise FrontendError(new_flag)
-                                    wait_rounds += 1
-                                    time.sleep(1)
-
-                                logger.info(f"Request ID: {request_id} -> Task_{page_id}: 【渲染成功】 前端代码渲染成功！")
-                                
-                                # save screenshot
-                                if not return_code:
-                                    img_path = capture_screenshot(request_id, page_id, driver, save_dir=self.progress_manager._get_request_dir(request_id))
-                                    logger.info(f"Request ID: {request_id} -> Task_{page_id}: Selenium 截图已保存至 {img_path}")
-                                # save code
-                                self.progress_manager.save_code(request_id, page_id, react_code)
-                            
-                                render_success = True
-                                break
-                    time.sleep(1)
-
-                if not render_success:
-                    raise RenderTimeoutError("Gradio渲染超时！")
+                # 8. wait rendering (25s)
+                wait_for_render(request_id, page_id, conf["service"]["render_timeout_sec"], browser_registry, browser_lock, logger)
+                logger.info(f"Request ID: {request_id} -> Task_{page_id}: 第 {turn + 1} 轮成功！")
+                
+                # 9. module level task, return generated module-level templates
+                self.progress_manager.save_code(request_id, page_id, react_code)
+                if return_code:
+                    return react_code  
+                
+                # 10. capture screenshot and upload
+                img_path = capture_screenshot(request_id, page_id, driver, save_dir=self.progress_manager._get_request_dir(request_id))
+                logger.info(f"Request ID: {request_id} -> Task_{page_id}: Selenium 截图已保存至 {img_path}")
+                res = self.upload_manager.upload_single_file(img_path)   #  upload to file system
+                return res   
 
             except FormatError as e:
                 logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【输出格式错误】{e}")
                 messages.append({"role": "user", "content": str(e)})
+            except PortTimeoutError as e:
+                logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【Gradio端口连接错误】{e}")    
             except FrontendError as e:
                 logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【前端代码错误】{e}")
                 messages.append({"role": "user", "content": str(e)})
             except RenderTimeoutError as e:
                 logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【Gradio渲染超时错误】{e}")
-            except ConnectionRefusedError as e:
-                logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【Gradio端口连接错误】{e}")                 
-            # except OpenAIError as e:
-            #     logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【OpenAI错误】{e}")
-            # except ChromeError as e:    
-            #     logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【Chrome错误】{e}")
+                
+            except OpenAIError:
+                raise
+            except ChromeError:    
+                raise
+            except FileSystemError:
+                raise
             # except Exception as e:
             #     logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【其他错误】{e}")
              
             finally:
                 if browser:
                     browser.kill()
-                    logger.info(
-                        f"Request ID: {request_id} -> Task_{page_id}: Gradio浏览器 退出! 错误码: {browser.exitcode}")
+                    logger.info(f"Request ID: {request_id} -> Task_{page_id}: Gradio浏览器 退出! 错误码: {browser.exitcode}")
                     
                 if driver:
                     driver.close()
                     driver.quit()
                     logger.info(f"Request ID: {request_id} -> Task_{page_id}: Chrome Driver 退出!")
-
-            # exit judge
-            if render_success:
-                logger.info(f"Request ID: {request_id} -> Task_{page_id}: 第 {turn + 1} 轮成功！")
-                break
-            else:
-                logger.info(f"Request ID: {request_id} -> Task_{page_id}: 第 {turn + 1} 轮失败！")
-
-        
-        if not render_success:
-            raise MaxRetriesExceededError(f"任务超过最大重试次数: {conf["service"]["max_retries"]}")
-        
-        if return_code:
-            return react_code   # module level task
-        else:  
-            return img_path     # page level task  
-        
+                    
+        raise MaxRetriesExceededError(f"任务超过最大重试次数: {conf["service"]["max_retries"]}")

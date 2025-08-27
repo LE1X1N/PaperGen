@@ -2,7 +2,7 @@ import re
 import time
 import socket
 
-from src.errors import FormatError
+from src.errors import FormatError, PortTimeoutError
 
 def get_generated_files(text):
     patterns = {
@@ -52,5 +52,4 @@ def wait_for_port(port, timeout=10):
                 return True
         except (ConnectionRefusedError, OSError):
             time.sleep(0.5)
-    return False
-
+    raise PortTimeoutError(f"等待Gradio端口 {port} 超时，超过 {timeout} 秒未被监听")

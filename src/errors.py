@@ -10,12 +10,17 @@ class ChromeError(Exception):
     # errors related to chrome selenium
     pass
 
-class FrontendError(Exception):
-    # frontend render/compile error
+class FileSystemError(Exception):
+    # errors related to DFS
     pass
 
 class UploadError(Exception):
     # error when upload files
+    pass
+
+
+class FrontendError(Exception):
+    # frontend render/compile error
     pass
 
 class MaxRetriesExceededError(Exception):
@@ -24,6 +29,10 @@ class MaxRetriesExceededError(Exception):
 
 class RenderTimeoutError(Exception):
     # time limit for gradio rendering
+    pass
+
+class PortTimeoutError(Exception):
+    # waiting port times out
     pass
 
 class FormatError(Exception):
