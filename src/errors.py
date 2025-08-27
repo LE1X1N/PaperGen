@@ -18,7 +18,6 @@ class UploadError(Exception):
     # error when upload files
     pass
 
-
 class FrontendError(Exception):
     # frontend render/compile error
     pass
