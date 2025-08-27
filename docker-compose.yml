@@ -11,6 +11,7 @@ services:
     depends_on:
       - leixin-chrome
     environment:
+      - APP_ENV=dev   # dev/prod,  load dev.yaml
       - SELENIUM_REMOTE_URL=http://localhost:4444/wd/hub   # chrome 服务地址
     network_mode: host
 

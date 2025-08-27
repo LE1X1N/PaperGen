@@ -1,14 +1,21 @@
 from pathlib import Path
 import yaml
+import os
+from deepmerge import Merger
 
+ENV = os.getenv("APP_ENV", "dev")
 
-def load_config(config_path: str="config/dev.yaml"):
+def load_yaml(file_path: str):
+    with open(file_path, "r") as f:
+        return yaml.safe_load(f)
+
+def load_config():
     """
         Load YAML config file
     """
-    config_file = Path(config_path).resolve()
-    if not config_file.exists():
-        raise FileNotFoundError(f"配置文件不存在：{config_file}")
+    merger = Merger([(dict, "merge")], [], [])
     
-    with open(config_file, "r") as f:
-        return yaml.safe_load(f)
+    base_config = load_yaml("config/base.yaml")
+    ext_config = load_yaml(f"config/config_{ENV}.yaml")
+    final_config = merger.merge(base_config, ext_config)
+    return final_config
