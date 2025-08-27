@@ -1,7 +1,6 @@
 import time
 from concurrent.futures import ThreadPoolExecutor, TimeoutError
 from multiprocessing import Process, Lock, Queue
-from openai import APIConnectionError, InternalServerError
 
 from src.errors import *
 from src.config import conf
@@ -57,7 +56,7 @@ class TaskManager:
             try:
                 result = future.result(timeout=conf["service"]["process_timeout_sec"])
                 res = self.upload_manager.upload_single_file(result)   #  upload image to file system
-                self.progress_manager.update_task_status(request_id,  task["page_id"],  ProgressStatus.SUCCESS, url=(conf["dfs"]["download_prefix"] + res["result"]))
+                self.progress_manager.update_task_status(request_id,  task["page_id"],  ProgressStatus.SUCCESS, url=res)
                 error_msg = None
                     
             except TimeoutError as e:

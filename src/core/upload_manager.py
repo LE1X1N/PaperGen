@@ -19,12 +19,12 @@ class UploadManager:
         try:
             files = {'file': open(file_path, 'rb')}
             data = {'service_type': self.service_type}
-            response = requests.post(self.url, files=files, data=data).json()
+            res = requests.post(self.url, files=files, data=data).json()
 
-            if response['code'] != 0:
-                raise UploadError(response["message"])
+            if res['code'] != 0:
+                raise UploadError(res["message"])
             
-            return response
+            return conf["dfs"]["download_prefix"] + res["result"]
         
         except ConnectTimeout:
             raise    
