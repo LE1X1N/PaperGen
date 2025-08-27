@@ -6,8 +6,8 @@ from src.config import conf
 
 class UploadManager:
     def __init__(self):
-        self.url = conf["upload_url"]
-        self.service_type = conf["service_type"]
+        self.url = conf["dfs"]["upload_url"]
+        self.service_type = conf["dfs"]["service_name"]
 
     def upload_files(self, data: dict):
         paths = []

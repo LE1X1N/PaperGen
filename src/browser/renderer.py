@@ -3,15 +3,37 @@ import modelscope_studio.components.antd as antd
 import modelscope_studio.components.base as ms
 import modelscope_studio.components.pro as pro
 
-from src.config import conf
-
+react_import = {
+    # UI框架
+    "semantic-ui-react": "https://esm.sh/semantic-ui-react@2.1.5",
+    "semantic-ui-css": "https://esm.sh/semantic-ui-css@2.5.0",
+    # 样式工具
+    "styled-components": "https://esm.sh/styled-components@6.1.19",
+    "@tailwindcss/browser": "https://esm.sh/@tailwindcss/browser@4.1.11",
+    # 图标库
+    "lucide-react": "https://esm.sh/lucide-react@0.525.0",
+    # 动画引擎
+    # "framer-motion": "https://esm.sh/framer-motion@12.23.6",
+    "matter-js": "https://esm.sh/matter-js@0.20.0",
+    # 3D 引擎  
+    "three": "https://esm.sh/three@0.178.0",
+    "@react-three/fiber": "https://esm.sh/@react-three/fiber@9.2.0",
+    "@react-three/drei": "https://esm.sh/@react-three/drei@10.5.2",
+    # 数据可视化
+    "echarts": "https://esm.sh/echarts@6.0.0",
+    "recharts": "https://esm.sh/recharts@3.1.0",
+    "konva": "https://esm.sh/konva@9.3.22",
+    "react-konva": "https://esm.sh/react-konva@19.0.7",
+    "p5": "https://esm.sh/p5@2.0.3",
+    # 工具库
+    "dayjs": "https://esm.sh/dayjs",
+}
 
 def launch_sandbox_demo(request_id, task_id, react_code, port, browser_registry=None, browser_lock=None, logger=None, *args):
     """
         Sandbox based on modelscope_studio sandboxs
         
     """
-    
     # compile / render 
     def handle_compile_error(e: gr.EventData):
         """ Compile Error """
@@ -47,7 +69,7 @@ def launch_sandbox_demo(request_id, task_id, react_code, port, browser_registry=
                 sandbox = pro.WebSandbox(
                     height=1080,
                     template="react",
-                    imports=conf["react_import"],
+                    imports=react_import,
                     value={
                         "./index.tsx": """import Demo from './demo.tsx'
                                             import "@tailwindcss/browser"

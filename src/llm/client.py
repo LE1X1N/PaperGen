@@ -5,8 +5,8 @@ from src.config import conf
 
  # OpenAI client
 client = OpenAI(
-    base_url=conf["base_url"],
-    api_key=conf["api_key"]
+    base_url=conf["openai"]["base_url"],
+    api_key=conf["openai"]["api_key"]
 )
 
 def call_chat_completion(messages):
@@ -16,7 +16,7 @@ def call_chat_completion(messages):
     try:
         # openai compatible
         response = client.chat.completions.create(
-                model=conf["model"],  
+                model=conf["openai"]["model"],  
                 messages=messages,
                 stream=True,
                 extra_headers={

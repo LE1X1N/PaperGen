@@ -22,10 +22,8 @@ class TemplateManager:
         # style: 
         #      0: 网站
         #      1: 小程序     
-        path = random.choice(self.tmpl_paths[style])
-        if not path:
-            raise ValueError(f"未知模板：{style}")
-        
+        path = random.choice(self.tmpl_paths[style])  
+              
         with open(path, 'r', encoding='utf-8') as f:
             content = f.read()
 

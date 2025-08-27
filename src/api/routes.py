@@ -9,8 +9,8 @@ from src.llm import check_openai_health
 from src.browser import check_driver_health
 from src.utils import get_logger
 
-logger = get_logger()
 api_bp = Blueprint('v1', __name__)
+logger = get_logger()
 
 task_manager = TaskManager()  # global task manager
 

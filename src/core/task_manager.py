@@ -5,7 +5,7 @@ from openai import APIConnectionError, InternalServerError
 
 from src.errors import *
 from src.config import conf
-from src.llm import call_chat_completion
+from src.llm import call_chat_completion, SYSTEM_PROMPT
 from src.browser import launch_sandbox_demo
 from src.browser import  init_driver, capture_screenshot
 from src.utils import get_random_available_port, wait_for_port, get_logger, get_generated_files
@@ -19,14 +19,14 @@ logger = get_logger()
 
 
 class TaskManager:
-    def __init__(self, num_workers=conf["max_workers"]):
+    def __init__(self):
         self.parser = DataParser(tmpl_manager=TemplateManager())
-        self.progress_manager = ProgressManager(base_dir=conf["screenshot_dir"])
+        self.progress_manager = ProgressManager(base_dir=conf["service"]["local_file_dir"])
         self.upload_manager = UploadManager()
         
         # global thread pool
         if not hasattr(TaskManager, 'global_executor'):
-            TaskManager.global_executor = ThreadPoolExecutor(num_workers, thread_name_prefix="GlobalThreadPool-")
+            TaskManager.global_executor = ThreadPoolExecutor(conf["service"]["max_workers"], thread_name_prefix="GlobalThreadPool-")
         
     def process_tasks(self, request_id: str, data: dict, task_id: str):
         """
@@ -55,13 +55,13 @@ class TaskManager:
         logger.info(f"Request ID: {request_id}: 开始页面级别代码生成！任务数量：{len(tasks)}")
         for future, task in zip(futures, tasks):
             try:
-                result = future.result(timeout=conf["process_timeout"])
+                result = future.result(timeout=conf["service"]["process_timeout_sec"])
                 res = self.upload_manager.upload_single_file(result)   #  upload image to file system
-                self.progress_manager.update_task_status(request_id,  task["page_id"],  ProgressStatus.SUCCESS, url=(conf["download_url_prefix"] + res["result"]))
+                self.progress_manager.update_task_status(request_id,  task["page_id"],  ProgressStatus.SUCCESS, url=(conf["dfs"]["download_prefix"] + res["result"]))
                 error_msg = None
                     
             except TimeoutError as e:
-                error_msg = f"【超时错误】TimeoutError： 超过任务最大时间 {conf["process_timeout"]} s"
+                error_msg = f"【超时错误】TimeoutError： 超过任务最大时间 {conf["service"]["process_timeout_sec"]} s"
             except UploadError as e:
                 error_msg = f"【上传错误】UploadError: {str(e)}"
             except MaxRetriesExceededError as e:
@@ -83,13 +83,13 @@ class TaskManager:
         logger.info(f"Request ID: {request_id} -> Task_{page_id}: ********* 任务 {page_id} 开始！*********")
 
         # 2. create messages
-        messages = [{"role": 'system', "content": conf["system_prompt"]}]
+        messages = [{"role": 'system', "content": SYSTEM_PROMPT}]
         messages.append({"role": "user", "content": query})
 
         # Multi-turn generation
         render_success = False
         
-        for turn in range(conf["max_retries"]):
+        for turn in range(conf["service"]["max_retries"]):
             logger.info(f"Request ID: {request_id} -> Task_{page_id}: 进行第 {turn + 1} 轮尝试...")
 
             try:
@@ -118,7 +118,7 @@ class TaskManager:
                 browser.start()
 
                 # wait port connected (15s)
-                if not wait_for_port(port, timeout=conf["connect_timeout"]):
+                if not wait_for_port(port, timeout=conf["service"]["connect_timeout_sec"]):
                     raise ConnectionRefusedError("Gradio端口连接失败")
                 logger.info(f"Request ID: {request_id} -> Task_{page_id}: Gradio 初始化成功！")
 
@@ -127,8 +127,8 @@ class TaskManager:
                 driver.get(f'http://localhost:{port}')
                 logger.info(f"Request ID: {request_id} -> Task_{page_id}: Chrome driver 初始化成功！")
 
-                # wait rendering 
-                for _ in range(conf["render_timeout"]):
+                # wait rendering (25s)
+                for _ in range(conf["service"]["render_timeout_sec"]):
                     with browser_lock:
                         logger.info(f"Request ID: {request_id} -> Task_{page_id}: 检查渲染状态...")
                         if not browser_registry.empty():
@@ -204,7 +204,7 @@ class TaskManager:
 
         
         if not render_success:
-            raise MaxRetriesExceededError(f"任务超过最大重试次数: {conf["max_retries"]}")
+            raise MaxRetriesExceededError(f"任务超过最大重试次数: {conf["service"]["max_retries"]}")
         
         if return_code:
             return react_code   # module level task

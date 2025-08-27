@@ -1,4 +1,3 @@
-from pathlib import Path
 import yaml
 import os
 from deepmerge import Merger
