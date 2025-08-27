@@ -1,23 +1,11 @@
 # 代码界面渲染
 
-## 1. 环境配置
+## 1. 修改配置文件
 
 服务依赖代码模型生成对应的前端代码，并且依赖 selenium/standalone-chrome 镜像作为浏览器访问代理，提供的 selenium+webdriver+headless 浏览器的截屏功能。
 
-### 1.1 Selenium容器启动
-``` bash
-# 启动
-docker run -d --network host --name leixin-selenium-chrome selenium/standalone-chrome
-
-# 停止 
-docker stop selenium-chrome
-docker rm selenium-chrome
-```
-
-### 1.2 配置修改
-
-#### 1.2.1 模型配置
-基于调用模型，修改 **config/config.yaml** 当中对应OpenAI的相关配置
+### 1.1 模型配置
+基于调用模型，修改 **config/config_prod.yaml** 当中对应OpenAI的相关配置
 
 ``` yaml
 # openai config
@@ -26,17 +14,17 @@ api_key: sk-XXXXXX
 model: Qwen3
 ```
 
-#### 1.2.2 服务内部线程池大小
+### 1.2 服务内部线程池大小
 线程池大小决定服务内部同一时间能够处理的最大任务数量。比如同一个时间收到10个api请求，每个请求内部包括15个图片生成需求，则此时并发应当对应150个任务处理线程。
 
-根据业务需求修改**config/config.yaml** 当中的线程配置：
+根据业务需求修改**config/base.yaml** 当中的线程配置：
 
 ``` yaml
 # service config
 max_workers: 150          # multithread
 ```
 
-#### 1.2.3 Chrome Driver的sessions数量
+### 1.3 Chrome Driver的sessions数量
 对于每一张图片均需要单独在Selenium中初始化一个Chrome Driver，对应于启动一个浏览器渲染代码。每个浏览器进程（如 Chrome）启动后约占用 200-500MB 内存。因此单结点的承载driver数量受限于server的内存和CPU核心数量。即虽然配置了线程池，但是线程之间仍然会争抢配置的有限个Driver。
 
 根据业务需求，修改 **docker-compose.yml** 中的Seleium配置：
@@ -46,7 +34,7 @@ max_workers: 150          # multithread
   leixin-chrome:
     image: swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/selenium/standalone-chrome:latest
     container_name: leixin-selenium-chrome
-    shm_size: 4g
+    shm_size: 8g                       # default 8G shared memory
     network_mode: host
     environment:
       - SE_NODE_MAX_SESSIONS=15        # default 15 sessions
@@ -54,25 +42,9 @@ max_workers: 150          # multithread
 ```
 
 
-## 2. 服务启动
 
-### 2.1 Flask测试服务器
-直接使用Flask作为测试服务器开发API服务，方便开发
-``` bash
-python wsgi.py
-```
 
-### 2.2 uWSGI服务器
-使用uwsgi 提供接口服务
-``` bash
-# 启动
-uwsgi --ini uwsgi_service.ini
-
-# 停止
-uwsgi --stop log/uwsgi.pid
-```
-
-## 2.3 服务测试
+## 2. 服务接口
 
 当前服务对外提供两个接口：
 
@@ -81,7 +53,7 @@ uwsgi --stop log/uwsgi.pid
 
 具体的接口请参考 [接口文档](docs/接口文档.md)
 
-### 2.3.1 生成请求
+### 2.1 生成请求
 ``` bash
 # 发送请求
 curl -X POST http://localhost:8687/v1/gen_images -H "Content-Type: application/json"  -d @docs/测试输入.json
@@ -93,7 +65,7 @@ curl -X POST http://localhost:8687/v1/gen_images -H "Content-Type: application/j
 {"code":0,"message":"任务创建成功!","request_id":"d0793ba1-32df-44f1-b5fb-6dbd4ec211a5","task_id":"20250813104545707549754_TASK_REPORT"}
 ```
 
-### 2.3.2 查询进度
+### 2.2 查询进度
 根据返回的 **request_id**，继续根据这个任务ID号查询状态。
 
 ```bash
@@ -102,16 +74,35 @@ curl http://localhost:8687/v1/progress/<request_id>
 ```
 
 
-## 3. Docker
-项目提供 docker-compose.yml 方便同时管理项目的环境镜像和Chrome镜像，环境镜像需要实现打包，业务代码通过映射到镜像中的 */app* 文件目录。
+## 3. 服务启动
 
-### 3.1 创建环境镜像
-```bash
-# 创建镜像，不含业务代码
-docker build -t  leixin/coder-artifacts-dev:latest .
+### 3.1 Flask测试服务器
+直接使用Flask作为测试服务器开发API服务，方便开发
+``` bash
+python wsgi.py
 ```
 
-### 3.2 Docker compose 启动
+### 3.2 uWSGI服务器
+使用uwsgi 提供接口服务
+``` bash
+# 启动
+uwsgi --ini uwsgi_service.ini
+
+# 停止
+uwsgi --stop log/uwsgi.pid
+```
+
+
+## 4. Docker 启动
+项目提供 docker-compose.yml 方便同时管理项目的环境镜像和Chrome镜像，环境镜像需要实现打包，业务代码通过映射到镜像中的 */app* 文件目录。
+
+### 4.1 创建环境镜像
+```bash
+# 创建镜像，不含业务代码
+docker compose build
+```
+
+### 4.2 服务启动
 
 ``` bash
 # 启动服务
@@ -120,25 +111,28 @@ docker compose up -d
 # 查看容器状态（此时依赖的两个容器应当均为 running）
 docker compose ps
 
-# 进入 Python容器测试
+# 进入容器
 docker compose exec leixin-coder-artifacts bash
 
 # 服务启动
 uwsgi --ini uwsgi_service.ini
+```
 
+### 4.3 服务停止
+``` bash
 # 停止容器
 docker compose down
 ```
 
-
-## 4. 项目结构
+## 5. 项目结构
 
 ```
 coder-artifacts
 ├─ Dockerfile
 ├─ README.md
 ├─ config
-│  ├─ config.yaml            # 服务配置
+│  ├─ base.yaml           # 基础配置
+│  ├─ config.yaml         # 服务配置
 ├─ docs
 │  ├─ 接口文档.md
 │  ├─ 测试输入.json
