@@ -21,7 +21,6 @@ class TaskManager:
     def __init__(self):
         self.parser = DataParser(tmpl_manager=TemplateManager())
         self.progress_manager = ProgressManager(base_dir=conf["service"]["local_file_dir"])
-        self.upload_manager = UploadManager()
         
         # global thread pool
         if not hasattr(TaskManager, 'global_executor'):
@@ -69,7 +68,9 @@ class TaskManager:
                 error_msg = f"【上传错误】{e}"
             except MaxRetriesExceededError as e:
                 error_msg = f"【重试次数超限错误】{e}"
-          
+            except Exception as e:
+                error_msg = f"【其他错误】{e}"
+                
             finally:
                 # update task status
                 if error_msg:
@@ -81,6 +82,7 @@ class TaskManager:
     
 
     def _process_single_task(self, task: dict) -> dict:
+         
         # 1. parse data
         request_id = task["request_id"]
         page_id = task["page_id"]
@@ -116,7 +118,7 @@ class TaskManager:
 
                 port = get_random_available_port()        # random port
                 browser = Process(target=launch_sandbox_demo,
-                                  args=(request_id, page_id, react_code, port, browser_registry, browser_lock, logger), name="Browser Process")
+                                  args=(request_id, page_id, react_code, port, browser_registry, browser_lock, logger), name="BrowserProcess")
                 browser.start()
 
                 # 6. wait port connected (15s)
@@ -140,7 +142,8 @@ class TaskManager:
                 # 10. capture screenshot and upload
                 img_path = capture_screenshot(request_id, page_id, driver, save_dir=self.progress_manager._get_request_dir(request_id))
                 logger.info(f"Request ID: {request_id} -> Task_{page_id}: Selenium 截图已保存至 {img_path}")
-                res = self.upload_manager.upload_single_file(img_path)   #  upload to file system
+                res = UploadManager.upload_single_file(img_path)        #  upload to file system
+                logger.info(f"Request ID: {request_id} -> Task_{page_id}: 【任务成功】上传文件访问路径：{res}")
                 return res   
 
             except FormatError as e:
@@ -160,8 +163,8 @@ class TaskManager:
                 raise
             except FileSystemError:
                 raise
-            # except Exception as e:
-            #     logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【其他错误】{e}")
+            except Exception:
+                raise
              
             finally:
                 if browser:
@@ -172,5 +175,6 @@ class TaskManager:
                     driver.close()
                     driver.quit()
                     logger.info(f"Request ID: {request_id} -> Task_{page_id}: Chrome Driver 退出!")
+                    
                     
         raise MaxRetriesExceededError(f"任务超过最大重试次数: {conf["service"]["max_retries"]}")

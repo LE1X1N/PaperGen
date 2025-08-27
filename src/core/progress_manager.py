@@ -79,13 +79,9 @@ class ProgressManager:
         
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
-        
-        # log
-        if status == ProgressStatus.SUCCESS:
-            logger.info(f"Request ID: {request_id} -> Task_{page_id}: 【任务成功】上传文件访问路径：{url}")
-        elif status == ProgressStatus.FAILED:
+
+        if status == ProgressStatus.FAILED:
             logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【任务失败】{error}")
-            
         return True
     
 
