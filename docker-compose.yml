@@ -11,8 +11,7 @@ services:
     depends_on:
       - leixin-chrome
     environment:
-      - APP_ENV=dev   # dev/prod,  load dev.yaml
-      - SELENIUM_REMOTE_URL=http://localhost:4444/wd/hub   # chrome 服务地址
+      - APP_ENV=dev               # dev/prod,  load dev.yaml
     network_mode: host
 
   # Selenium Chrome Image
@@ -22,5 +21,5 @@ services:
     shm_size: 4g
     network_mode: host
     environment:
-      - SE_NODE_MAX_SESSIONS=15
+      - SE_NODE_MAX_SESSIONS=15   # chrome sessions
       - SE_NODE_SESSION_TIMEOUT=60

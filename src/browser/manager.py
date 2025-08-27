@@ -1,14 +1,13 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-import os
 import time
 
+from src.config import conf
 from src.errors import ChromeError
 from src.utils import  get_logger
 
 logger = get_logger()
 
-selenium_url = os.getenv("SELENIUM_REMOTE_URL", "http://localhost:4444/wd/hub")
 
 def init_driver():
     """
@@ -22,7 +21,7 @@ def init_driver():
         chrome_options.add_argument("--window-size=1920x1080")
 
         return webdriver.Remote(
-            command_executor=selenium_url,
+            command_executor=conf["selenium"]["url"],
             options=chrome_options
         )
 

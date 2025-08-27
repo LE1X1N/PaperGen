@@ -3,6 +3,9 @@ openai:
     api_key: sk-XXXXXX
     model: Qwen3
 
+selenium:
+    url: http://localhost:4444/wd/hub
+    
 dfs:
     upload_url: http://10.20.171.5:32005/file/DAS_ha
     service_name: website.result
