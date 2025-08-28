@@ -1,13 +1,8 @@
 import json
 import os
 from datetime import datetime
-from typing import Dict, Optional, Literal
+from typing import Dict, Optional
 from pathlib import Path
-
-from src.utils import get_logger
-from .data_processing.json_parser import DataParser
-
-logger = get_logger()
 
 
 class ProgressStatus:
@@ -15,14 +10,16 @@ class ProgressStatus:
     FAILED = "failed"
     PENDING = "pending"
 
+
 class ProgressManager:
     """
         Upload status JSON to local dir or to mongodb
     """
     
-    def __init__(self, base_dir: str, mode: Literal["local, db"] = "local"):
+    def __init__(self, base_dir: str, logger=None):
         self.base_dir = Path(base_dir)
         self.request_dict_name = "request_status.json"
+        self.logger = logger
         
         if not self.base_dir.exists():
             self.base_dir.mkdir(exist_ok=True)
@@ -34,8 +31,12 @@ class ProgressManager:
     def _get_request_dict_path(self, request_id):
         return self._get_request_dir(request_id) /  self.request_dict_name
         
-    def init_request(self, request_id: str, data: dict, task_id: str):
-        task_ids = DataParser.parse_task_ids(data)
+    def init_request(self, request_id: str, page_ids: list, task_id: str):
+        """
+            request_id: 服务对于每个请求request生成的独立ID
+            page_id: 请求体中的每个页面附带ID
+            task_id: 请求体中附带任务ID
+        """
         
         # create corresponding dir
         save_dir = self._get_request_dir(request_id)
@@ -48,15 +49,15 @@ class ProgressManager:
             "task_id": task_id,
             "request_id": request_id,
             "create_time": datetime.now().isoformat(),
-            "total_tasks": len(task_ids),
+            "total_tasks": len(page_ids),
             "tasks": [
-                {"id": task_id, "status": ProgressStatus.PENDING, "url": ""} for task_id in task_ids
+                {"id": page_id, "status": ProgressStatus.PENDING, "url": ""} for page_id in page_ids
             ]
         }
         
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(request_dict, f, indent=2, ensure_ascii=False)
-        logger.info(f"Request ID: {request_id} ->: 开始处理请求，状态文件存储路径：{file_path}")    
+        self.logger.info(f"Request ID: {request_id} ->: 开始处理请求，状态文件存储路径：{file_path}")    
         return file_path
     
     
@@ -85,7 +86,7 @@ class ProgressManager:
             json.dump(data, f, indent=2, ensure_ascii=False)
 
         if status == ProgressStatus.FAILED:
-            logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【任务失败】{error}")
+            self.logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【任务失败】{error}")
         return True
     
 
@@ -111,7 +112,7 @@ class ProgressManager:
             json.dump(data, f, indent=2, ensure_ascii=False)
         
         if status == ProgressStatus.FAILED:
-            logger.error(f"Request ID: {request_id}: 【任务失败】{error}")
+            self.logger.error(f"Request ID: {request_id}: 【任务失败】{error}")
             
         return True
         
@@ -128,5 +129,5 @@ class ProgressManager:
         file_path = self._get_request_dir(request_id) / f"task_{page_id}.jsx"
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(code)
-        logger.info(f"Request ID: {request_id} -> Task_{page_id}: 代码存储路径：{str(file_path)}")
+        self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: 代码存储路径：{str(file_path)}")
         

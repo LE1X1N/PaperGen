@@ -9,8 +9,8 @@ from src.browser import launch_sandbox_demo, wait_for_render
 from src.browser import  init_driver, capture_screenshot
 from src.utils import get_random_available_port, wait_for_port, get_logger, get_generated_files
 
-from .data_processing.json_parser import DataParser
-from .progress_manager import ProgressManager, ProgressStatus
+from .data_processing import DataParser
+from .progress import ProgressManager, ProgressStatus
 from .storage import upload_single_file
 
 logger = get_logger()
@@ -18,8 +18,8 @@ logger = get_logger()
 
 class TaskManager:
     def __init__(self):
-        self.parser = DataParser()
-        self.progress_manager = ProgressManager(base_dir=conf["service"]["local_file_dir"])
+        self.parser = DataParser(logger=logger)
+        self.progress_manager = ProgressManager(base_dir=conf["service"]["local_file_dir"], logger=logger)
         
         # global thread pool
         if not hasattr(TaskManager, 'global_executor'):
@@ -36,7 +36,7 @@ class TaskManager:
         start_time = time.time()
 
         # 1. Images save dir
-        self.progress_manager.init_request(request_id, data, task_id)
+        self.progress_manager.init_request(request_id, self.parser.parse_page_ids(data), task_id)
             
         # 2. module-level tasks       
         tasks = self.parser.parse_module(request_id, data)

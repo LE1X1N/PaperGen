@@ -5,9 +5,10 @@ from .tmpl_manager import TemplateManager
 
 
 class DataParser:
-    def __init__(self):
+    def __init__(self, logger=None):
         self.tmpl_manager = TemplateManager()
-
+        self.logger = logger
+        
     def check_field(self, data: dict):
         # Check whether input JSON is valid
         try:
@@ -106,7 +107,7 @@ class DataParser:
         
 
     @staticmethod
-    def parse_task_ids(data:dict) -> list[str]:
+    def parse_page_ids(data:dict) -> list[str]:
         task_ids = []
         for module in data["web_pages"]:
             for page in module['page']:
