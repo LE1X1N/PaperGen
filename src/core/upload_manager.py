@@ -1,11 +1,14 @@
 import requests
-from requests.exceptions import ConnectTimeout
 
 from src.errors import *
 from src.config import conf
 
+
 class UploadManager:
-    
+
+    """
+        Upload files to DFS
+    """
     @staticmethod
     def upload_single_file(file_path):
         try:

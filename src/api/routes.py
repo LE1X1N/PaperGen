@@ -5,8 +5,6 @@ import uuid
 from src.core.task_manager import TaskManager
 
 from src.errors import InvalidJSONError, OpenAIError, ChromeError
-from src.llm import check_openai_health
-from src.browser import check_driver_health
 from src.utils import get_logger
 
 api_bp = Blueprint('v1', __name__)
@@ -25,14 +23,12 @@ def gen_images():
   
     try:
         task_manager.parser.check_field(data)  # check JSON field
-        check_openai_health()                  # check OpenAI
-        check_driver_health()                  # check chrome driver
         task_thread = threading.Thread(target=task_manager.process_tasks, args=(request_id, data, task_id))  
         task_thread.start()
         logger.info(f"Request ID: {request_id} -> 创建任务成功！")
         return jsonify({"code": 0, "message": "任务创建成功!", "task_id": task_id,  "request_id": request_id})
         
-    except (InvalidJSONError, OpenAIError, ChromeError) as e:
+    except Exception as e:
         logger.info(f"Request ID: {request_id} -> 创建任务失败：{e} ")
         return jsonify({"code": -1, "message": f"任务创建失败! {e}"}), 500
     

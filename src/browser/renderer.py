@@ -7,6 +7,7 @@ import modelscope_studio.components.pro as pro
 
 from src.errors import FrontendError, RenderTimeoutError
 
+
 react_import = {
     # UI框架
     "semantic-ui-react": "https://esm.sh/semantic-ui-react@2.1.5",

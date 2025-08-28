@@ -58,4 +58,3 @@ def check_driver_health():
         if driver is not None:
             driver.close()
             driver.quit()
-    

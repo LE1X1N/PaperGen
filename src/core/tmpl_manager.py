@@ -2,6 +2,7 @@ from pathlib import Path
 import os
 import random
 
+
 class TemplateManager:
     def __init__(self):
 

@@ -2,6 +2,7 @@ from src.llm import build_module_prompt, build_page_prompt
 from src.errors import InvalidJSONError
 from .tmpl_manager import TemplateManager
 
+
 class DataParser:
     def __init__(self, tmpl_manager: TemplateManager):
         self.tmpl_manager = tmpl_manager
@@ -110,3 +111,4 @@ class DataParser:
             for page in module['page']:
                 task_ids.append(page["id"])
         return task_ids
+    
