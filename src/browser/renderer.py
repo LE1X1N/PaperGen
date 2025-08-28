@@ -60,7 +60,7 @@ def launch_sandbox_demo(request_id, page_id, react_code, port, browser_registry=
 
     def handle_compile_success():
         """ Compile Success """
-        msg = f"【编译成功】: 代码编译成功，无语法错误，开始渲染..."
+        msg = f"代码编译成功，无语法错误，开始渲染..."
         if logger:
             logger.info(f"Request ID: {request_id} -> Task_{page_id}:{msg}")
         if browser_registry is not None:
@@ -128,9 +128,8 @@ def wait_for_render(request_id, page_id, timeout, browser_registry=None, browser
                         wait_rounds += 1
                         time.sleep(1)
 
-                    logger.info(f"Request ID: {request_id} -> Task_{page_id}: 【渲染成功】 前端代码渲染成功！")
+                    logger.info(f"Request ID: {request_id} -> Task_{page_id}: 前端代码渲染成功！")
                     return True
         time.sleep(1)
         
     raise RenderTimeoutError(f"Gradio渲染超时，超过 {timeout} 秒未渲染成功！")
-

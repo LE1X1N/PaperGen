@@ -1,11 +1,15 @@
 import base64
 from pathlib import Path
+import os
 
 from src.config import LOCAL_FILE_DIR
 
 
 def get_local_request_dir(request_id):
-    return Path(LOCAL_FILE_DIR) / request_id
+    request_dir = Path(LOCAL_FILE_DIR) / request_id
+    if not os.path.exists(request_dir):
+        os.mkdir(request_dir)
+    return request_dir
 
 
 def save_code(request_id: str, page_id: str, code: str):

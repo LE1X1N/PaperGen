@@ -2,7 +2,8 @@ import json
 import os
 from datetime import datetime
 from typing import Dict, Optional
-from pathlib import Path
+
+from src.db import get_mongo_collection
 
 
 class ProgressStatus:
@@ -16,34 +17,20 @@ class ProgressManager:
         Upload status JSON to local dir or to mongodb
     """
     
-    def __init__(self, base_dir: str, logger=None):
-        self.base_dir = Path(base_dir)
-        self.request_dict_name = "request_status.json"
+    def __init__(self, logger=None):
         self.logger = logger
+        self.collection = get_mongo_collection()
         
-    def _get_request_dir(self, request_id):
-        return self.base_dir / request_id
-    
-    def _get_request_dict_path(self, request_id):
-        return self._get_request_dir(request_id) /  self.request_dict_name
         
     def init_request(self, request_id: str, page_ids: list, task_id: str):
         """
             request_id: 服务对于每个请求request生成的独立ID
             page_id: 请求体中的每个页面附带ID
             task_id: 请求体中附带任务ID
-        """
-        
-        # create corresponding dir
-        save_dir = self._get_request_dir(request_id)
-        os.makedirs(save_dir, exist_ok=True)
-        
-        # create initial dict
-        file_path = save_dir / self.request_dict_name
-        
+        """    
         request_dict = {
+            "_id": request_id,
             "task_id": task_id,
-            "request_id": request_id,
             "create_time": datetime.now().isoformat(),
             "total_tasks": len(page_ids),
             "tasks": [
@@ -51,71 +38,35 @@ class ProgressManager:
             ]
         }
         
-        with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(request_dict, f, indent=2, ensure_ascii=False)
-        self.logger.info(f"Request ID: {request_id} ->: 开始处理请求，状态文件存储路径：{file_path}")    
-        return file_path
+        res = self.collection.insert_one(request_dict)
+        return res.inserted_id
     
     
     def update_task_status(self, request_id: str, page_id:str, status:str, url:str="", error: str=""):
         # update corresponding request dict
-        file_path = self._get_request_dict_path(request_id)
-        if not file_path.exists():
-            return False    
+        update_fields = {
+            f"tasks.$.status" : status
+        }
+        if url:
+            update_fields[f"tasks.$.url"] = url
+        if error:
+            update_fields[f"tasks.$.error"] = error
         
-        # read JSON
-        with open(file_path, "r", encoding="utf-8") as f:
-            data = json.load(f) 
+        # filter
+        res = self.collection.update_one(
+            filter={
+                "_id": request_id, 
+                "tasks.id": page_id
+            },
+            update={"$set": update_fields}
+        )
         
-        # updata field
-        for task in data.get("tasks", []):
-            if task.get("id") == page_id:
-                task["status"] = status
-                task["url"] = url
-                if error:
-                    task["error"] = error
-                else:
-                    task.pop("error", None)  
-                break
-        
-        with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2, ensure_ascii=False)
-
-        if status == ProgressStatus.FAILED:
-            self.logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【任务失败】{error}")
-        return True
+        self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: 【任务完成】MongoDB任务状态更新成功：{status}")
+        return res.modified_count == 1
     
 
-    def update_all_tasks(self, request_id: str, status:str, url:str="", error: str=""):
-        # read JSON
-        file_path = self._get_request_dict_path(request_id)
-        if not file_path.exists():
-            return False   
-        with open(file_path, "r", encoding="utf-8") as f:
-            data = json.load(f) 
-        
-        # updata task field
-        for task in data.get("tasks", []):
-            task["status"] = status
-            task["url"] = url
-            if error:
-                task["error"] = error
-            else:
-                task.pop("error", None)  
-        
-        # write JSON
-        with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2, ensure_ascii=False)
-        
-        if status == ProgressStatus.FAILED:
-            self.logger.error(f"Request ID: {request_id}: 【任务失败】{error}")
-            
-        return True
-        
-    
     def get_progress(self, request_id: str) -> Optional[Dict]:
-        file_path = self._get_request_dict_path(request_id)
-        if not file_path.exists():
-            return None
-        with open(file_path, "r", encoding="utf-8") as f:
-            return json.load(f)
+        document = self.collection.find_one({"_id": request_id})
+        if document:
+            document["_id"] = str(document["_id"])
+        return document

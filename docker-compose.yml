@@ -18,8 +18,8 @@ services:
   leixin-chrome:
     image: swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/selenium/standalone-chrome:latest
     container_name: leixin-selenium-chrome
-    shm_size: 4g
+    shm_size: 8g
     network_mode: host
     environment:
       - SE_NODE_MAX_SESSIONS=10    # chrome sessions
-      - SE_NODE_SESSION_TIMEOUT=60
+      - SE_NODE_SESSION_TIMEOUT=120

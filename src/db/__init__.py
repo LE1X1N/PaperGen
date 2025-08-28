@@ -1,1 +1,1 @@
-from .client import check_mongodb_health
+from .client import check_mongodb_health, get_mongo_collection

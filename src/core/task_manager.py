@@ -1,5 +1,5 @@
 import time
-from concurrent.futures import ThreadPoolExecutor, TimeoutError
+from concurrent.futures import ThreadPoolExecutor, TimeoutError, as_completed
 from multiprocessing import Process, Lock, Queue
 
 from src.errors import *
@@ -11,13 +11,13 @@ from src.utils import get_random_available_port, wait_for_port, get_generated_fi
 
 from .data_processing import DataParser
 from .progress import ProgressManager, ProgressStatus
-from .storage import upload_single_file, save_code, save_img
+from .storage import upload_single_file, save_code, save_img, get_local_request_dir
 
 
 class TaskManager:
     def __init__(self, logger=None):
         self.parser = DataParser(logger=logger)
-        self.progress_manager = ProgressManager(base_dir=conf["service"]["local_file_dir"], logger=logger)
+        self.progress_manager = ProgressManager(logger=logger)
         self.logger = logger
         
         # global thread pool
@@ -34,9 +34,12 @@ class TaskManager:
         """
         start_time = time.time()
 
-        # 1. Images save dir
+        # 1. ini request status dict and dir
         self.progress_manager.init_request(request_id, self.parser.parse_page_ids(data), task_id)
-            
+        request_dir = get_local_request_dir(request_id)
+        self.logger.info(f"Request ID: {request_id} ->: 状态JSON上传MongoDB成功") 
+        self.logger.info(f"Request ID: {request_id} ->: 本地文件存储路径：{request_dir}") 
+        
         # 2. module-level tasks       
         tasks = self.parser.parse_module(request_id, data)
         self.logger.info(f"Request ID: {request_id}: 开始模块级别模板生成! 任务数量：{len(tasks)}")
@@ -45,15 +48,19 @@ class TaskManager:
 
         # 3. page-level tasks
         tasks = self.parser.parse_page(request_id, data, gen_tmpls)
-        futures = [TaskManager.global_executor.submit(self._process_single_task, task) for task in tasks]
+        future_to_task = {}
+        for task in tasks:
+            future = TaskManager.global_executor.submit(self._process_single_task, task) 
+            future_to_task[future] = task
             
         # traverse all tasks
         self.logger.info(f"Request ID: {request_id}: 开始页面级别代码生成！任务数量：{len(tasks)}")
-        for future, task in zip(futures, tasks):
+        for future in as_completed(future_to_task):
+            task = future_to_task[future]
+            
             try:
                 res = future.result(timeout=conf["service"]["process_timeout_sec"])
-                error_msg = None
-            
+                error_msg = None  
             except OpenAIError as e:
                 error_msg = f"【OpenAI错误】{e}"
             except ChromeError as e:    
@@ -70,15 +77,15 @@ class TaskManager:
             finally:
                 # update task status
                 if error_msg:
-                    self.progress_manager.update_task_status(request_id, task["page_id"], ProgressStatus.FAILED, url="", error=error_msg)
+                    self.progress_manager.update_task_status(request_id, task["page_id"], ProgressStatus.FAILED, url="", error=error_msg) # fail
                 else:
-                    self.progress_manager.update_task_status(request_id,  task["page_id"],  ProgressStatus.SUCCESS, url=res)
+                    self.progress_manager.update_task_status(request_id,  task["page_id"],  ProgressStatus.SUCCESS, url=res)    # success
                     
         self.logger.info(f"Request ID: {request_id} -> 处理请求完成！共耗时 {time.time() - start_time} s")
     
 
     def _process_single_task(self, task: dict) -> dict:
-         
+        
         # 1. parse data
         request_id = task["request_id"]
         page_id = task["page_id"]
@@ -144,7 +151,7 @@ class TaskManager:
                 
                 # 11. upload img to DFS
                 res = upload_single_file(img_path) 
-                self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: 【任务成功】上传文件访问路径：{res}")
+                self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: DFS 上传文件访问路径：{res}")
                 return res   
 
             except FormatError as e:
@@ -171,11 +178,11 @@ class TaskManager:
                 if browser:
                     browser.kill()
                     self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: Gradio浏览器 退出! 错误码: {browser.exitcode}")
-                    
+                        
                 if driver:
                     driver.close()
                     driver.quit()
                     self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: Chrome Driver 退出!")
-                    
+
                     
         raise MaxRetriesExceededError(f"任务超过最大重试次数: {conf["service"]["max_retries"]}")
