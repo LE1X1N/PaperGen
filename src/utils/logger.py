@@ -2,21 +2,16 @@ import logging
 import os
 from concurrent_log_handler import ConcurrentRotatingFileHandler
 
-from src.config import conf
+from src.config import conf, LOG_BASE_DIR
 
 
 def setup_logger():
-    """Initialize the logger for the application."""
+    """
+        Initialize the logger for the application.
+    """
     
-    # dir
-    work_root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))    # file system
-    log_dir = os.path.join(work_root_dir, conf["service"]["log"]["base_dir"])
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-    
-    # log file
-    logger_file_name = conf["service"]["log"]["file_name"]
-    logger_file_path = os.path.join(log_dir, logger_file_name)
+    # log file 
+    logger_file_path = os.path.join(LOG_BASE_DIR, conf["service"]["log"]["file_name"])
 
     # init logger
     logger = logging.getLogger(conf["service"]["name"])
@@ -29,7 +24,7 @@ def setup_logger():
     )
     service_handler.setFormatter(logging.Formatter(conf["service"]["log"]["format"]))
     logger.addHandler(service_handler)
-    return logger
+    return logger_file_path
 
 
 def get_logger():

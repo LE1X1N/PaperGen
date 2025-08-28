@@ -3,8 +3,6 @@ from flask import Blueprint, request, jsonify
 import uuid
 
 from src.core.task_manager import TaskManager
-
-from src.errors import InvalidJSONError, OpenAIError, ChromeError
 from src.utils import get_logger
 
 api_bp = Blueprint('v1', __name__)

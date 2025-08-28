@@ -21,10 +21,6 @@ class ProgressManager:
         self.request_dict_name = "request_status.json"
         self.logger = logger
         
-        if not self.base_dir.exists():
-            self.base_dir.mkdir(exist_ok=True)
-            logger.info(f"创建文件存储路径：{self.base_dir}")
-            
     def _get_request_dir(self, request_id):
         return self.base_dir / request_id
     

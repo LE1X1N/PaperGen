@@ -3,19 +3,33 @@ from flask import Flask
 from src.llm import check_openai_health
 from src.browser import check_driver_health
 from src.utils import setup_logger
-from src.api import api_bp
+from src.config import LOCAL_FILE_DIR, LOG_BASE_DIR
 
 def create_app():
-    app = Flask(__name__)
-    setup_logger()
-    app.register_blueprint(api_bp, url_prefix='/v1')
-
     try:
-        check_openai_health()                  # check OpenAI
+        if not LOCAL_FILE_DIR.exists():
+            LOCAL_FILE_DIR.mkdir(exist_ok=True)
+            print(f"创建文件存储路径：{LOCAL_FILE_DIR}")
+            
+            
+        if not LOG_BASE_DIR.exists():
+            LOG_BASE_DIR.mkdir(exist_ok=True)
+            print(f"创建日志路径：{LOCAL_FILE_DIR}")  
+            
+        log_file_path = setup_logger()
+        print(f"日志存储位置：{log_file_path}")
+    
+        check_openai_health()                
         print("OpenAI 检查通过！")
-        check_driver_health()                  # check chrome driver  
+        
+        check_driver_health()                 
         print("Chrome Driver 检查通过！")
         
+        
+        from src.api import api_bp
+        
+        app = Flask(__name__)
+        app.register_blueprint(api_bp, url_prefix='/v1')
         print("服务启动成功！")
         return app
     
