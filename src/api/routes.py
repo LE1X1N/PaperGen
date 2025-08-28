@@ -10,7 +10,8 @@ from src.utils import get_logger
 api_bp = Blueprint('v1', __name__)
 logger = get_logger()
 
-task_manager = TaskManager()  # global task manager
+task_manager = TaskManager(logger=logger)  # global task manager
+
 
 @api_bp.route('/gen_images', methods=['POST'])
 def gen_images():

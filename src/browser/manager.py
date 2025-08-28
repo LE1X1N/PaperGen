@@ -4,9 +4,6 @@ import time
 
 from src.config import conf
 from src.errors import ChromeError
-from src.utils import  get_logger
-
-logger = get_logger()
 
 
 def init_driver():
@@ -30,7 +27,7 @@ def init_driver():
         raise ChromeError(f"Chrome Driver 初始化失败: {error_msg}") from e
 
 
-def capture_screenshot(request_id, task_id, driver, save_dir):
+def capture_screenshot(driver, save_path):
     """
         Capture screenshots
     """
@@ -41,14 +38,16 @@ def capture_screenshot(request_id, task_id, driver, save_dir):
         driver.set_window_size(1920, total_height)
 
         # save screenshot
-        screenshot_path = save_dir / f"task_{task_id}.png"
-        driver.save_screenshot(screenshot_path)
-    except Exception as e:
-        logger.info(f"Request ID: {request_id} -> Task ID: {task_id} 截屏失败 - {str(e)}")
-    return screenshot_path
-
+        driver.save_screenshot(save_path)
+        return save_path
+    except Exception:
+        raise
+    
 
 def check_driver_health():
+    """
+        Try to initialize a chrome driver
+    """
     driver = None
     try:
         driver = init_driver()
