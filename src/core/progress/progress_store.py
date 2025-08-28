@@ -123,11 +123,3 @@ class ProgressManager:
             return None
         with open(file_path, "r", encoding="utf-8") as f:
             return json.load(f)
-        
-    
-    def save_code(self, request_id: str, page_id: str, code: str):
-        file_path = self._get_request_dir(request_id) / f"task_{page_id}.jsx"
-        with open(file_path, "w", encoding="utf-8") as f:
-            f.write(code)
-        self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: 代码存储路径：{str(file_path)}")
-        

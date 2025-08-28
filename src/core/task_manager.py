@@ -11,7 +11,7 @@ from src.utils import get_random_available_port, wait_for_port, get_generated_fi
 
 from .data_processing import DataParser
 from .progress import ProgressManager, ProgressStatus
-from .storage import upload_single_file
+from .storage import upload_single_file, save_code, save_img
 
 
 class TaskManager:
@@ -132,15 +132,20 @@ class TaskManager:
                 wait_for_render(request_id, page_id, conf["service"]["render_timeout_sec"], browser_registry, browser_lock, self.logger)
                 self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: 第 {turn + 1} 轮成功！")
                 
-                # 9. module level task, return generated module-level templates
-                self.progress_manager.save_code(request_id, page_id, react_code)
+                # 9. save jsx code
+                code_path = save_code(request_id, page_id, react_code)
+                self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: jsx 代码已保存至 {code_path}")
+
                 if return_code:
                     return react_code  
                 
-                # 10. capture screenshot and upload
-                img_path = capture_screenshot(driver, save_path=self.progress_manager._get_request_dir(request_id) / f"task_{page_id}.png")
+                # 10. capture screenshot and save png image
+                screenshot_img = capture_screenshot(driver)
+                img_path = save_img(request_id, page_id, screenshot_img)
                 self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: Selenium 截图已保存至 {img_path}")
-                res = upload_single_file(img_path)        #  upload to file system
+                
+                # 11. upload img to DFS
+                res = upload_single_file(img_path) 
                 self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: 【任务成功】上传文件访问路径：{res}")
                 return res   
 

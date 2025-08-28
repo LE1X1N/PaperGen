@@ -1,6 +1,7 @@
+import time
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-import time
 
 from src.config import conf
 from src.errors import ChromeError
@@ -27,22 +28,22 @@ def init_driver():
         raise ChromeError(f"Chrome Driver 初始化失败: {error_msg}") from e
 
 
-def capture_screenshot(driver, save_path):
+def capture_screenshot(driver):
     """
         Capture screenshots
     """
     try:
-        time.sleep(1)
+        time.sleep(3)
         # window size 
         total_height = driver.execute_script("return document.body.scrollHeight")
         driver.set_window_size(1920, total_height)
 
         # save screenshot
-        driver.save_screenshot(save_path)
-        return save_path
+        base64_str = driver.get_screenshot_as_base64()
+        return base64_str
     except Exception:
         raise
-    
+
 
 def check_driver_health():
     """
