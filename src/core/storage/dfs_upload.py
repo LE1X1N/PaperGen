@@ -1,6 +1,6 @@
 import requests
 
-from src.errors import UploadError, FileSystemError
+from src.errors import FileSystemError
 from src.config import conf
 
 """
@@ -13,7 +13,7 @@ def upload_single_file(file_path):
         res = requests.post(conf["dfs"]["upload_url"], files=files, data=data).json()
 
         if res['code'] != 0:
-            raise UploadError(res["message"])
+            raise FileSystemError(res["message"])
             
         return conf["dfs"]["download_prefix"] + res["result"]
         
@@ -27,4 +27,12 @@ def upload_files(data: dict):
     for res in data:
         paths.append(res["path"])
     return [upload_single_file(path) for path in paths]
-    
+
+
+def check_dfs_health():
+    try:
+        res = requests.get(conf["dfs"]["health_check_url"])
+        if res.status_code != 200:
+            raise FileSystemError
+    except FileSystemError:
+        raise

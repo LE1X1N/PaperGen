@@ -10,7 +10,8 @@ dfs:
     upload_url: http://10.20.171.5:32005/file/DAS_ha
     service_name: website.result
     download_prefix: http://10.20.171.4:52003/fsdata/website/website.result
-
+    health_check_url: http://10.20.171.5:32005/file/health
+    
 mongodb:
     uri: mongodb://website_online:hZc8f7zEqX@mongo2.aimc.offline:27017,mongo3.aimc.offline:27018,mongo4.aimc.offline:27019/?replicaSet=mongos
     db_name: website_generation

@@ -62,8 +62,6 @@ class TaskManager:
                 error_msg = f"【DFS错误】{e}"  
             except TimeoutError as e:
                 error_msg = f"【超时错误】： 生成超过任务最大时间 {conf["service"]["process_timeout_sec"]} s"
-            except UploadError as e:
-                error_msg = f"【上传错误】{e}"
             except MaxRetriesExceededError as e:
                 error_msg = f"【重试次数超限错误】{e}"
             except Exception as e:

@@ -1,7 +1,9 @@
 from flask import Flask
 
+from src.core.storage import check_dfs_health
 from src.llm import check_openai_health
 from src.browser import check_driver_health
+from src.db import check_mongodb_health
 from src.utils import setup_logger
 from src.config import LOCAL_FILE_DIR, LOG_BASE_DIR
 
@@ -10,7 +12,7 @@ def create_app():
         if not LOCAL_FILE_DIR.exists():
             LOCAL_FILE_DIR.mkdir(exist_ok=True)
             print(f"创建文件存储路径：{LOCAL_FILE_DIR}")
-            
+        print(f"本地文件存储位置：{LOCAL_FILE_DIR}")
             
         if not LOG_BASE_DIR.exists():
             LOG_BASE_DIR.mkdir(exist_ok=True)
@@ -25,6 +27,11 @@ def create_app():
         check_driver_health()                 
         print("Chrome Driver 检查通过！")
         
+        check_mongodb_health()
+        print("MongoDB 检查通过！")
+        
+        check_dfs_health()
+        print("DFS 检查通过！")
         
         from src.api import api_bp
         

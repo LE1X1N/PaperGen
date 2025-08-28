@@ -44,3 +44,4 @@ def check_openai_health():
         call_chat_completion(messages)
     except OpenAIError:
         raise
+    

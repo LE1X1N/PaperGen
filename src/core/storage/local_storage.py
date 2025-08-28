@@ -7,11 +7,13 @@ from src.config import LOCAL_FILE_DIR
 def get_local_request_dir(request_id):
     return Path(LOCAL_FILE_DIR) / request_id
 
+
 def save_code(request_id: str, page_id: str, code: str):
     file_path = get_local_request_dir(request_id) / f"task_{page_id}.jsx"
     with open(file_path, "w", encoding="utf-8") as f:
         f.write(code)
     return file_path
+
 
 def save_img(request_id: str, page_id: str, img: str):
     """
