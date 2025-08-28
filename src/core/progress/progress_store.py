@@ -68,5 +68,7 @@ class ProgressManager:
     def get_progress(self, request_id: str) -> Optional[Dict]:
         document = self.collection.find_one({"_id": request_id})
         if document:
-            document["_id"] = str(document["_id"])
+            str_id = str(document["_id"])
+            del document["_id"]
+            document["request_id"] = str_id
         return document
