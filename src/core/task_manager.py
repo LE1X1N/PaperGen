@@ -9,17 +9,16 @@ from src.browser import launch_sandbox_demo, wait_for_render
 from src.browser import  init_driver, capture_screenshot
 from src.utils import get_random_available_port, wait_for_port, get_logger, get_generated_files
 
-from .data_parser import DataParser
-from .tmpl_manager import TemplateManager
+from .data_processing.json_parser import DataParser
 from .progress_manager import ProgressManager, ProgressStatus
-from .upload_manager import UploadManager
+from .storage import upload_single_file
 
 logger = get_logger()
 
 
 class TaskManager:
     def __init__(self):
-        self.parser = DataParser(tmpl_manager=TemplateManager())
+        self.parser = DataParser()
         self.progress_manager = ProgressManager(base_dir=conf["service"]["local_file_dir"])
         
         # global thread pool
@@ -142,7 +141,7 @@ class TaskManager:
                 # 10. capture screenshot and upload
                 img_path = capture_screenshot(request_id, page_id, driver, save_dir=self.progress_manager._get_request_dir(request_id))
                 logger.info(f"Request ID: {request_id} -> Task_{page_id}: Selenium 截图已保存至 {img_path}")
-                res = UploadManager.upload_single_file(img_path)        #  upload to file system
+                res = upload_single_file(img_path)        #  upload to file system
                 logger.info(f"Request ID: {request_id} -> Task_{page_id}: 【任务成功】上传文件访问路径：{res}")
                 return res   
 

@@ -1,22 +1,26 @@
 import json
 import os
 from datetime import datetime
-from typing import Dict, Optional
+from typing import Dict, Optional, Literal
 from pathlib import Path
 
 from src.utils import get_logger
-from .data_parser import DataParser
+from .data_processing.json_parser import DataParser
 
 logger = get_logger()
+
 
 class ProgressStatus:
     SUCCESS = "success"
     FAILED = "failed"
     PENDING = "pending"
 
-
 class ProgressManager:
-    def __init__(self, base_dir: str):
+    """
+        Upload status JSON to local dir or to mongodb
+    """
+    
+    def __init__(self, base_dir: str, mode: Literal["local, db"] = "local"):
         self.base_dir = Path(base_dir)
         self.request_dict_name = "request_status.json"
         
@@ -121,7 +125,8 @@ class ProgressManager:
         
     
     def save_code(self, request_id: str, page_id: str, code: str):
-        file_path = self._get_request_dir(request_id) / f"{page_id}.jsx"
+        file_path = self._get_request_dir(request_id) / f"task_{page_id}.jsx"
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(code)
         logger.info(f"Request ID: {request_id} -> Task_{page_id}: 代码存储路径：{str(file_path)}")
+        

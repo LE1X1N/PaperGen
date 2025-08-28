@@ -6,7 +6,7 @@ import random
 class TemplateManager:
     def __init__(self):
 
-        self.base_dir = Path(__file__).parent.parent.parent / "static"  
+        self.base_dir = Path(__file__).parent.parent.parent.parent / "static"  
         
         self.tmpl_dirs = {
             0 : [self.base_dir / dir for dir in ["上中下布局", "侧边布局", "顶部-侧边布局"]], 
