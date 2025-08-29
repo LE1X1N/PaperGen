@@ -46,10 +46,11 @@ max_workers: 150          # multithread
 
 ## 2. 服务接口
 
-当前服务对外提供两个接口：
+当前服务对外提供三个接口：
 
 - /v1/gen_images
 - /v1/progress/{request_id}
+- /v1/health
 
 具体的接口请参考 [接口文档](docs/接口文档.md)
 
@@ -73,6 +74,12 @@ curl -X POST http://localhost:8687/v1/gen_images -H "Content-Type: application/j
 curl http://localhost:8687/v1/progress/<request_id>
 ```
 
+### 2.3 检查状态
+调用此接口将会触发服务状态检查，包括检查 OpenAI、Selenium、DFS以及MongoDB的连接状态。
+```bash
+# 检查当前服务的状态
+curl http://localhost:8687/v1/health
+```
 
 ## 3. 服务启动
 
