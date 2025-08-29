@@ -2,8 +2,13 @@ import threading
 from flask import Blueprint, request, jsonify
 import uuid
 
+from src.core.storage import check_dfs_health
+from src.llm import check_openai_health
+from src.browser import check_driver_health
+from src.db import check_mongodb_health
 from src.core.task_manager import TaskManager
 from src.utils import get_logger
+from src.config import conf
 
 api_bp = Blueprint('v1', __name__)
 logger = get_logger()
@@ -42,4 +47,14 @@ def get_progress(request_id: str):
 
 @api_bp.route('/health', methods=['GET'])
 def health_check():
-    return jsonify({"status": "healthy", "service": "picture_processor"})
+    try:
+        check_openai_health()                
+        check_driver_health()                 
+        check_mongodb_health()
+        check_dfs_health()
+        return jsonify({"code": 0, "status": "healthy", "service": conf["service"]["name"]})
+    
+    except Exception as e:
+        return jsonify({"code": -1, "status": "error", "service": conf["service"]["name"]}), 500
+    
+    
