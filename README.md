@@ -38,7 +38,7 @@ max_workers: 150          # multithread
     network_mode: host
     environment:
       - SE_NODE_MAX_SESSIONS=15        # default 15 sessions
-      - SE_NODE_SESSION_TIMEOUT=60
+      - SE_NODE_SESSION_TIMEOUT=120
 ```
 
 
@@ -131,8 +131,9 @@ coder-artifacts
 ├─ Dockerfile
 ├─ README.md
 ├─ config
-│  ├─ base.yaml           # 基础配置
-│  ├─ config.yaml         # 服务配置
+│  ├─ base.yaml            # 基础配置  
+│  └─ config_prod.yaml     # 服务配置
+├─ docker-compose.yml
 ├─ docs
 │  ├─ 接口文档.md
 │  ├─ 测试输入.json
@@ -141,36 +142,46 @@ coder-artifacts
 ├─ src
 │  ├─ api
 │  │  ├─ __init__.py
-│  │  └─ routes.py          # API
-│  ├─ app.py                # Flask app初始化
+│  │  └─ routes.py       # API
+│  ├─ app.py             # Flask app初始化
 │  ├─ browser
 │  │  ├─ __init__.py
-│  │  ├─ manager.py         # Selenium Driver相关
-│  │  └─ renderer.py        # Gradio界面渲染相关
+│  │  ├─ manager.py      # Selenium Driver相关
+│  │  └─ renderer.py     # Gradio界面渲染相关
 │  ├─ config
 │  │  ├─ __init__.py
-│  │  └─ loader.py
+│  │  └─ loader.py       # 配置文件加载
 │  ├─ core
-│  │  ├─ data_parser.py        # JSON解析处理
-│  │  ├─ progress_manager.py   # 流程控制，读写结果
-│  │  ├─ task_manager.py       # 请求任务分解与处理核心
-│  │  ├─ tmpl_manager.py       # 管理静态jsx模板
-│  │  └─ upload_manager.py     # 负责上传文件
-│  ├─ errors.py            
+│  │  ├─ data_processing    # JSON解析处理 / 模板控制
+│  │  │  ├─ __init__.py
+│  │  │  ├─ json_parser.py
+│  │  │  └─ tmpl_manager.py
+│  │  ├─ progress            # 流程控制，处理状态JSON
+│  │  │  ├─ __init__.py
+│  │  │  └─ progress_store.py
+│  │  ├─ storage             # 存储管理，DFS与本地文件
+│  │  │  ├─ __init__.py
+│  │  │  ├─ dfs_upload.py
+│  │  │  └─ local_storage.py
+│  │  └─ task_manager.py    # 任务核心，负责拆解与执行任务
+│  ├─ db
+│  │  ├─ __init__.py
+│  │  └─ client.py       # MongoDB 相关
+│  ├─ errors.py
 │  ├─ llm
 │  │  ├─ __init__.py
-│  │  ├─ client.py             # LLM 调用
-│  │  └─ prompt.py             # Prompt生成
-│  └─ utils 
+│  │  ├─ client.py       # LLM 相关
+│  │  └─ prompt.py
+│  └─ utils
 │     ├─ __init__.py
 │     ├─ common.py
 │     └─ logger.py
-├─ static                      # 不同局部的静态jsx模板
+├─ static                # 不同局部的静态jsx模板
 │  ├─ 上中下布局
 │  ├─ 侧边布局
 │  ├─ 小程序
 │  └─ 顶部-侧边布局
-├─ uwsgi_service.ini           # uwsgi 配置文件
-└─ wsgi.py                     # 服务入口
+├─ uwsgi_service.ini     # uwsgi 配置文件
+└─ wsgi.py               # 服务入口
 
 ```
