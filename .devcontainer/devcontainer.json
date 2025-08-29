@@ -1,0 +1,8 @@
+{
+    "name": "leixin development env",
+    "dockerComposeFile": "../docker-compose.yml",
+    "service": "leixin-coder-artifacts",
+    "workspaceFolder": "/app",
+    "recreateContainer": false,
+    "updateRemoteUserUID": false
+}
