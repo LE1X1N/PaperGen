@@ -9,11 +9,15 @@ def get_local_request_dir(request_id):
     request_dir = Path(LOCAL_FILE_DIR) / request_id
     if not os.path.exists(request_dir):
         os.mkdir(request_dir)
+    if not os.path.exists(request_dir / "code"):
+        os.mkdir(request_dir / "code")
+    if not os.path.exists(request_dir / "img"):
+        os.mkdir(request_dir / "img")
     return request_dir
 
 
 def save_code(request_id: str, page_id: str, code: str):
-    file_path = get_local_request_dir(request_id) / f"task_{page_id}.jsx"
+    file_path = get_local_request_dir(request_id) / "code" / f"task_{page_id}.jsx"
     with open(file_path, "w", encoding="utf-8") as f:
         f.write(code)
     return file_path
@@ -23,7 +27,7 @@ def save_img(request_id: str, page_id: str, img: str):
     """
         img: Base64 encoded images
     """
-    file_path = get_local_request_dir(request_id) / f"task_{page_id}.png"
+    file_path = get_local_request_dir(request_id) / "img" / f"task_{page_id}.png"
     
     if img.startswith("data:image"):
         img_base64 = img.split(",")[1]
