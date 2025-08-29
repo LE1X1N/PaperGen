@@ -76,6 +76,11 @@ curl http://localhost:8687/v1/progress/<request_id>
 
 ### 2.3 检查状态
 调用此接口将会触发服务状态检查，包括检查 OpenAI、Selenium、DFS以及MongoDB的连接状态。
+- OpenAI：尝试向模型发送 "ping" 信息，等待模型回复，若正确得到返回则判断正常。 
+- Selenium: 尝试获取一个Chrome Driver，若Driver正常初始化成功则判断正常。
+- DFS：向配置文件当中的 dfs.health_check_url 发送查询状态信息，如返回无错误码则判断正常。
+- MongoDB：连接MongoDB，并尝试读取数据库的条目数量，若能够正确返回条目数量则判断正常。
+
 ```bash
 # 检查当前服务的状态
 curl http://localhost:8687/v1/health
