@@ -1,60 +1,34 @@
-import time
+from playwright.sync_api import sync_playwright, Browser, Page
+import base64
 
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-
-from src.config import conf
 from src.errors import ChromeError
 
-
-def init_driver():
-    """
-        Init a chrome driver
-    """
+def open_browser_page(port: int) -> tuple[sync_playwright, Browser, Page]:
     try:
-        chrome_options = Options()
-        chrome_options.add_argument("--headless")
-        chrome_options.add_argument("--no-sandbox")
-        chrome_options.add_argument("--disable-dev-shm-usage")
-        chrome_options.add_argument("--window-size=1920x1080")
-
-        return webdriver.Remote(
-            command_executor=conf["selenium"]["url"],
-            options=chrome_options
-        )
-
+        playwright = sync_playwright().start()
+        browser = playwright.chromium.launch(headless=True)
+        
+        page = browser.new_page(viewport={"width": 1280, "height": 720})
+        page.goto(f"http://0.0.0.0:{port}")
+        return playwright, browser, page
+    
     except Exception as e:
         error_msg = f"{type(e).__name__}: {str(e)}"
-        raise ChromeError(f"Chrome Driver 初始化失败: {error_msg}") from e
+        raise ChromeError(f"Playwright启动浏览器失败: {error_msg}") from e
 
 
-def capture_screenshot(driver):
+def capture_screenshot(page: Page):
     """
-        Capture screenshots
+    Capture screenshot and return as base64 string
     """
-    try:
-        time.sleep(3)
-        # window size 
-        total_height = driver.execute_script("return document.body.scrollHeight")
-        driver.set_window_size(1920, total_height)
-
-        # save screenshot
-        base64_str = driver.get_screenshot_as_base64()
+    try: 
+        page.wait_for_timeout(3000)
+        page.wait_for_selector("body", state="attached")    # wait for body 
+        
+        screenshot_bytes = page.screenshot()
+        base64_str = base64.b64encode(screenshot_bytes).decode('utf-8')
         return base64_str
-    except Exception:
-        raise
-
-
-def check_driver_health():
-    """
-        Try to initialize a chrome driver
-    """
-    driver = None
-    try:
-        driver = init_driver()
-    except ChromeError:
-        raise
-    finally:
-        if driver is not None:
-            driver.close()
-            driver.quit()
+    
+    except Exception as e:
+        error_msg = f"{type(e).__name__}: {str(e)}"
+        raise ChromeError(f"Playwright截屏失败: {error_msg}") from e
