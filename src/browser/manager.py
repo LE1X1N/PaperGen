@@ -9,7 +9,7 @@ def open_browser_page(port: int) -> tuple[sync_playwright, Browser, Page]:
         browser = playwright.chromium.launch(headless=True)
         
         page = browser.new_page(viewport={"width": 1280, "height": 720})
-        page.goto(f"http://0.0.0.0:{port}")
+        page.goto(f"http://localhost:{port}")
         return playwright, browser, page
     
     except Exception as e:
