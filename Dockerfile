@@ -1,13 +1,19 @@
 FROM swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/python:3.12-slim
 
-RUN apt-get update && apt-get install -y \
-    git \
-    vim \
-    gcc \
-    procps\
-    python3-dev \
-    && apt-get clean \  
-    && rm -rf /var/lib/apt/lists/* 
+RUN echo "deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm main contrib non-free" > /etc/apt/sources.list && \
+    echo "deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm-updates main contrib non-free" >> /etc/apt/sources.list && \
+    echo "deb https://mirrors.tuna.tsinghua.edu.cn/debian-security/ bookworm-security main contrib non-free" >> /etc/apt/sources.list
+
+RUN apt-get update && \
+    apt-get install -y \
+        git \
+        vim \
+        gcc \
+        curl \
+        procps \
+        python3-dev && \
+    apt-get clean && \ 
+    rm -rf /var/lib/apt/lists/* 
 
 WORKDIR /app
 
