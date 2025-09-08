@@ -6,6 +6,7 @@ RUN echo "deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm main contrib
 
 RUN apt-get update && \
     apt-get install -y \
+        dbus \
         git \
         vim \
         gcc \
@@ -23,3 +24,6 @@ COPY requirements.txt .
 RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple && \
     pip install --upgrade pip  && \
     pip install --no-cache-dir -r requirements.txt
+
+# download playwright browsers
+RUN playwright install && playwright install-deps 
