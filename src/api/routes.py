@@ -4,7 +4,6 @@ import uuid
 
 from src.core.storage import check_dfs_health
 from src.llm import check_openai_health
-from src.browser import check_driver_health
 from src.db import check_mongodb_health
 from src.core.task_manager import TaskManager
 from src.utils import get_logger
@@ -48,8 +47,7 @@ def get_progress(request_id: str):
 @api_bp.route('/health', methods=['GET'])
 def health_check():
     try:
-        check_openai_health()                
-        check_driver_health()                 
+        check_openai_health()                                 
         check_mongodb_health()
         check_dfs_health()
         return jsonify({"code": 0, "status": "healthy", "service": conf["service"]["name"]})

@@ -6,13 +6,43 @@ from src.errors import *
 from src.config import conf
 from src.llm import call_chat_completion, SYSTEM_PROMPT
 from src.browser import launch_sandbox_demo, wait_for_render
-from src.browser import  init_driver, capture_screenshot
+from src.browser import  capture_screenshot, open_browser_page
 from src.utils import get_random_available_port, wait_for_port, get_generated_files
 
 from .data_processing import DataParser
 from .progress import ProgressManager, ProgressStatus
 from .storage import upload_single_file, save_code, save_img, get_local_request_dir
+from PIL import Image
 
+
+def IsSolidColorImage(image_path, max_size=400, tolerance=0.92):
+        
+    with Image.open(image_path) as img:
+        
+        width, height = img.size
+        if max(width, height) > max_size:
+        
+            scale = max_size / max(width, height)
+            new_width = int(width * scale)
+            new_height = int(height * scale)
+        
+            img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+        
+        gray_img = img.convert('L')  
+        
+        pixels = list(gray_img.getdata())
+        total_pixels = len(pixels)
+        pixel_counts = {}
+        for p in pixels:
+            pixel_counts[p] = pixel_counts.get(p, 0) + 1
+        
+        if not pixel_counts:
+            return True
+        
+        max_count = max(pixel_counts.values())
+        peak_ratio = max_count / float(total_pixels)
+        
+        return peak_ratio >= tolerance
 
 class TaskManager:
     def __init__(self, logger=None):
@@ -103,8 +133,9 @@ class TaskManager:
 
             try:
                 start_time = time.time()
-                browser = None  
-                driver = None   
+                gradio_process = None  
+                playwright = None
+                browser = None
                 
                 # 3. code generation
                 res = call_chat_completion(messages)
@@ -120,20 +151,19 @@ class TaskManager:
                 browser_lock = Lock()
 
                 port = get_random_available_port()        # random port
-                browser = Process(target=launch_sandbox_demo,
+                gradio_process = Process(target=launch_sandbox_demo,
                                   args=(request_id, page_id, react_code, port, browser_registry, browser_lock, self.logger), name="BrowserProcess")
-                browser.start()
+                gradio_process.start()
 
                 # 6. wait port connected (15s)
                 wait_for_port(port, timeout=conf["service"]["connect_timeout_sec"])
                 self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: Gradio 初始化成功！绑定端口: {port}")
 
                 # 7. init chrome driver
-                driver = init_driver()
-                driver.get(f'http://localhost:{port}')
-                self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: Chrome driver 初始化成功！")
+                playwright, browser, page = open_browser_page(port)
+                self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: Playwright Chrome 初始化成功！")
 
-                # 8. wait rendering (25s)
+                # 8.  wait rendering (25s)
                 wait_for_render(request_id, page_id, conf["service"]["render_timeout_sec"], browser_registry, browser_lock, self.logger)
                 self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: 第 {turn + 1} 轮成功！")
                 
@@ -145,9 +175,13 @@ class TaskManager:
                     return react_code  
                 
                 # 10. capture screenshot and save png image
-                screenshot_img = capture_screenshot(driver)
+                screenshot_img = capture_screenshot(page)
                 img_path = save_img(request_id, page_id, screenshot_img)
-                self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: Selenium 截图已保存至 {img_path}")
+                self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: 截图已保存至 {img_path}")
+
+                if IsSolidColorImage(img_path):
+                    self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: 是纯色图，未渲染成功")
+                    raise
                 
                 # 11. upload img to DFS
                 res = upload_single_file(img_path) 
@@ -175,14 +209,15 @@ class TaskManager:
                 raise
              
             finally:
-                if browser:
-                    browser.kill()
-                    self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: Gradio浏览器 退出! 错误码: {browser.exitcode}")
+                if gradio_process:
+                    gradio_process.kill()
+                    self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: Gradio进程退出! ")
                         
-                if driver:
-                    driver.close()
-                    driver.quit()
-                    self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: Chrome Driver 退出!")
+                if browser:
+                    browser.close()
+                if playwright:
+                    playwright.stop()
+                    self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: Playwright退出!")
 
                     
         raise MaxRetriesExceededError(f"任务超过最大重试次数: {conf["service"]["max_retries"]}")

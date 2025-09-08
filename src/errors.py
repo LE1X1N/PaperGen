@@ -7,7 +7,7 @@ class OpenAIError(Exception):
     pass
 
 class ChromeError(Exception):
-    # errors related to chrome selenium
+    # errors related to playwright chrome 
     pass
 
 class FileSystemError(Exception):
