@@ -8,21 +8,24 @@ class TemplateManager:
 
         self.base_dir = Path(__file__).parent.parent.parent.parent / "static"  
         
-        self.tmpl_dirs = {
-            0 : [self.base_dir / dir for dir in ["上中下布局", "侧边布局", "顶部-侧边布局"]], 
-            1 : [self.base_dir / dir for dir in ["小程序"]]
+        self.style_map = {
+            0 : self.base_dir / "web", 
+            1 : self.base_dir / "app",
+            2 : self.base_dir / "wechat"
         }
         
         self.tmpl_paths = {
-            0 : [tmpl_dir / file for tmpl_dir in self.tmpl_dirs[0] for file in os.listdir(tmpl_dir) if file.endswith(".jsx")],
-            1 : [tmpl_dir / file for tmpl_dir in self.tmpl_dirs[1] for file in os.listdir(tmpl_dir) if file.endswith(".jsx")]
+            0 : list(self.style_map[0].rglob("*.jsx")),
+            1 : list(self.style_map[1].rglob("*.jsx")),
+            2 : list(self.style_map[2].rglob("*.jsx"))
         }
 
     def load_template(self, style: int=0):   
         # random choose one .jsx template based on style
         # style: 
-        #      0: 网站
-        #      1: 小程序     
+        #      0: web     网站类
+        #      1: app     手机应用类
+        #      2: wechat  微信小程序类
         path = random.choice(self.tmpl_paths[style])  
               
         with open(path, 'r', encoding='utf-8') as f:
