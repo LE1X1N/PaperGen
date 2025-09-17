@@ -1,13 +1,34 @@
 services:
-  # Python Image
-  leixin-coder-artifacts:
+  papergen:
     build: .
-    image: leixin/coder-artifacts-dev:latest
-    container_name: leixin-coder-app
+    image: papergen-nightly-build:latest
+    container_name: papergen-service
     volumes:
-      - ./:/app   # 代码挂载
+      - ./:/app      # 代码挂载
     entrypoint: /bin/bash
     tty: true
-    environment:
-      - APP_ENV=dev                # dev/prod,  load dev.yaml
     network_mode: host
+    depends_on:
+      - mongodb
+      - selenium
+
+  selenium:
+    image: selenium/standalone-chrome:latest
+    container_name: papergen-selenium
+    shm_size: 8g
+    network_mode: host
+    environment:
+      - SE_NODE_MAX_SESSIONS=10     # chrome sessions
+      - SE_NODE_SESSION_TIMEOUT=120
+      - SE_OPTS=--port 4444         # port for selenium service
+
+  mongodb:
+    image: mongo:7.0.12
+    container_name: papergen-mongodb
+    volumes: 
+      - ~/mongodb-data:/data/db
+    ports:
+      - "127.0.0.1:27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=123456
