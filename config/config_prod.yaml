@@ -7,6 +7,6 @@ selenium:
     url: http://localhost:4444/wd/hub
     
 mongodb:
-    uri: mongodb://website_online:hZc8f7zEqX@mongo2.aimc.offline:27017,mongo3.aimc.offline:27018,mongo4.aimc.offline:27019/?replicaSet=mongos
-    db_name: website_generation
-    collection_name: website_info_online
+    uri: mongodb://localhost:27017 
+    db_name: papergen
+    collection_name: request_progress
