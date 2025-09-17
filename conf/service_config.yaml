@@ -1,12 +1,16 @@
+papergen:
+  host: 0.0.0.0
+  http_port: 8686
+
 openai:
     base_url: http://localhost:8000/v1
     api_key: sk-XXXXXX
     model: Qwen2.5-Coder-3B-Instruct
 
-selenium:
-    url: http://localhost:4444/wd/hub
-    
 mongodb:
-    uri: mongodb://localhost:27017 
+    uri: mongodb://admin:123456@localhost:27017/
     db_name: papergen
     collection_name: request_progress
+
+selenium:
+    url: http://localhost:4444/wd/hub
