@@ -1,5 +1,7 @@
+version: '3'
+
 services:
-  papergen:
+  papergen: 
     build: .
     image: papergen-nightly-build:latest
     container_name: papergen-service
