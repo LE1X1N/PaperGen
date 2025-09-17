@@ -1,16 +1,10 @@
 openai:
-    base_url: http://localhost:8001/v1
+    base_url: http://localhost:8000/v1
     api_key: sk-XXXXXX
-    model: Qwen3
+    model: Qwen2.5-Coder-3B-Instruct
 
 selenium:
     url: http://localhost:4444/wd/hub
-    
-dfs:
-    upload_url: http://10.20.171.5:32005/file/DAS_ha
-    service_name: website.result
-    download_prefix: http://10.20.171.4:52003/fsdata/website/website.result
-    health_check_url: http://10.20.171.5:32005/file/health
     
 mongodb:
     uri: mongodb://website_online:hZc8f7zEqX@mongo2.aimc.offline:27017,mongo3.aimc.offline:27018,mongo4.aimc.offline:27019/?replicaSet=mongos
