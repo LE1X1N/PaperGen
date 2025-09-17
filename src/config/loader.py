@@ -1,9 +1,5 @@
 import yaml
-import os
-
 from deepmerge import Merger
-
-ENV = os.getenv("APP_ENV", "prod")
 
 def load_yaml(file_path: str):
     with open(file_path, "r") as f:
@@ -15,7 +11,7 @@ def load_config():
     """
     merger = Merger([(dict, "merge")], [], [])
     
-    base_config = load_yaml("config/base.yaml")
-    ext_config = load_yaml(f"config/config_{ENV}.yaml")
+    base_config = load_yaml("conf/base.yaml")
+    ext_config = load_yaml(f"conf/service_config.yaml")
     final_config = merger.merge(base_config, ext_config)
     return final_config
