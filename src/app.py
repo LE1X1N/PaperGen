@@ -1,6 +1,5 @@
 from flask import Flask
 
-from src.core.storage import check_dfs_health
 from src.llm import check_openai_health
 from src.db import check_mongodb_health
 from src.utils import setup_logger
@@ -25,9 +24,6 @@ def create_app():
         
         check_mongodb_health()
         print("MongoDB 检查通过！")
-        
-        check_dfs_health()
-        print("DFS 检查通过！")
         
         from src.api import api_bp
         

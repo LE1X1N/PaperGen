@@ -11,7 +11,7 @@ from src.utils import get_random_available_port, wait_for_port, get_generated_fi
 
 from .data_processing import DataParser
 from .progress import ProgressManager, ProgressStatus
-from .storage import upload_single_file, save_code, save_img, get_local_request_dir
+from .storage import save_code, save_img, get_local_request_dir
 from PIL import Image
 
 
@@ -183,10 +183,7 @@ class TaskManager:
                     self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: 是纯色图，未渲染成功")
                     raise
                 
-                # 11. upload img to DFS
-                res = upload_single_file(img_path) 
-                self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: DFS 上传文件访问路径：{res}")
-                return res   
+                return img_path
 
             except FormatError as e:
                 self.logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【输出格式错误】{e}")
