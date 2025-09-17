@@ -19,12 +19,6 @@ def call_chat_completion(messages):
                 model=conf["openai"]["model"],  
                 messages=messages,
                 stream=True,
-                extra_headers={
-                    'AIMC-OrderId': "coder-test-leixin",
-                    'AIMC-OrderType': "test",
-                    'AIMC-Remarks' : "test-leixin",
-                    'DOUBAO-THINKING': "disabled"  
-                }
             )
         
         full_content = []

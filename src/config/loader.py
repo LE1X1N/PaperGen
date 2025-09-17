@@ -3,7 +3,7 @@ import os
 
 from deepmerge import Merger
 
-ENV = os.getenv("APP_ENV", "dev")
+ENV = os.getenv("APP_ENV", "prod")
 
 def load_yaml(file_path: str):
     with open(file_path, "r") as f:
