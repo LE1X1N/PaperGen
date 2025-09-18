@@ -17,12 +17,13 @@ services:
   selenium:
     image: selenium/standalone-chrome:latest
     container_name: papergen-selenium
-    shm_size: 8g
+    shm_size: 2g
     network_mode: host
     environment:
       - SE_NODE_MAX_SESSIONS=10     # chrome sessions
-      - SE_NODE_SESSION_TIMEOUT=120
+      - SE_NODE_SESSION_TIMEOUT=300
       - SE_OPTS=--port 4444         # port for selenium service
+      - JAVA_OPTS=-Dotel.traces.exporter=none -Dotel.metrics.exporter=none -Dotel.logs.exporter=none
 
   mongodb:
     image: mongo:7.0.12
