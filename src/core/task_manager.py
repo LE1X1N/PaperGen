@@ -79,7 +79,7 @@ class TaskManager:
                 else:
                     self.progress_manager.update_task_status(request_id,  task["page_id"],  ProgressStatus.SUCCESS, url=res)    # success
                     
-        self.logger.info(f"Request ID: {request_id} -> 处理请求完成！共耗时 {time.time() - start_time} s")
+        self.logger.info(f"Request ID: {request_id} -> 【处理请求完成】共耗时 {time.time() - start_time} s")
     
 
     def _process_single_task(self, task: dict) -> dict:
