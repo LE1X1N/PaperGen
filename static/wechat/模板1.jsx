@@ -1,18 +1,24 @@
-import React from'react';
+import React from 'react';
 
 function App() {
-return (
-    <div className="w-[375px] h-[812px] border border-gray-300 bg-white flex flex-col mx-auto">
+  return (
+    <div className="w-[375px] h-[667px] border-4 border-black bg-white flex flex-col mx-auto rounded-3xl overflow-hidden">
       {/* 状态栏 */}
-      <div className="flex justify-between items-center px-3 py-1 text-xs text-black bg-white">
+      <div className="flex justify-between items-center px-5 py-3 text-xs text-black bg-white">
         <div className="flex items-center gap-2">
           <span className="text-[11px]">●●●●●</span>
           <span>WeChat</span>
         </div>
+        {/* 时间 */}
         <span className="text-sm">20:35</span>
+        {/* 电池 */}
         <div className="flex items-center gap-1">
-          <span className="text-sm">100%</span>
-          <div className="w-6 h-3 border border-black rounded-sm" />
+          <div className="relative flex items-center">
+            <div className="w-8 h-4 border-2 border-black rounded-sm flex items-center px-[2px]">
+              <div className="h-2.5 bg-black rounded-sm" style={{ width: '80%' }} />
+            </div>
+          </div>
+          <span className="text-sm">80%</span>
         </div>
       </div>
 
@@ -78,5 +84,5 @@ return (
       </main>
     </div>
   );
-  }
+}
 export default App;
