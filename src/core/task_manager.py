@@ -7,7 +7,7 @@ from src.config import conf
 from src.llm import call_chat_completion, SYSTEM_PROMPT
 from src.browser import launch_sandbox_demo, wait_for_render
 from src.browser import init_driver, capture_screenshot
-from src.utils import get_random_available_port, wait_for_port, get_generated_files
+from src.utils import get_random_available_port, wait_for_port, get_generated_files, post_processing_img
 
 from .data_processing import DataParser
 from .progress import ProgressManager, ProgressStatus
@@ -179,9 +179,8 @@ class TaskManager:
                 img_path = save_img(request_id, page_id, screenshot_img)
                 self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: 截图已保存至 {img_path}")
 
-                if IsSolidColorImage(img_path):
-                    self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: 是纯色图，未渲染成功")
-                    raise
+                # 11. post-processing image
+                img_path = post_processing_img(img_path, task["style"])
                 
                 return img_path
 
