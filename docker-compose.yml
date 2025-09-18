@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  papergen: 
+  papergen-service: 
     build: .
     image: papergen-nightly-build:latest
     container_name: papergen-service
@@ -9,7 +9,10 @@ services:
       - ./:/app      # 代码挂载
     entrypoint: /bin/bash
     tty: true
-    network_mode: host
+    networks:
+      - papergen
+    ports:
+      - "127.0.0.1:8686:8686"
     depends_on:
       - mongodb
       - selenium
@@ -17,10 +20,11 @@ services:
   selenium:
     image: selenium/standalone-chrome:latest
     container_name: papergen-selenium
-    shm_size: 2g
-    network_mode: host
+    shm_size: 4g
+    networks:
+      - papergen
     environment:
-      - SE_NODE_MAX_SESSIONS=10     # chrome sessions
+      - SE_NODE_MAX_SESSIONS=5      # chrome sessions
       - SE_NODE_SESSION_TIMEOUT=300
       - SE_OPTS=--port 4444         # port for selenium service
       - JAVA_OPTS=-Dotel.traces.exporter=none -Dotel.metrics.exporter=none -Dotel.logs.exporter=none
@@ -29,9 +33,15 @@ services:
     image: mongo:7.0.12
     container_name: papergen-mongodb
     volumes: 
-      - ~/mongodb-data:/data/db
+      - ./data/mongodb_data:/data/db
+    networks:
+      - papergen
     ports:
       - "127.0.0.1:27017:27017"
     environment:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=123456
+
+networks:
+  papergen:
+    driver: bridge
