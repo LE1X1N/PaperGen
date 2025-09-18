@@ -9,7 +9,7 @@ client = OpenAI(
     api_key=conf["openai"]["api_key"]
 )
 
-def call_chat_completion(messages):
+def call_chat_completion(messages, **kwargs):
     """
         Call LLM to generate code
     """
@@ -19,6 +19,7 @@ def call_chat_completion(messages):
                 model=conf["openai"]["model"],  
                 messages=messages,
                 stream=True,
+                **kwargs
             )
         
         full_content = []
@@ -35,7 +36,7 @@ def call_chat_completion(messages):
 def check_openai_health():
     messages=[{"role": "user", "content": "ping"}]
     try:
-        call_chat_completion(messages)
+        call_chat_completion(messages, max_completion_tokens=5)
     except OpenAIError:
         raise
     
