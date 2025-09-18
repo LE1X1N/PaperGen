@@ -12,37 +12,7 @@ from src.utils import get_random_available_port, wait_for_port, get_generated_fi
 from .data_processing import DataParser
 from .progress import ProgressManager, ProgressStatus
 from .storage import save_code, save_img, get_local_request_dir
-from PIL import Image
 
-
-def IsSolidColorImage(image_path, max_size=400, tolerance=0.92):
-        
-    with Image.open(image_path) as img:
-        
-        width, height = img.size
-        if max(width, height) > max_size:
-        
-            scale = max_size / max(width, height)
-            new_width = int(width * scale)
-            new_height = int(height * scale)
-        
-            img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
-        
-        gray_img = img.convert('L')  
-        
-        pixels = list(gray_img.getdata())
-        total_pixels = len(pixels)
-        pixel_counts = {}
-        for p in pixels:
-            pixel_counts[p] = pixel_counts.get(p, 0) + 1
-        
-        if not pixel_counts:
-            return True
-        
-        max_count = max(pixel_counts.values())
-        peak_ratio = max_count / float(total_pixels)
-        
-        return peak_ratio >= tolerance
 
 class TaskManager:
     def __init__(self, logger=None):
