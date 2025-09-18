@@ -65,10 +65,12 @@ class DataParser:
                         "request_id": request_id,
                         "page_id": f'module-{mid}',
                         "return_code": True,
+                        "style": int(module["style"]),
                         "query": build_module_prompt({
                                                 "web_title": data["title"], 
                                                 "module_name": module["page_name"],
-                                                "module_pages": [m["name"] for m in module['page']],
+                                                "style": int(module["style"]),
+                                                "module_pages": [m["name"] for m in module['page'] if m["tab"]],
                                                 "tmpl": tmpls[int(module["style"])]
                         })
                     }
@@ -90,12 +92,15 @@ class DataParser:
                             "request_id": request_id,
                             "page_id": f"{page["id"]}",
                             "return_code": False,
+                            "style": int(module["style"]),
                             "query": build_page_prompt({
                                         "web_title": data["title"], 
                                         "module_name": module["page_name"],
+                                        "style": module["style"],
                                         "page_name": page["name"],
                                         "page_desc": page["text"],
-                                        "tmpl": gen_tmpls[mid]
+                                        "tmpl": gen_tmpls[mid],
+                                        "tab": page['tab']
                             })
 
                         }
