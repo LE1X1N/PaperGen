@@ -6,7 +6,7 @@ from src.errors import *
 from src.config import conf
 from src.llm import call_chat_completion, SYSTEM_PROMPT
 from src.browser import launch_sandbox_demo, wait_for_render
-from src.browser import  capture_screenshot, open_browser_page
+from src.browser import  init_driver, capture_screenshot
 from src.utils import get_random_available_port, wait_for_port, get_generated_files
 
 from .data_processing import DataParser
@@ -132,10 +132,9 @@ class TaskManager:
             self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: 进行第 {turn + 1} 轮尝试...")
 
             try:
-                start_time = time.time()
-                gradio_process = None  
-                playwright = None
+                start_time = time.time()  
                 browser = None
+                driver = None
                 
                 # 3. code generation
                 res = call_chat_completion(messages)
@@ -160,8 +159,9 @@ class TaskManager:
                 self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: Gradio 初始化成功！绑定端口: {port}")
 
                 # 7. init chrome driver
-                playwright, browser, page = open_browser_page(port)
-                self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: Playwright Chrome 初始化成功！")
+                driver = init_driver()
+                driver.get(f'http://localhost:{port}')
+                self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: Chrome driver 初始化成功！")
 
                 # 8.  wait rendering (25s)
                 wait_for_render(request_id, page_id, conf["service"]["render_timeout_sec"], browser_registry, browser_lock, self.logger)
@@ -175,7 +175,7 @@ class TaskManager:
                     return react_code  
                 
                 # 10. capture screenshot and save png image
-                screenshot_img = capture_screenshot(page)
+                screenshot_img = capture_screenshot(driver)
                 img_path = save_img(request_id, page_id, screenshot_img)
                 self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: 截图已保存至 {img_path}")
 
@@ -210,11 +210,10 @@ class TaskManager:
                     gradio_process.kill()
                     self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: Gradio进程退出! ")
                         
-                if browser:
-                    browser.close()
-                if playwright:
-                    playwright.stop()
-                    self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: Playwright退出!")
+                if driver:
+                    driver.close()
+                    driver.quit()
+                    self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: Chrome Driver 退出!")
 
                     
         raise MaxRetriesExceededError(f"任务超过最大重试次数: {conf["service"]["max_retries"]}")
