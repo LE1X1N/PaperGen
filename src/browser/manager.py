@@ -1,34 +1,66 @@
-from playwright.sync_api import sync_playwright, Browser, Page
-import base64
+import time
 
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+
+from src.config import conf
 from src.errors import ChromeError
 
-def open_browser_page(port: int) -> tuple[sync_playwright, Browser, Page]:
+
+def init_driver() -> webdriver.Remote:
+    """
+        Init a chrome driver
+    """
     try:
-        playwright = sync_playwright().start()
-        browser = playwright.chromium.launch(headless=True)
-        
-        page = browser.new_page(viewport={"width": 1280, "height": 720})
-        page.goto(f"http://localhost:{port}")
-        return playwright, browser, page
-    
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+
+        return webdriver.Remote(
+            command_executor=conf["selenium"]["url"],
+            options=chrome_options
+        )
+
     except Exception as e:
         error_msg = f"{type(e).__name__}: {str(e)}"
-        raise ChromeError(f"Playwright启动浏览器失败: {error_msg}") from e
+        raise ChromeError(f"Chrome Driver 初始化失败: {error_msg}") from e
 
 
-def capture_screenshot(page: Page):
+def capture_screenshot(driver : webdriver.Remote, width: int=1920, height=1080) -> str:
     """
-    Capture screenshot and return as base64 string
+        Capture screenshots
     """
-    try: 
-        page.wait_for_timeout(3000)
-        page.wait_for_selector("body", state="attached")    # wait for body 
+    try:
+        WebDriverWait(driver, 10).until(
+            EC.visibility_of_element_located((By.TAG_NAME, "body"))
+        )
+        time.sleep(3)
         
-        screenshot_bytes = page.screenshot()
-        base64_str = base64.b64encode(screenshot_bytes).decode('utf-8')
+        # window size 
+        total_height = driver.execute_script("return document.body.scrollHeight")
+        driver.set_window_size(width=width, height=total_height)
+
+        # save screenshot
+        base64_str = driver.get_screenshot_as_base64()
         return base64_str
-    
     except Exception as e:
-        error_msg = f"{type(e).__name__}: {str(e)}"
-        raise ChromeError(f"Playwright截屏失败: {error_msg}") from e
+        raise ChromeError(f"Chrome Driver 截屏失败: {str(e)}") from e
+
+
+def check_driver_health():
+    """
+        Try to initialize a chrome driver
+    """
+    driver = None
+    try:
+        driver = init_driver()
+    except ChromeError:
+        raise
+    finally:
+        if driver is not None:
+            driver.close()
+            driver.quit()
