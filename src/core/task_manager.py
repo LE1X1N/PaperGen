@@ -64,9 +64,7 @@ class TaskManager:
             except OpenAIError as e:
                 error_msg = f"【OpenAI错误】{e}"
             except ChromeError as e:    
-                error_msg = f"【Chrome错误】{e}"  
-            except FileSystemError as e:
-                error_msg = f"【DFS错误】{e}"  
+                error_msg = f"【Chrome错误】{e}"    
             except TimeoutError as e:
                 error_msg = f"【超时错误】： 生成超过任务最大时间 {conf["service"]["process_timeout_sec"]} s"
             except MaxRetriesExceededError as e:
@@ -167,8 +165,6 @@ class TaskManager:
                 raise
             except ChromeError:    
                 raise
-            except FileSystemError:
-                raise
             except Exception:
                 raise
              
@@ -181,6 +177,5 @@ class TaskManager:
                     driver.close()
                     driver.quit()
                     self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: Chrome Driver 退出!")
-
-                    
+  
         raise MaxRetriesExceededError(f"任务超过最大重试次数: {conf["service"]["max_retries"]}")

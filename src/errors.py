@@ -10,10 +10,6 @@ class ChromeError(Exception):
     # errors related to playwright chrome 
     pass
 
-class FileSystemError(Exception):
-    # errors related to DFS
-    pass
-
 class FrontendError(Exception):
     # frontend render/compile error
     pass
