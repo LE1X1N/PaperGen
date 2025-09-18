@@ -6,7 +6,7 @@ from src.errors import *
 from src.config import conf
 from src.llm import call_chat_completion, SYSTEM_PROMPT
 from src.browser import launch_sandbox_demo, wait_for_render
-from src.browser import  init_driver, capture_screenshot
+from src.browser import init_driver, capture_screenshot
 from src.utils import get_random_available_port, wait_for_port, get_generated_files
 
 from .data_processing import DataParser
@@ -150,9 +150,9 @@ class TaskManager:
                 browser_lock = Lock()
 
                 port = get_random_available_port()        # random port
-                gradio_process = Process(target=launch_sandbox_demo,
+                browser = Process(target=launch_sandbox_demo,
                                   args=(request_id, page_id, react_code, port, browser_registry, browser_lock, self.logger), name="BrowserProcess")
-                gradio_process.start()
+                browser.start()
 
                 # 6. wait port connected (15s)
                 wait_for_port(port, timeout=conf["service"]["connect_timeout_sec"])
@@ -206,8 +206,8 @@ class TaskManager:
                 raise
              
             finally:
-                if gradio_process:
-                    gradio_process.kill()
+                if browser:
+                    browser.kill()
                     self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: Gradio进程退出! ")
                         
                 if driver:
