@@ -119,13 +119,11 @@ class TaskManager:
         # 1. parse data
         request_id = task["request_id"]
         page_id = task["page_id"]
-        return_code = task["return_code"]
-        query = task["query"]
         self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: ********* 任务 {page_id} 开始！*********")
 
         # 2. create messages
         messages = [{"role": 'system', "content": SYSTEM_PROMPT}]
-        messages.append({"role": "user", "content": query})
+        messages.append({"role": "user", "content": task["query"]})
 
         # Multi-turn generation
         for turn in range(conf["service"]["max_retries"]):
@@ -171,7 +169,7 @@ class TaskManager:
                 code_path = save_code(request_id, page_id, react_code)
                 self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: jsx 代码已保存至 {code_path}")
 
-                if return_code:
+                if task["return_code"]:
                     return react_code  
                 
                 # 10. capture screenshot and save png image
