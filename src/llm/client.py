@@ -1,3 +1,4 @@
+import os
 from openai import OpenAI
 
 from src.errors import OpenAIError
@@ -6,7 +7,7 @@ from src.config import conf
  # OpenAI client
 client = OpenAI(
     base_url=conf["openai"]["base_url"],
-    api_key=conf["openai"]["api_key"]
+    api_key=os.getenv("OPENAI_API_KEY")
 )
 
 def call_chat_completion(messages, **kwargs):
