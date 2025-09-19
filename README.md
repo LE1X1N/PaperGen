@@ -1,3 +1,40 @@
+# 镜像准备
+
+### 1. MongoDB
+
+MongoDB 主要用于存储JSON样式的订单状态。
+
+```bash
+# 下载镜像
+docker pull swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/library/mongo:7.0.12
+docker tag  swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/library/mongo:7.0.12  docker.io/library/mongo:7.0.12
+```
+### 2. Selenium
+
+Selenium主要用于截屏服务。
+
+```bash
+# 下载镜像
+docker pull swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/selenium/standalone-chrome:latest
+docker tag  swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/selenium/standalone-chrome:latest  docker.io/selenium/standalone-chrome:latest
+```
+
+### 3. Minio
+
+Minio主要用于存储生成的图片和代码
+
+```bash
+# 下载镜像
+docker pull swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/minio/minio:RELEASE.2025-09-07T16-13-09Z
+docker tag  swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/minio/minio:RELEASE.2025-09-07T16-13-09Z  docker.io/minio/minio:RELEASE.2025-09-07T16-13-09Z
+```
+
+### 4. Redis
+
+Redis用于在内存中存储订单状态，加速查询速度
+
+
+
 # 代码界面渲染
 
 ## 1. 修改配置文件
@@ -12,6 +49,11 @@
 base_url: http://localhost:8001/v1    
 api_key: sk-XXXXXX         
 model: Qwen3
+```
+
+推荐使用vLLM本地启动模型
+``` bash
+vllm serve Qwen2.5-Coder-3B-Instruct --gpu-memory-utilization 0.8 --max-model-len 4096
 ```
 
 ### 1.2 服务内部线程池大小
@@ -107,6 +149,12 @@ uwsgi --stop log/uwsgi.pid
 
 ## 4. Docker 启动
 项目提供 docker-compose.yml 方便同时管理项目的环境镜像和Chrome镜像，环境镜像需要实现打包，业务代码通过映射到镜像中的 */app* 文件目录。
+
+### 4.1 Mongodb
+
+
+
+
 
 ### 4.1 创建环境镜像
 ```bash
