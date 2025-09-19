@@ -1,8 +1,7 @@
 {
-    "name": "leixin development env",
+    "name": "papergen development env",
     "dockerComposeFile": "../docker-compose.yml",
-    "service": "leixin-coder-artifacts",
+    "service": "papergen-service",
     "workspaceFolder": "/app",
-    "recreateContainer": false,
     "updateRemoteUserUID": false
 }
