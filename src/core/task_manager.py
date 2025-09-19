@@ -126,12 +126,11 @@ class TaskManager:
 
                 # 7. init chrome driver
                 driver = init_driver()
-                driver.get(f'http://localhost:{port}')
                 self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: Chrome driver 初始化成功！")
-
+                
                 # 8.  wait rendering (25s)
+                driver.get(f'http://papergen-service:{port}')
                 wait_for_render(request_id, page_id, conf["service"]["render_timeout_sec"], browser_registry, browser_lock, self.logger)
-                self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: 第 {turn + 1} 轮成功！")
                 
                 # 9. save jsx code
                 code_path = save_code(request_id, page_id, react_code)
@@ -148,7 +147,7 @@ class TaskManager:
                 # 11. post-processing image
                 img_path = post_processing_img(img_path, task["style"])
                 
-                return img_path
+                return str(img_path)
 
             except FormatError as e:
                 self.logger.error(f"Request ID: {request_id} -> Task_{page_id}: 【输出格式错误】{e}")
