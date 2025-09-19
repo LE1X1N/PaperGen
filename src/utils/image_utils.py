@@ -63,6 +63,20 @@ def _crop_by_edge_detection(img_path, output_path=None):
     return cropped_img
 
 
+def _crop_by_black_border(img_path, output_path=None, threshold=230):
+    img = cv2.imread(img_path)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    _, binary = cv2.threshold(gray, threshold, 255, cv2.THRESH_BINARY)
+    contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    max_contour = max(contours, key=cv2.contourArea)
+    x, y, w, h = cv2.boundingRect(max_contour)
+    
+    cropped_img = img[y:y+h, x:x+w]
+    save_path = output_path if output_path else img_path
+    cv2.imwrite(save_path, cropped_img)
+    return cropped_img
+
+
 def _isSolidColorImage(img_path, max_size=400, tolerance=0.92):
         
     with Image.open(img_path) as img:
