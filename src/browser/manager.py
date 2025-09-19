@@ -21,7 +21,7 @@ def init_driver() -> webdriver.Remote:
         chrome_options.add_argument("--disable-dev-shm-usage")
 
         return webdriver.Remote(
-            command_executor=os.getenv("SELENIUM_URL"),
+            command_executor=f"http://{os.getenv("SELENIUM_HOST")}:{os.getenv("SELENIUM_PORT")}/wd/hub",
             options=chrome_options
         )
 

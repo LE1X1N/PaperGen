@@ -12,7 +12,7 @@ def _get_mongo_client():
     global mongo_client
     if mongo_client is None:
         try:
-            mongo_client = MongoClient(os.getenv("MONGODB_URI"))
+            mongo_client = MongoClient(f"mongodb://{os.getenv("MONGODB_USER")}:{os.getenv("MONGODB_PASSWORD")}@{os.getenv("MONGODB_HOST")}:{os.getenv("MONGODB_PORT")}/")
         except PyMongoError:
             raise
     return mongo_client
