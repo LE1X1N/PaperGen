@@ -19,13 +19,6 @@ def init_driver() -> webdriver.Remote:
         chrome_options.add_argument("--headless=new")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
-        chrome_options.add_argument("--disable-gpu") 
-        chrome_options.add_argument("--disable-extensions") 
-        chrome_options.add_argument("--disable-plugins") 
-        chrome_options.add_argument("--disable-software-rasterizer")  
-        chrome_options.add_argument("--no-first-run")  
-        chrome_options.add_argument("--no-default-browser-check")  
-        chrome_options.add_argument("--disable-background-networking")  
 
         return webdriver.Remote(
             command_executor=conf["selenium"]["url"],
