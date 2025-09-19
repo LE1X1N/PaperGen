@@ -1,15 +1,15 @@
-papergen:
-  host: 0.0.0.0
-  http_port: 8686
+service:
+    name: self-coder-service          # service name
+    max_workers: 10                    # multithread
+    max_retries: 5                    # Number of retry attempts after failure
+    connect_timeout_sec: 15           # Wait the port to be listend
+    render_timeout_sec: 25            # max gradio rendering time 
+    process_timeout_sec: 200          # Processing timeout for long-running tasks
+    local_file_dir: screenshots/
 
-openai:
-    base_url: https://dashscope.aliyuncs.com/compatible-mode/v1
-    model: qwen3-coder-480b-a35b-instruct
-
-mongodb:
-    uri: mongodb://admin:123456@mongodb:27017/
-    db_name: papergen
-    collection_name: request_progress
-
-selenium:
-    url: http://selenium:4444/wd/hub
+    log:
+        base_dir: log/
+        file_name: service.log
+        roll_max_bytes: 524288000  # 500MB   
+        backup_count: 180
+        format: '%(asctime)s - %(name)s - %(processName)s - %(threadName)s - %(filename)s[line:%(lineno)d] - %(levelname)s - %(message)s'
