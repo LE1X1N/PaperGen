@@ -1,6 +1,6 @@
 service:
     name: self-coder-service          # service name
-    max_workers: 150                  # multithread
+    max_workers: 10                    # multithread
     max_retries: 5                    # Number of retry attempts after failure
     connect_timeout_sec: 15           # Wait the port to be listend
     render_timeout_sec: 25            # max gradio rendering time 

@@ -3,14 +3,13 @@ papergen:
   http_port: 8686
 
 openai:
-    base_url: http://localhost:8000/v1
-    api_key: sk-XXXXXX
-    model: Qwen2.5-Coder-3B-Instruct
+    base_url: https://dashscope.aliyuncs.com/compatible-mode/v1
+    model: qwen3-coder-30b-a3b-instruct
 
 mongodb:
-    uri: mongodb://admin:123456@localhost:27017/
+    uri: mongodb://admin:123456@mongodb:27017/
     db_name: papergen
     collection_name: request_progress
 
 selenium:
-    url: http://localhost:4444/wd/hub
+    url: http://selenium:4444/wd/hub
