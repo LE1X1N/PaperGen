@@ -1,4 +1,5 @@
 import time
+import os
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -6,7 +7,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 
-from src.config import conf
 from src.errors import ChromeError
 
 
@@ -21,7 +21,7 @@ def init_driver() -> webdriver.Remote:
         chrome_options.add_argument("--disable-dev-shm-usage")
 
         return webdriver.Remote(
-            command_executor=conf["selenium"]["url"],
+            command_executor=os.getenv("SELENIUM_URL"),
             options=chrome_options
         )
 

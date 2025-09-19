@@ -6,7 +6,7 @@ from src.config import conf
 
  # OpenAI client
 client = OpenAI(
-    base_url=conf["openai"]["base_url"],
+    base_url=os.getenv("OPENAI_BASE_URL"),
     api_key=os.getenv("OPENAI_API_KEY")
 )
 
@@ -17,7 +17,7 @@ def call_chat_completion(messages, **kwargs):
     try:
         # openai compatible
         response = client.chat.completions.create(
-                model=conf["openai"]["model"],  
+                model=os.getenv("OPENAI_MODEL"),  
                 messages=messages,
                 stream=True,
                 **kwargs
