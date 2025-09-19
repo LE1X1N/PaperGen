@@ -1,6 +1,6 @@
 {
-    "name": "papergen development env",
-    "dockerComposeFile": "../docker-compose.yml",
+    "name": "Papergen Dev",
+    "dockerComposeFile": "../docker/docker-compose.yml",
     "service": "papergen-service",
     "workspaceFolder": "/app",
     "updateRemoteUserUID": false
