@@ -184,7 +184,46 @@ uwsgi --ini uwsgi_service.ini
 docker compose down
 ```
 
-## 5. 项目结构
+
+## 5. 问题定位
+
+- **1️⃣ 输出图片样式不满意，怎样修改图片的样式呢？**
+  
+  生成图片的样式（如上下布局，左右布局，基础样式等）主要由 **/static** 下的不同模板控制，基于此模板模型会生成复合输入JSON描述的对应tsx代码，因此如果产品认为生成图片的样式布局需要调整，可以尝试在 **/static** 下添加或者修改对应的模板tsx代码。
+
+- **2️⃣ 输出图片有些细节问题，比如功能栏位置错误，不美观等**
+
+  基于模板tsx代码，在 **src/llm/prompt.py** 当中将会拼接为对应的模型提示词，有模型生成最终的 tsx代码用于渲染。由于大模型生成内容的不确定性，图片当中可能有些细节无法完全控制（比如：渲染出的界面滚动条太粗）。这个时候就需要调整提示词。在对应的提示词生成函数当中添加 “滚动条限制为5px” 类似的描述，则最终生成的图片细节会有改善。
+
+- **3️⃣ 输出图片比例存在问题 / 图片需要进行裁剪**
+  
+  当前在 **src/core/task_manager.py** 的第11步当中提供了图片后处理操作。传入初始图像的路径，直接在生成图片上进行操作，比如使用cv2库，进行裁剪或者拉伸操作。
+
+- **4️⃣ 可以添加更多的生成样式吗？**
+
+  当前支持 style为 网页端（0），APP（1），微信小程序（2），分别对应传入JSON的style字段为 0、1、2的情况。当需要扩充样式，则需要在 **src/core/data_processing/tmpl_manager.py** 当中添加对于对应类别的样式解析。比如添加ios (4) 对应 **/static** 目录下的 ios 文件夹。接着对于 **src/llm/prompt.py** 添加对应 style的提示词即可。
+
+- **5️⃣ 我想查看某一个tsx代码的样式调整，怎样做？**
+
+  在 **src/browser/renderer.py** 当中的 **launch_sandbox_demo()** 函数基于gradio在一个浏览器当中渲染tsx代码，将tsx文件读取并传入此函数当中，即可以在浏览器当中输入对应的端口查看渲染情况。
+
+  示例测试代码：
+
+  ``` python
+  import os
+  import sys
+
+  from src.browser import launch_sandbox_demo
+
+  code = open("static/app/模板2.jsx").read()
+  launch_sandbox_demo("111", "222", code, 50049)  # 这里的111， 222随便填写，50049为浏览器端口
+  ```
+  接着在浏览器当中访问 *http://localhost:50049* 即可查看渲染情况。
+  注意：当前 **launch_sandbox_demo()** 当中 demo.launch 参数设置 quiet=True，可以设置为 False方便查看浏览器路径。
+
+
+
+## 6. 项目结构
 
 ```
 coder-artifacts
