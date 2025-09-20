@@ -6,7 +6,6 @@ from src.llm import check_openai_health
 from src.db import check_mongodb_health
 from src.core.task_manager import TaskManager
 from src.utils import get_logger
-from src.config import conf
 
 api_bp = Blueprint('v1', __name__)
 logger = get_logger()
@@ -48,9 +47,9 @@ def health_check():
     try:
         check_openai_health()                                 
         check_mongodb_health()
-        return jsonify({"code": 0, "status": "healthy", "service": conf["service"]["name"]})
+        return jsonify({"code": 0, "status": "healthy"})
     
     except Exception as e:
-        return jsonify({"code": -1, "status": "error", "service": conf["service"]["name"]}), 500
+        return jsonify({"code": -1, "status": "error", "msg": str(e)}), 500
     
     

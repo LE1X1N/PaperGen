@@ -2,7 +2,6 @@ import os
 from openai import OpenAI
 
 from src.errors import OpenAIError
-from src.config import conf
 
  # OpenAI client
 client = OpenAI(

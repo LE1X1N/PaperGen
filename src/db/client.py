@@ -3,8 +3,6 @@ import os
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 
-from src.config import conf
-
 # global mongodb client
 mongo_client = None
 
