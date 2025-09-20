@@ -6,28 +6,24 @@ An automonous undergraduate thesis generator.
 
 🐳 请事先预下载以下项目所依赖的镜像 。
 
-## 1.1. MongoDB
-MongoDB 主要用于存储JSON样式的订单状态。
+- **MongoDB**:主要用于存储JSON样式的订单状态。
 
-```bash
-docker pull docker.io/library/mongo:7.0.12
-```
-## 1.2. Selenium
-Selenium主要用于截屏服务。
+  ```bash
+  docker pull docker.io/library/mongo:7.0.12
+  ```
+- **Selenium**: 主要用于截屏服务。
 
-```bash
-docker pull docker.io/selenium/standalone-chrome:latest
-```
+  ```bash
+  docker pull docker.io/selenium/standalone-chrome:latest
+  ```
 
-## 1.3. Minio
-Minio主要用于存储生成的图片和代码
+- **Minio**: 用于存储生成的图片和代码
 
-```bash
-docker docker.io/minio/minio:RELEASE.2025-09-07T16-13-09Z
-```
+  ```bash
+  docker docker.io/minio/minio:RELEASE.2025-09-07T16-13-09Z
+  ```
 
-## 1.4. Redis
-Redis用于在内存中存储订单状态，加速查询速度
+- **Redis**: 用于在内存中存储订单状态，加速查询速度
 
 
 ⚠️：若遇到网络问题，请尝试使用 *swr.cn-north-4.myhuaweicloud.com/ddn-k8s/* 镜像前缀。
