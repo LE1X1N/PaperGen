@@ -4,7 +4,9 @@ An automonous undergraduate thesis generator.
 
 # 1. Prerequisite 🚧
 
-🐳 请事先预下载以下项目所依赖的镜像 。
+预下载以下项目所依赖的镜像 🐳 。
+
+⚠️：若遇到网络问题，请尝试使用 *swr.cn-north-4.myhuaweicloud.com/ddn-k8s/* 镜像前缀。
 
 - **MongoDB**:主要用于存储JSON样式的订单状态。
 
@@ -26,7 +28,7 @@ An automonous undergraduate thesis generator.
 - **Redis**: 用于在内存中存储订单状态，加速查询速度
 
 
-⚠️：若遇到网络问题，请尝试使用 *swr.cn-north-4.myhuaweicloud.com/ddn-k8s/* 镜像前缀。
+
 
 
 # 2. 配置文件修改 🔧
