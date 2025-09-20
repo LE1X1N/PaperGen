@@ -1,1 +1,1 @@
-from .progress_store import ProgressManager, ProgressStatus
+from .progress_manager import ProgressManager, ProgressStatus
