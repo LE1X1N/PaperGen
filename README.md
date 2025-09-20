@@ -223,32 +223,33 @@ PaperGen
 │  ├─ app.py             # Flask app初始化
 │  ├─ browser
 │  │  ├─ __init__.py
-│  │  ├─ manager.py      # Selenium Driver相关
-│  │  └─ renderer.py     # Gradio界面渲染相关
+│  │  ├─ manager.py      # Selenium Driver相关，负责截屏逻辑
+│  │  └─ renderer.py     # Gradio界面渲染相关，负责渲染逻辑
 │  ├─ config
 │  │  ├─ __init__.py
 │  │  └─ loader.py       # 配置文件加载
 │  ├─ core
-│  │  ├─ data_processing    # JSON解析处理 / 模板控制
+│  │  ├─ data_processing     
 │  │  │  ├─ __init__.py
-│  │  │  ├─ json_parser.py
-│  │  │  └─ tmpl_manager.py
-│  │  ├─ progress            # 流程控制，处理状态JSON
+│  │  │  ├─ json_parser.py   # JSON解析处理
+│  │  │  └─ tmpl_manager.py  # 生成代码模板控制
+│  │  ├─ progress            # 流程控制，处理状态JSON保存至MongoDB
 │  │  │  ├─ __init__.py
 │  │  │  └─ progress_store.py
-│  │  ├─ storage             # 存储管理，DFS与本地文件
+│  │  ├─ storage            # 存储管理，管理代码和图片的本地存储(screenshot/) 以及 MinIO上传
 │  │  │  ├─ __init__.py
-│  │  │  ├─ dfs_upload.py
-│  │  │  └─ local_storage.py
+│  │  │  ├─ local_storage.py
+│  │  │  └─ minio_storage.py
 │  │  └─ task_manager.py    # 任务核心，负责拆解与执行任务
 │  ├─ db
 │  │  ├─ __init__.py
-│  │  └─ client.py       # MongoDB 相关
+│  │  ├─ minio_client.py    # MinIO 相关，建立连接
+│  │  └─ mongo_client.py    # MongoDB 相关，建立连接
 │  ├─ errors.py
 │  ├─ llm
 │  │  ├─ __init__.py
-│  │  ├─ client.py       # LLM 相关
-│  │  └─ prompt.py
+│  │  ├─ client.py       # LLM 相关，建立连接
+│  │  └─ prompt.py       # 构建提示词
 │  └─ utils
 │     ├─ __init__.py
 │     ├─ common.py
