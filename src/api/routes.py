@@ -4,7 +4,7 @@ import uuid
 
 from src.llm import check_openai_health
 from src.db import check_mongodb_health
-from src.core.task_manager import TaskManager
+from core.pipeline import TaskManager
 from src.utils import get_logger
 
 api_bp = Blueprint('v1', __name__)
