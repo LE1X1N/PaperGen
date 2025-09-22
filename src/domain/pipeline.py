@@ -2,7 +2,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor, TimeoutError, as_completed
 from multiprocessing import Process, Lock, Queue
 
-from .data_processing import DataParser
+from .parser import DataParser
 
 from src.errors import *
 from src.config import conf

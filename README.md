@@ -224,14 +224,11 @@ PaperGen
 │  ├─ config
 │  │  ├─ __init__.py
 │  │  └─ loader.py       # 配置文件加载
-│  ├─ core
+│  ├─ domain
 │  │  ├─ data_processing     
 │  │  │  ├─ __init__.py
 │  │  │  ├─ json_parser.py   # JSON解析处理
-│  │  │  └─ tmpl_manager.py  # 生成代码模板控制
-│  │  ├─ progress           
-│  │  │  ├─ __init__.py
-│  │  │  └─ progress_manager.py    # 流程控制，处理状态JSON保存至MongoDB
+│  │  │  └─ tmpl_manager.py  # 生成代码模板控制  
 │  │  └─ pipeline.py        # 任务核心，负责拆解与执行任务
 │  ├─ errors.py
 │  ├─ infrastructure
@@ -248,7 +245,9 @@ PaperGen
 │  │  │  └─ prompt_builder.py   # 构建提示词
 │  │  └─ storage                # 存储管理，管理代码和图片的本地存储(screenshot/) 
 │  │     ├─ __init__.py
-│  │     └─ local_storage.py    
+│  │     └─ local_storage.py   
+│  ├─ repository
+│  │  └─ progress_repository.py  # 流程控制，处理状态JSON保存至MongoDB
 │  └─ utils
 │     ├─ __init__.py
 │     ├─ common.py
