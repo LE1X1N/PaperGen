@@ -3,11 +3,12 @@ from concurrent.futures import ThreadPoolExecutor, TimeoutError, as_completed
 from multiprocessing import Process, Lock, Queue
 
 from .data_processing import DataParser
-from .progress import ProgressManager, ProgressStatus
 
 from src.errors import *
 from src.config import conf
 from src.utils import get_random_available_port, wait_for_port, get_generated_files, post_processing_img
+
+from src.repository.progress_repository import ProgressManager, ProgressStatus
 
 from src.infrastructure.llm import call_chat_completion, SYSTEM_PROMPT
 from src.infrastructure.browser import launch_sandbox_demo, wait_for_render, init_driver, capture_screenshot

@@ -2,7 +2,6 @@ import threading
 from flask import Blueprint, request, jsonify
 import uuid
 
-
 from src.utils import get_logger
 from src.domain.pipeline import TaskManager
 from src.infrastructure.llm import check_openai_health
