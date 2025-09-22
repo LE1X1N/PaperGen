@@ -1,6 +1,6 @@
 from flask import Flask
 
-from src.llm import check_openai_health
+from src.infrastructure.llm import check_openai_health
 from src.db import check_mongodb_health
 from src.browser import check_driver_health
 from src.utils import setup_logger

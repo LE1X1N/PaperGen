@@ -1,4 +1,4 @@
-from src.llm import build_module_prompt, build_page_prompt
+from src.infrastructure.llm import build_module_prompt, build_page_prompt
 from src.errors import InvalidJSONError
 
 from .tmpl_manager import TemplateManager
