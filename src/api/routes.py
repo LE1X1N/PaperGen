@@ -2,6 +2,7 @@ import threading
 from flask import Blueprint, request, jsonify
 import uuid
 
+from .validator.json_validator import JSONValidator
 from src.utils import get_logger
 from src.domain.pipeline import TaskManager
 from src.infrastructure.llm import check_openai_health
@@ -23,7 +24,7 @@ def gen_images():
     data = req['data']
   
     try:
-        task_manager.parser.check_field(data)  # check JSON field
+        JSONValidator.check_field(data)    # check JSON field
         task_thread = threading.Thread(target=task_manager.process_tasks, args=(request_id, data, task_id))  
         task_thread.start()
         logger.info(f"Request ID: {request_id} -> 创建任务成功！")
