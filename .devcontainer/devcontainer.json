@@ -3,5 +3,10 @@
     "dockerComposeFile": "../docker/docker-compose.yml",
     "service": "papergen-service",
     "workspaceFolder": "/app",
-    "updateRemoteUserUID": false
+    "updateRemoteUserUID": false,
+    "extensions": [
+        "ms-python.python",
+        "ms-python.debugpy",
+        "ms-python.vscode-pylance"
+    ]
 }
