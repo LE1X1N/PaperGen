@@ -12,7 +12,7 @@ from src.repository.progress_repository import ProgressManager, ProgressStatus
 from src.infrastructure.llm import call_chat_completion
 from src.infrastructure.renderer import launch_sandbox_demo, wait_for_render
 from src.infrastructure.browser import init_driver, capture_screenshot
-from src.infrastructure.storage import save_code, save_img, get_local_request_dir
+from src.infrastructure.storage import save_code, save_img
 
 
 class TaskManager:
@@ -35,11 +35,11 @@ class TaskManager:
         """
         start_time = time.time()
 
-        # 1. ini request status dict and dir
+        # 1. ini request status dict
         self.progress_manager.init_request(request_id, self.parser.parse_page_ids(data), task_id)
-        request_dir = get_local_request_dir(request_id)
+        # request_dir = _get_local_request_dir(request_id)
         self.logger.info(f"Request ID: {request_id} ->: 状态JSON上传MongoDB成功") 
-        self.logger.info(f"Request ID: {request_id} ->: 本地文件存储路径：{request_dir}") 
+        # self.logger.info(f"Request ID: {request_id} ->: 本地文件存储路径：{request_dir}") 
         
         # 2. module-level tasks       
         tasks = self.parser.parse_module(request_id, data)
