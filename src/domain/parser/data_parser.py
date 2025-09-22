@@ -1,11 +1,9 @@
-from src.infrastructure.llm import build_module_prompt, build_page_prompt
-
-from .tmpl_manager import TemplateManager
-
+from .tmpl_parser import TemplateParser
+from .prompts import build_page_prompt, build_module_prompt
 
 class DataParser:
     def __init__(self, logger=None):
-        self.tmpl_manager = TemplateManager()
+        self.tmpl_parser = TemplateParser()
         self.logger = logger
         
     def parse_module(self, request_id: str, data:dict) -> list[dict]:
@@ -15,7 +13,7 @@ class DataParser:
             tmpls = {}
             # choose template for different styles
             for module in data["web_pages"]:
-                tmpls[int(module["style"])] = self.tmpl_manager.load_template(int(module["style"]))
+                tmpls[int(module["style"])] = self.tmpl_parser.load_template(int(module["style"]))
             
             for mid, module in enumerate(data["web_pages"]):
                 tasks.append(
@@ -76,4 +74,3 @@ class DataParser:
             for page in module['page']:
                 task_ids.append(page["id"])
         return task_ids
-    

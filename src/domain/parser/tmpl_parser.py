@@ -2,7 +2,7 @@ import random
 from pathlib import Path
 
 
-class TemplateManager:
+class TemplateParser:
     def __init__(self):
 
         self.base_dir = Path(__file__).parent.parent.parent.parent / "static"  

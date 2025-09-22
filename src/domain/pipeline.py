@@ -2,7 +2,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor, TimeoutError, as_completed
 from multiprocessing import Process, Lock, Queue
 
-from .parser import DataParser
+from .parser import DataParser, SYSTEM_PROMPT
 
 from src.errors import *
 from src.config import conf
@@ -10,7 +10,7 @@ from src.utils import get_random_available_port, wait_for_port, get_generated_fi
 
 from src.repository.progress_repository import ProgressManager, ProgressStatus
 
-from src.infrastructure.llm import call_chat_completion, SYSTEM_PROMPT
+from src.infrastructure.llm import call_chat_completion
 from src.infrastructure.browser import launch_sandbox_demo, wait_for_render, init_driver, capture_screenshot
 from src.infrastructure.storage import save_code, save_img, get_local_request_dir
 
