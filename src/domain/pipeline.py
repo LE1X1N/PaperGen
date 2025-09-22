@@ -10,7 +10,8 @@ from src.utils import get_random_available_port, wait_for_port, get_generated_fi
 
 from src.repository.progress_repository import ProgressManager, ProgressStatus
 from src.infrastructure.llm import call_chat_completion
-from src.infrastructure.browser import launch_sandbox_demo, wait_for_render, init_driver, capture_screenshot
+from src.infrastructure.renderer import launch_sandbox_demo, wait_for_render
+from src.infrastructure.browser import init_driver, capture_screenshot
 from src.infrastructure.storage import save_code, save_img, get_local_request_dir
 
 
