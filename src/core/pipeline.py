@@ -4,7 +4,7 @@ from multiprocessing import Process, Lock, Queue
 
 from src.errors import *
 from src.config import conf
-from src.llm import call_chat_completion, SYSTEM_PROMPT
+from src.infrastructure.llm import call_chat_completion, SYSTEM_PROMPT
 from src.browser import launch_sandbox_demo, wait_for_render
 from src.browser import init_driver, capture_screenshot
 from src.utils import get_random_available_port, wait_for_port, get_generated_files, post_processing_img
