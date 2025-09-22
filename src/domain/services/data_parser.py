@@ -1,5 +1,5 @@
 from .tmpl_parser import TemplateParser
-from .prompts import build_page_prompt, build_module_prompt
+from .prompt_builder import build_page_prompt, build_module_prompt
 
 class DataParser:
     def __init__(self, logger=None):
