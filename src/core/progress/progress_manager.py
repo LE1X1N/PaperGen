@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Dict, Optional
 
-from src.db import get_mongo_collection
+from src.infrastructure.db import get_mongo_collection
 
 
 class ProgressStatus:

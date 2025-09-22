@@ -1,10 +1,12 @@
 from flask import Flask
 
-from src.infrastructure.llm import check_openai_health
-from src.db import check_mongodb_health
-from src.infrastructure.browser import check_driver_health
 from src.utils import setup_logger
 from src.config import LOCAL_FILE_DIR, LOG_BASE_DIR
+
+from src.infrastructure.llm import check_openai_health
+from src.infrastructure.db import check_mongodb_health
+from src.infrastructure.browser import check_driver_health
+
 
 def create_app():
     try:

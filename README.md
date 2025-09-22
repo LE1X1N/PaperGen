@@ -185,7 +185,7 @@ docker compose down
   import os
   import sys
 
-  from src.browser import launch_sandbox_demo
+  from src.infrastructure.browser import launch_sandbox_demo
 
   code = open("static/app/模板2.jsx").read()
   launch_sandbox_demo("111", "222", code, 50049)  # 这里的111， 222随便填写，50049为浏览器端口
