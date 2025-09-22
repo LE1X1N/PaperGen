@@ -5,7 +5,7 @@ from pathlib import Path
 class TemplateParser:
     def __init__(self):
 
-        self.base_dir = Path(__file__).parent.parent.parent.parent / "static"  
+        self.base_dir = Path(__file__).parent.parent.parent.parent / "templates"  
         
         self.style_map = {
             0 : self.base_dir / "web", 
