@@ -1,6 +1,5 @@
-from pathlib import Path
-import os
 import random
+from pathlib import Path
 
 
 class TemplateManager:
