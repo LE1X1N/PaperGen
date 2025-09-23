@@ -1,17 +1,22 @@
 import logging
 import os
+from pathlib import Path
 from concurrent_log_handler import ConcurrentRotatingFileHandler
 
-from src.config import conf, LOG_BASE_DIR
+from src.config import conf
 
 
 def setup_logger():
     """
         Initialize the logger for the application.
     """
+    log_dir = Path(conf["service"]["log"]["base_dir"])
+    if not log_dir.exists():
+        log_dir.mkdir(exist_ok=True)
+        print(f"创建日志路径：{log_dir}") 
     
     # log file 
-    logger_file_path = os.path.join(LOG_BASE_DIR, conf["service"]["log"]["file_name"])
+    logger_file_path = os.path.join(log_dir, conf["service"]["log"]["file_name"])
 
     # init logger
     logger = logging.getLogger(conf["service"]["name"])

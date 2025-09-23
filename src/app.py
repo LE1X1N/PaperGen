@@ -1,25 +1,19 @@
 import os
 from flask import Flask
 
-
 def create_app():
     try:
         if os.getenv("OPENAI_API_KEY") is None:
             print("Error: 当前环境未设置 OPENAI_API_KEY, 请使用 export OPENAI_API_KEY=sk-XXXXXX 设置该环境变量！")
             exit(0)
         
-        from src.config import conf, LOG_BASE_DIR
-        
         # log 
-        if not LOG_BASE_DIR.exists():
-            LOG_BASE_DIR.mkdir(exist_ok=True)
-            print(f"创建日志路径：{LOG_BASE_DIR}")  
-            
         from src.utils import setup_logger
         log_file_path = setup_logger()
         print(f"日志存储位置：{log_file_path}")
         
         # storage engine
+        from src.config import conf
         print(f"文件存储引擎：{conf["service"]["storage"]["type"]}")
         if conf["service"]["storage"]["type"] == "local":
             from src.infrastructure.storage.local_storage import LocalStorage
