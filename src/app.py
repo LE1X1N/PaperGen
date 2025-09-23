@@ -23,12 +23,16 @@ def create_app():
         # storage engine
         print(f"文件存储引擎：{conf["service"]["storage"]["type"]}")
         if conf["service"]["storage"]["type"] == "local":
+            
             if not LOCAL_FILE_DIR.exists():
                 LOCAL_FILE_DIR.mkdir(exist_ok=True)
                 print(f"创建文件存储路径：{LOCAL_FILE_DIR}")
             print(f"本地文件存储位置：{LOCAL_FILE_DIR}")
-        
-        
+            
+        elif conf["service"]["storage"]["type"] == "minio":
+            from src.infrastructure.storage import check_minio_health
+            check_minio_health()
+            print(f"MinIO 检查通过！使用桶：{os.getenv("MINIO_BUCKET")}")
 
         # openai
         from src.infrastructure.llm import check_openai_health
