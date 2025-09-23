@@ -8,7 +8,7 @@ from src.errors import *
 from src.config import conf
 from src.utils import get_random_available_port, wait_for_port, get_generated_files, post_processing_img
 
-from src.repository.progress_repository import ProgressManager, ProgressStatus
+from src.repository.progress_repository import ProgressRepository, ProgressStatus
 
 from src.infrastructure.llm import call_chat_completion
 from src.infrastructure.renderer import launch_sandbox_demo, wait_for_render
@@ -19,7 +19,7 @@ from src.infrastructure.storage import save_code, save_img
 class TaskManager:
     def __init__(self, logger=None):
         self.parser = DataParser(logger=logger)
-        self.progress_manager = ProgressManager(logger=logger)
+        self.progress_repo = ProgressRepository(logger=logger)
         self.logger = logger
         
         # global thread pool
@@ -37,7 +37,7 @@ class TaskManager:
         start_time = time.time()
 
         # 1. ini request status dict
-        self.progress_manager.init_request(request_id, self.parser.parse_page_ids(data), task_id)
+        self.progress_repo.init_request(request_id, self.parser.parse_page_ids(data), task_id)
         self.logger.info(f"Request ID: {request_id} ->: 状态JSON上传MongoDB成功") 
         
         # 2. module-level tasks       

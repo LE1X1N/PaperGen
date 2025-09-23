@@ -10,7 +10,7 @@ class ProgressStatus:
     PENDING = "pending"
 
 
-class ProgressManager:
+class ProgressRepository:
     """
         Upload status JSON to local dir or to mongodb
     """

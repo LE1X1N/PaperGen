@@ -37,7 +37,7 @@ def gen_images():
 
 @api_bp.route('/progress/<request_id>', methods=['GET'])
 def get_progress(request_id: str):
-    progress = task_manager.progress_manager.get_progress(request_id)
+    progress = task_manager.progress_repo.get_progress(request_id)
     if not progress:
         return jsonify({"error": "请求ID不存在"}), 404
     return jsonify(progress)
