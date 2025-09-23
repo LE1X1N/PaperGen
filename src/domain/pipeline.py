@@ -9,18 +9,20 @@ from src.config import conf
 from src.utils import get_random_available_port, wait_for_port, get_generated_files, post_processing_img
 
 from src.repository.progress_repository import ProgressRepository, ProgressStatus
+from src.repository.storage_repository import StorageRepository
 
 from src.infrastructure.llm import call_chat_completion
 from src.infrastructure.renderer import launch_sandbox_demo, wait_for_render
 from src.infrastructure.browser import init_driver, capture_screenshot
-from src.infrastructure.storage import save_code, save_img
 
 
 class TaskManager:
     def __init__(self, logger=None):
+        self.logger = logger
+        
         self.parser = DataParser(logger=logger)
         self.progress_repo = ProgressRepository(logger=logger)
-        self.logger = logger
+        self.storage_repo  = StorageRepository()
         
         # global thread pool
         if not hasattr(TaskManager, 'global_executor'):
@@ -133,7 +135,7 @@ class TaskManager:
                 wait_for_render(request_id, page_id, conf["service"]["render_timeout_sec"], browser_registry, browser_lock, self.logger)
                 
                 # 9. save jsx code
-                code_path = save_code(request_id, page_id, react_code)
+                code_path = self.storage_repo.save_code(request_id, page_id, react_code)
                 self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: jsx 代码已保存至 {code_path}")
 
                 if task["return_code"]:
@@ -141,7 +143,7 @@ class TaskManager:
                 
                 # 10. capture screenshot and save png image
                 screenshot_img = capture_screenshot(driver)
-                img_path = save_img(request_id, page_id, screenshot_img)
+                img_path = self.storage_repo.save_img(request_id, page_id, screenshot_img)
                 self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: 截图已保存至 {img_path}")
 
                 # 11. post-processing image
