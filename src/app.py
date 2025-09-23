@@ -22,10 +22,8 @@ def create_app():
         # storage engine
         print(f"文件存储引擎：{conf["service"]["storage"]["type"]}")
         if conf["service"]["storage"]["type"] == "local":
-            
-            if not LOCAL_FILE_DIR.exists():
-                LOCAL_FILE_DIR.mkdir(exist_ok=True)
-                print(f"创建文件存储路径：{LOCAL_FILE_DIR}")
+            from src.infrastructure.storage.local_storage import LocalStorage
+            LocalStorage().check_storage_health()
             print(f"本地文件存储位置：{LOCAL_FILE_DIR}")
             
         elif conf["service"]["storage"]["type"] == "minio":
