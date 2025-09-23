@@ -5,8 +5,12 @@ service:
     connect_timeout_sec: 15           # Wait the port to be listend
     render_timeout_sec: 25            # max gradio rendering time 
     process_timeout_sec: 200          # Processing timeout for long-running tasks
-    local_file_dir: screenshots/
 
+    storage:
+        type: minio       # minio / local
+        local:
+            base_dir:  screenshots/
+            
     log:
         base_dir: log/
         file_name: service.log
