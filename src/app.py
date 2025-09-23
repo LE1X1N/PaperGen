@@ -8,12 +8,12 @@ def create_app():
             print("Error: 当前环境未设置 OPENAI_API_KEY, 请使用 export OPENAI_API_KEY=sk-XXXXXX 设置该环境变量！")
             exit(0)
         
-        from src.config import conf,  LOCAL_FILE_DIR, LOG_BASE_DIR
+        from src.config import conf, LOG_BASE_DIR
         
         # log 
         if not LOG_BASE_DIR.exists():
             LOG_BASE_DIR.mkdir(exist_ok=True)
-            print(f"创建日志路径：{LOCAL_FILE_DIR}")  
+            print(f"创建日志路径：{LOG_BASE_DIR}")  
             
         from src.utils import setup_logger
         log_file_path = setup_logger()
@@ -24,7 +24,7 @@ def create_app():
         if conf["service"]["storage"]["type"] == "local":
             from src.infrastructure.storage.local_storage import LocalStorage
             LocalStorage().check_storage_health()
-            print(f"本地文件存储位置：{LOCAL_FILE_DIR}")
+            print(f"本地文件存储位置：{conf["service"]["storage"]["local"]["base_dir"]}")
             
         elif conf["service"]["storage"]["type"] == "minio":
             from src.infrastructure.storage import check_minio_health
