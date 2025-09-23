@@ -5,7 +5,10 @@ class StorageRepository:
         pass
     
     def save_code():
-        pass
+        raise NotImplementedError
     
     def save_img():
-        pass
+        raise NotImplementedError
+    
+    def check_storage_health():
+        raise NotImplementedError
