@@ -5,24 +5,22 @@ import base64
 from minio import Minio
 from minio.error import S3Error
 
-minio_client = None
+_minio_client = None
 
 
 def _get_minio_client():
-    global minio_client
-    if minio_client is None:
+    global _minio_client
+    if _minio_client is None:
         try:
-            minio_client = Minio(
+            _minio_client = Minio(
                 endpoint=f"{os.getenv("MINIO_HOST")}:{os.getenv("MINIO_PORT")}",
                 access_key=os.getenv("MINIO_USER"),
                 secret_key=os.getenv("MINIO_PASSWORD"),
                 secure=False
             )
-            _create_bucket(minio_client, os.getenv("MINIO_BUCKET"))
-            
         except S3Error:
             raise
-    return minio_client
+    return _minio_client
 
 def _create_bucket(client, bucket):
     if not client.bucket_exists(bucket):
@@ -50,7 +48,6 @@ def save_code(request_id: str, page_id: str, code: str):
         raise
     
     
-
 def save_img(request_id: str, page_id: str, img: str):
     try:
         client = _get_minio_client() 
@@ -74,5 +71,13 @@ def save_img(request_id: str, page_id: str, img: str):
         )
         return f"http://localhost:{os.getenv("MINIO_CONSOLE_PORT")}/{bucket}/{object_name}"
         
+    except S3Error as e:
+        raise
+
+
+def check_minio_health():
+    try:
+        client = _get_minio_client()
+        _create_bucket(client, os.getenv("MINIO_BUCKET"))
     except S3Error as e:
         raise
