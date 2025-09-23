@@ -19,7 +19,6 @@ def create_app():
         log_file_path = setup_logger()
         print(f"日志存储位置：{log_file_path}")
         
-        
         # storage engine
         print(f"文件存储引擎：{conf["service"]["storage"]["type"]}")
         if conf["service"]["storage"]["type"] == "local":
@@ -37,7 +36,7 @@ def create_app():
         # openai
         from src.infrastructure.llm import check_openai_health
         check_openai_health()                
-        print("OpenAI 检查通过！")
+        print(f"OpenAI 检查通过！默认模型：{os.getenv("OPENAI_MODEL")}")
         
         # selenium
         from src.infrastructure.browser import check_driver_health
@@ -50,7 +49,6 @@ def create_app():
         print("MongoDB 检查通过！")
         
         from src.api import api_bp
-        
         app = Flask(__name__)
         app.register_blueprint(api_bp, url_prefix='/v1')
         print("服务启动成功！")
