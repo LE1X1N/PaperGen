@@ -1,6 +1,6 @@
 import time
 from concurrent.futures import ThreadPoolExecutor, TimeoutError, as_completed
-from multiprocessing import Process, Lock, Queue
+from multiprocessing import Process, Queue
 
 from .services import DataParser, SYSTEM_PROMPT
 
@@ -118,11 +118,10 @@ class TaskManager:
                 
                 # 5. Launch browser to render react code
                 browser_registry = Queue()      #  communication between main process and browser process
-                browser_lock = Lock()
 
                 port = get_random_available_port()        # random port
                 browser = Process(target=launch_sandbox_demo,
-                                  args=(request_id, page_id, react_code, port, browser_registry, browser_lock, self.logger), name="BrowserProcess")
+                                  args=(request_id, page_id, react_code, port, browser_registry, self.logger), name="BrowserProcess")
                 browser.start()
 
                 # 6. wait port connected (15s)
@@ -135,7 +134,7 @@ class TaskManager:
                 
                 # 8.  wait rendering (25s)
                 driver.get(f'http://papergen-service:{port}')
-                wait_for_render(request_id, page_id, conf["service"]["render_timeout_sec"], browser_registry, browser_lock, self.logger)
+                wait_for_render(request_id, page_id, conf["service"]["render_timeout_sec"], browser_registry, self.logger)
                 
                 # 9. save jsx code
                 code_path = self.storage_repo.save_code(request_id, page_id, react_code)
@@ -144,13 +143,15 @@ class TaskManager:
                 if task["return_code"]:
                     return react_code  
                 
-                # 10. capture screenshot and save png image
+                # 10. capture screenshot
                 screenshot_img = capture_screenshot(driver)
+                
+                # 11. post-processing image
+                # screenshot_img = post_processing_img(screenshot_img, task["style"])
+                
+                # 12. save image
                 img_path = self.storage_repo.save_img(request_id, page_id, screenshot_img)
                 self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: 截图已保存至 {img_path}")
-
-                # 11. post-processing image
-                img_path = post_processing_img(img_path, task["style"])
                 
                 return str(img_path)
 
