@@ -10,7 +10,8 @@ from src.utils import get_random_available_port, wait_for_port, get_generated_fi
 
 from src.repository.progress_repository import ProgressRepository, ProgressStatus
 # from src.repository.storage_repository import StorageRepository
-from src.infrastructure.storage.local_storage import LocalStorage
+# from src.infrastructure.storage.local_storage import LocalStorage
+from src.infrastructure.storage.minio_storage import MinioStorage
 
 from src.infrastructure.llm import call_chat_completion
 from src.infrastructure.renderer import launch_sandbox_demo, wait_for_render
@@ -23,7 +24,8 @@ class TaskManager:
         
         self.parser = DataParser(logger=logger)
         self.progress_repo = ProgressRepository(logger=logger)
-        self.storage_repo  = LocalStorage()
+        # self.storage_repo  = LocalStorage()
+        self.storage_repo = MinioStorage()
         
         # global thread pool
         if not hasattr(TaskManager, 'global_executor'):
@@ -78,9 +80,9 @@ class TaskManager:
             finally:
                 # update task status
                 if error_msg:
-                    self.progress_manager.update_task_status(request_id, task["page_id"], ProgressStatus.FAILED, url="", error=error_msg) # fail
+                    self.progress_repo.update_task_status(request_id, task["page_id"], ProgressStatus.FAILED, url="", error=error_msg) # fail
                 else:
-                    self.progress_manager.update_task_status(request_id,  task["page_id"],  ProgressStatus.SUCCESS, url=res)    # success
+                    self.progress_repo.update_task_status(request_id,  task["page_id"],  ProgressStatus.SUCCESS, url=res)    # success
                     
         self.logger.info(f"Request ID: {request_id} -> 【处理请求完成】共耗时 {time.time() - start_time} s")
     

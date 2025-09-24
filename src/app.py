@@ -21,8 +21,8 @@ def create_app():
             print(f"本地文件存储位置：{conf["service"]["storage"]["local"]["base_dir"]}")
             
         elif conf["service"]["storage"]["type"] == "minio":
-            from src.infrastructure.storage import check_minio_health
-            check_minio_health()
+            from src.infrastructure.storage.minio_storage import MinioStorage
+            MinioStorage().check_storage_health()
             print(f"MinIO 检查通过！使用桶：{os.getenv("MINIO_BUCKET")}")
 
         # openai
