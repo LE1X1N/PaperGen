@@ -34,7 +34,7 @@ react_import = {
     "dayjs": "https://esm.sh/dayjs",
 }
 
-def launch_sandbox_demo(request_id, page_id, react_code, port, browser_registry=None, browser_lock=None, logger=None, *args):
+def launch_sandbox_demo(request_id, page_id, react_code, port, browser_registry=None, logger=None, *args):
     """
         Sandbox based on modelscope_studio sandboxs
         
@@ -46,8 +46,7 @@ def launch_sandbox_demo(request_id, page_id, react_code, port, browser_registry=
         if logger:
             logger.error(f"Request ID: {request_id} -> Task_{page_id}: {error_msg}")
         if browser_registry:
-            with browser_lock:
-                browser_registry.put(error_msg)  # error flag
+            browser_registry.put(error_msg)  # error flag
 
     def handle_render_error(e: gr.EventData):
         """ Render error """
@@ -55,8 +54,7 @@ def launch_sandbox_demo(request_id, page_id, react_code, port, browser_registry=
         if logger:
             logger.error(f"Request ID: {request_id} -> Task_{page_id}: {error_msg}")
         if browser_registry:
-            with browser_lock:
-                browser_registry.put(error_msg)  # error flag
+            browser_registry.put(error_msg)  # error flag
 
     def handle_compile_success():
         """ Compile Success """
@@ -64,8 +62,7 @@ def launch_sandbox_demo(request_id, page_id, react_code, port, browser_registry=
         if logger:
             logger.info(f"Request ID: {request_id} -> Task_{page_id}:{msg}")
         if browser_registry is not None:
-            with browser_lock:
-                browser_registry.put(page_id)  # compile success flag
+            browser_registry.put(page_id)  # compile success flag
 
     with gr.Blocks() as demo:
         with ms.Application():
@@ -103,33 +100,32 @@ def launch_sandbox_demo(request_id, page_id, react_code, port, browser_registry=
 
 
 
-def wait_for_render(request_id, page_id, timeout, browser_registry=None, browser_lock=None, logger=None):  
+def wait_for_render(request_id, page_id, timeout, browser_registry=None, logger=None):  
         
     for _ in range(timeout):
-        with browser_lock:
-            logger.info(f"Request ID: {request_id} -> Task_{page_id}: 检查渲染状态...")
+        logger.info(f"Request ID: {request_id} -> Task_{page_id}: 检查渲染状态...")
             
-            if not browser_registry.empty():
-                completed_flag = browser_registry.get()
+        if not browser_registry.empty():
+            completed_flag = browser_registry.get()
 
-                if completed_flag != page_id:
-                    # render / compile error
-                    raise FrontendError(completed_flag)
+            if completed_flag != page_id:
+                # render / compile error
+                raise FrontendError(completed_flag)
 
-                if completed_flag == page_id:
-                    # compile success, wait for render success
-                    wait_rounds = 0
-                    while wait_rounds < 3:
-                        logger.info(f"Request ID: {request_id} -> Task_{page_id}: 编译成功，等待渲染成功信号...")
-                        if not browser_registry.empty():
-                            new_flag = browser_registry.get()
-                            if new_flag != page_id:
-                                raise FrontendError(new_flag)
-                        wait_rounds += 1
-                        time.sleep(1)
+            if completed_flag == page_id:
+                # compile success, wait for render success
+                wait_rounds = 0
+                while wait_rounds < 3:
+                    logger.info(f"Request ID: {request_id} -> Task_{page_id}: 编译成功，等待渲染成功信号...")
+                    if not browser_registry.empty():
+                        new_flag = browser_registry.get()
+                        if new_flag != page_id:
+                            raise FrontendError(new_flag)
+                    wait_rounds += 1
+                    time.sleep(1)
 
-                    logger.info(f"Request ID: {request_id} -> Task_{page_id}: 前端代码渲染成功！")
-                    return True
+                logger.info(f"Request ID: {request_id} -> Task_{page_id}: 前端代码渲染成功！")
+                return True
         time.sleep(1)
         
     raise RenderTimeoutError(f"Gradio渲染超时，超过 {timeout} 秒未渲染成功！")
