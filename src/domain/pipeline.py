@@ -9,9 +9,7 @@ from src.config import conf
 from src.utils import get_random_available_port, wait_for_port, get_generated_files, post_processing_img
 
 from src.repository.progress_repository import ProgressRepository, ProgressStatus
-# from src.repository.storage_repository import StorageRepository
-from src.infrastructure.storage.local_storage import LocalStorage
-from src.infrastructure.storage.minio_storage import MinioStorage
+from src.repository.storage_factory import get_storage
 
 from src.infrastructure.llm import call_chat_completion
 from src.infrastructure.renderer import launch_sandbox_demo, wait_for_render
@@ -24,8 +22,7 @@ class TaskManager:
         
         self.parser = DataParser(logger=logger)
         self.progress_repo = ProgressRepository(logger=logger)
-        self.storage_repo  = LocalStorage()
-        # self.storage_repo = MinioStorage()
+        self.storage_repo  = get_storage()
         
         # global thread pool
         if not hasattr(TaskManager, 'global_executor'):
