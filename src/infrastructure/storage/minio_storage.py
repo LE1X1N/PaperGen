@@ -17,11 +17,9 @@ class MinioStorage:
             )
         self.bucket = os.getenv("MINIO_BUCKET")
 
-
     def _create_bucket(self, client, bucket):
         if not client.bucket_exists(bucket):
             client.make_bucket(bucket)
-
 
     def save_code(self, request_id: str, page_id: str, code: str):
         try: 
@@ -38,9 +36,10 @@ class MinioStorage:
             )
             return f"http://localhost:{os.getenv("MINIO_CONSOLE_PORT")}/{self.bucket}/{object_name}"
             
-        except S3Error as e:
+        except S3Error:
             raise
-    
+        except Exception:
+            raise
     
     def save_img(self, request_id: str, page_id: str, img: str):
         try:
@@ -61,11 +60,12 @@ class MinioStorage:
                 length=len(img_bytes),
                 content_type="image/png"
             )
-            return f"http://localhost:{os.getenv("MINIO_CONSOLE_PORT")}/{bucket}/{object_name}"
+            return f"http://localhost:{os.getenv("MINIO_CONSOLE_PORT")}/{self.bucket}/{object_name}"
             
-        except S3Error as e:
+        except S3Error:
             raise
-
+        except Exception:
+            raise
 
     def check_storage_health(self):
         try:
