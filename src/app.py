@@ -13,18 +13,9 @@ def create_app():
         print(f"日志存储位置：{log_file_path}")
         
         # storage engine
-        from src.config import conf
-        print(f"文件存储引擎：{conf["service"]["storage"]["type"]}")
-        if conf["service"]["storage"]["type"] == "local":
-            from src.infrastructure.storage.local_storage import LocalStorage
-            LocalStorage().check_storage_health()
-            print(f"本地文件存储位置：{conf["service"]["storage"]["local"]["base_dir"]}")
-            
-        elif conf["service"]["storage"]["type"] == "minio":
-            from src.infrastructure.storage.minio_storage import MinioStorage
-            MinioStorage().check_storage_health()
-            print(f"MinIO 检查通过！使用桶：{os.getenv("MINIO_BUCKET")}")
-
+        from src.repository.storage_factory import get_storage
+        get_storage().check_storage_health()
+        
         # openai
         from src.infrastructure.llm import check_openai_health
         check_openai_health()                
