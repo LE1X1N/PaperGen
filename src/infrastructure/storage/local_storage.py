@@ -41,7 +41,6 @@ class LocalStorage():
         img_bytes = base64.b64decode(img_base64, validate=True)
         with open(file_path, "wb") as f:  
             f.write(img_bytes)
-        
         return file_path
 
     def check_storage_health(self):
