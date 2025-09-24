@@ -1,14 +1,17 @@
+from abc import ABC, abstractmethod
 
-class StorageRepository:
-    
+class StorageRepository(ABC):
     def __init__(self):
+        super().__init__()
+    
+    @abstractmethod
+    def save_code(self):
         pass
     
-    def save_code():
-        raise NotImplementedError
+    @abstractmethod
+    def save_img(self):
+        pass
     
-    def save_img():
-        raise NotImplementedError
-    
-    def check_storage_health():
-        raise NotImplementedError
+    @abstractmethod
+    def check_storage_health(self):
+        pass

@@ -18,13 +18,11 @@ class LocalStorage():
             os.mkdir(request_dir / "img")
         return request_dir
 
-
     def save_code(self, request_id: str, page_id: str, code: str):
         file_path = self._get_local_request_dir(request_id) / "code" / f"task_{page_id}.jsx"
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(code)
         return file_path
-
 
     def save_img(self, request_id: str, page_id: str, img: str):
         """
