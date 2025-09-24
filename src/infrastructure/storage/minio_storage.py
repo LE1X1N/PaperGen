@@ -5,8 +5,10 @@ import base64
 from minio import Minio
 from minio.error import S3Error
 
+from src.repository.storage_repository import StorageRepository
 
-class MinioStorage:
+
+class MinioStorage(StorageRepository):
     
     def __init__(self):
         self.client = Minio(
@@ -21,30 +23,27 @@ class MinioStorage:
         if not client.bucket_exists(bucket):
             client.make_bucket(bucket)
 
-    def save_code(self, request_id: str, page_id: str, code: str):
+    def save_code(self, code: str, path: str):
         try: 
             code_bytes = code.encode("utf-8") # str to bytes stream
-            object_name = f"{request_id}/code/task_{page_id}.tsx"
             
             # upload to MinIO
             self.client.put_object(
                 bucket_name= self.bucket,
-                object_name = object_name,
+                object_name = path,
                 data = io.BytesIO(code_bytes),
                 length = len(code_bytes),
                 content_type = "text/typescript-jsx"
             )
-            return f"http://localhost:{os.getenv("MINIO_CONSOLE_PORT")}/{self.bucket}/{object_name}"
+            return f"http://localhost:{os.getenv("MINIO_CONSOLE_PORT")}/{self.bucket}/{path}"
             
         except S3Error:
             raise
         except Exception:
             raise
     
-    def save_img(self, request_id: str, page_id: str, img: str):
-        try:
-            object_name = f"{request_id}/img/task_{page_id}.png"
-            
+    def save_img(self, img: str, path: str):
+        try:    
             # base64 to binary stream
             if img.startswith("data:image"):
                 img_base64 = img.split(",")[1]
@@ -55,12 +54,12 @@ class MinioStorage:
             # upload to Minio
             self.client.put_object(
                 bucket_name = self.bucket,
-                object_name = object_name,
+                object_name = path,
                 data = io.BytesIO(img_bytes),
                 length=len(img_bytes),
                 content_type="image/png"
             )
-            return f"http://localhost:{os.getenv("MINIO_CONSOLE_PORT")}/{self.bucket}/{object_name}"
+            return f"http://localhost:{os.getenv("MINIO_CONSOLE_PORT")}/{self.bucket}/{path}"
             
         except S3Error:
             raise

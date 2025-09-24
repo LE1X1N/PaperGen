@@ -3,8 +3,10 @@ from pathlib import Path
 import os
 
 from src.config import conf
+from src.repository.storage_repository import StorageRepository
 
-class LocalStorage():
+
+class LocalStorage(StorageRepository):
     def __init__(self):
         self.local_file_dir = Path(conf["service"]["storage"]["local"]["base_dir"])
         

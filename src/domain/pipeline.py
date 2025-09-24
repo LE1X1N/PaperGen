@@ -137,7 +137,7 @@ class TaskManager:
                 wait_for_render(request_id, page_id, conf["service"]["render_timeout_sec"], browser_registry, self.logger)
                 
                 # 9. save jsx code
-                code_path = self.storage_repo.save_code(request_id, page_id, react_code)
+                code_path = self.storage_repo.save_code(react_code, f"{request_id}/code/task_{page_id}.tsx")
                 self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: jsx 代码已保存至 {code_path}")
 
                 if task["return_code"]:
@@ -150,7 +150,7 @@ class TaskManager:
                 # screenshot_img = post_processing_img(screenshot_img, task["style"])
                 
                 # 12. save image
-                img_path = self.storage_repo.save_img(request_id, page_id, screenshot_img)
+                img_path = self.storage_repo.save_img(screenshot_img, f"{request_id}/img/task_{page_id}.png")
                 self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: 截图已保存至 {img_path}")
                 
                 return str(img_path)
