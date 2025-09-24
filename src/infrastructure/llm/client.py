@@ -37,6 +37,7 @@ def check_openai_health():
     messages=[{"role": "user", "content": "ping"}]
     try:
         call_chat_completion(messages, max_completion_tokens=5)
+        print(f"OpenAI 检查通过！默认模型：{os.getenv("OPENAI_MODEL")}")
     except OpenAIError:
         raise
     

@@ -58,6 +58,7 @@ def check_driver_health():
     driver = None
     try:
         driver = init_driver()
+        print("Chrome Driver 检查通过！")
     except ChromeError:
         raise
     finally:

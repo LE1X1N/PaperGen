@@ -19,17 +19,14 @@ def create_app():
         # openai
         from src.infrastructure.llm import check_openai_health
         check_openai_health()                
-        print(f"OpenAI 检查通过！默认模型：{os.getenv("OPENAI_MODEL")}")
         
         # selenium
         from src.infrastructure.browser import check_driver_health
         check_driver_health()                 
-        print("Chrome Driver 检查通过！")
         
         # mongodb
         from src.infrastructure.db import check_mongodb_health
         check_mongodb_health()
-        print("MongoDB 检查通过！")
         
         from src.api import api_bp
         app = Flask(__name__)

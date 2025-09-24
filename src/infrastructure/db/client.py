@@ -34,7 +34,7 @@ def check_mongodb_health():
         db = client[os.getenv("MONGODB_DB")]
         collection = db[os.getenv("MONGODB_COLLECTION")]
         count = collection.count_documents({})  # try to read
-        return count
+        print(f"MongoDB 检查通过！当前存储条目: {count}")
     except PyMongoError:
         raise
     

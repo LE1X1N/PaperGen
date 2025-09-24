@@ -7,7 +7,7 @@ service:
     process_timeout_sec: 200          # Processing timeout for long-running tasks
 
     storage:
-        type: minio       # minio / local
+        type: minio      # minio / local
         local:
             base_dir:  screenshots/
             
