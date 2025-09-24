@@ -1,13 +1,13 @@
 import base64
 from pathlib import Path
 
-from src.config import conf
 from src.repository.storage_repository import StorageRepository
 
 
 class LocalStorage(StorageRepository):
-    def __init__(self):
-        self.local_file_dir = Path(conf["service"]["storage"]["local"]["base_dir"])
+    def __init__(self, local_file_dir):
+        super().__init__()
+        self.local_file_dir = Path(local_file_dir)
 
     def save_code(self, code: str, path: str):
         file_path = self.local_file_dir / path
@@ -41,4 +41,4 @@ class LocalStorage(StorageRepository):
         if not self.local_file_dir.exists():
             self.local_file_dir.mkdir(exist_ok=True)
             print(f"创建文件存储路径：{self.local_file_dir}")
-        
+        print(f"Storage检查通过，本地文件存储位置：{self.local_file_dir}")

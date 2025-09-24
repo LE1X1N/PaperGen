@@ -11,6 +11,7 @@ from src.repository.storage_repository import StorageRepository
 class MinioStorage(StorageRepository):
     
     def __init__(self):
+        super().__init__()
         self.client = Minio(
                 endpoint=f"{os.getenv("MINIO_HOST")}:{os.getenv("MINIO_PORT")}",
                 access_key=os.getenv("MINIO_USER"),
@@ -69,5 +70,6 @@ class MinioStorage(StorageRepository):
     def check_storage_health(self):
         try:
             self._create_bucket(self.client, self.bucket)
+            print(f"MinIO 检查通过！使用桶：{self.bucket}")
         except S3Error as e:
             raise
