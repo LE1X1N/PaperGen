@@ -95,9 +95,7 @@ def launch_sandbox_demo(request_id, page_id, react_code, port, browser_registry=
         quiet=True,
         *args
     )
-
     return demo
-
 
 
 def wait_for_render(request_id, page_id, timeout, browser_registry=None, logger=None):  
