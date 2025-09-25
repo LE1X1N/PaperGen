@@ -1,6 +1,8 @@
 from PIL import Image
 import cv2
 import numpy as np
+import io
+import base64
 
 from src.errors import  WhiteScreenshotError
 
@@ -27,6 +29,17 @@ def _crop_scrollbar(img_path, output_path: str=None, crop_width: int=20):
     save_path = img_path if output_path is None else output_path
     img.save(save_path)
     return save_path
+
+def _crop_scrollbar_b64(img_b64, crop_width: int=20):
+    # crop right scrollbar based on base64 encoded images
+    img = Image.open(io.BytesIO(base64.b64decode(img_b64))).convert('RGB')  # b64 to PIL
+    width, height = img.size    
+    img = img.crop((0, 0, width-crop_width, height))
+    
+    img_io = io.BytesIO()
+    img.save(img_io, format="PNG")
+    img_b64 = base64.b64encode(img_io.getvalue()).decode("utf-8")
+    return img_b64
     
 
 def _crop_by_edge_detection(img_path, output_path=None):
@@ -107,3 +120,12 @@ def _isSolidColorImage(img_path, max_size=400, tolerance=0.92):
         
         return peak_ratio >= tolerance
     
+# if __name__ == "__main__":
+#     with open("/home/lx/codespace/PaperGen/task_img.png", "rb") as f:
+#         img = f.read()
+#     img_b64 = base64.b64encode(img).decode('utf-8')
+#     img_b64 = _crop_scrollbar_b64(img_b64)
+#     print(img_b64)
+    
+#     with open("/home/lx/codespace/PaperGen/task_output.png", "wb") as f:
+#         f.write(base64.b64decode(img_b64, validate=True))
