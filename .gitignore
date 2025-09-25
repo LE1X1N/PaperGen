@@ -2,13 +2,9 @@
 .vscode
 .idea/
 .VSCodeCounter
-
 __pycache__
 
-config/config_dev.yaml
-demo/
 test/
 log/*
 screenshots/
-
 data/
