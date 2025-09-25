@@ -4,20 +4,30 @@ import numpy as np
 import io
 import base64
 
-from src.errors import  WhiteScreenshotError
+# from src.errors import  WhiteScreenshotError
 
-def post_processing_img(img_path, style):    
+# def post_processing_img(img_path, style):    
+#     # 1. crop right scrollbar
+#     _crop_scrollbar(img_path) 
+    
+#     # 2. crop by edge detection
+#     if style == 1 or style == 2:
+#         _crop_by_edge_detection(img_path)
+    
+#     # 3. solid color detection
+#     if _isSolidColorImage(img_path):
+#         raise WhiteScreenshotError
+#     return img_path
+
+
+def post_processing_img_b64(img_b64, style):    
     # 1. crop right scrollbar
-    _crop_scrollbar(img_path) 
+    img_b64 = _crop_scrollbar_b64(img_b64) 
     
     # 2. crop by edge detection
     if style == 1 or style == 2:
-        _crop_by_edge_detection(img_path)
-    
-    # 3. solid color detection
-    if _isSolidColorImage(img_path):
-        raise WhiteScreenshotError
-    return img_path
+        img_b64 = _crop_by_edge_detection_b64(img_b64)
+    return img_b64
 
 
 def _crop_scrollbar(img_path, output_path: str=None, crop_width: int=20):
@@ -156,12 +166,12 @@ def _isSolidColorImage(img_path, max_size=400, tolerance=0.92):
         return peak_ratio >= tolerance
     
 # if __name__ == "__main__":
-#     with open("/home/lx/codespace/PaperGen/task_output.png", "rb") as f:
+#     with open("/home/lx/codespace/PaperGen/task_img.png", "rb") as f:
 #         img = f.read()
 #     img_b64 = base64.b64encode(img).decode('utf-8')
 #     # img_b64 = _crop_scrollbar_b64(img_b64)
-#     img_b64 = _crop_by_edge_detection_b64(img_b64)
-#     print(img_b64)
+#     # img_b64 = _crop_by_edge_detection_b64(img_b64)
+#     img_b64 = post_processing_img_b64(img_b64, style=2)
     
-#     with open("/home/lx/codespace/PaperGen/task_output2.png", "wb") as f:
+#     with open("/home/lx/codespace/PaperGen/task_output3.png", "wb") as f:
 #         f.write(base64.b64decode(img_b64, validate=True))
