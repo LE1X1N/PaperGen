@@ -6,7 +6,7 @@ from .services import DataParser, SYSTEM_PROMPT
 
 from src.errors import *
 from src.config import conf
-from src.utils import get_random_available_port, wait_for_port, get_generated_files, post_processing_img
+from src.utils import get_random_available_port, wait_for_port, get_generated_files, post_processing_img_b64
 
 from src.repository.progress_repository import ProgressRepository, ProgressStatus
 from src.repository.storage_factory import get_storage
@@ -144,7 +144,7 @@ class TaskManager:
                 screenshot_img = capture_screenshot(driver)
                 
                 # 11. post-processing image
-                # screenshot_img = post_processing_img(screenshot_img, task["style"])
+                screenshot_img = post_processing_img_b64(screenshot_img, task["style"])
                 
                 # 12. save image
                 img_path = self.storage_repo.save_img(screenshot_img, f"{request_id}/img/task_{page_id}.png")
