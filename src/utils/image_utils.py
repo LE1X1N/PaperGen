@@ -18,14 +18,15 @@ def post_processing_img(img_path, style):
     return img_path
 
 
-def _crop_scrollbar(img_path, crop_width: int=20):
+def _crop_scrollbar(img_path, output_path: str=None, crop_width: int=20):
     # crop right scrollbar
     img = Image.open(img_path).convert('RGB')
-    width, height = img.size
-    
+    width, height = img.size    
     img = img.crop((0, 0, width-crop_width, height))
-    img.save(img_path)
-    return img_path
+
+    save_path = img_path if output_path is None else output_path
+    img.save(save_path)
+    return save_path
     
 
 def _crop_by_edge_detection(img_path, output_path=None):
@@ -105,3 +106,4 @@ def _isSolidColorImage(img_path, max_size=400, tolerance=0.92):
         peak_ratio = max_count / float(total_pixels)
         
         return peak_ratio >= tolerance
+    
