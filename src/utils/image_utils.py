@@ -73,8 +73,43 @@ def _crop_by_edge_detection(img_path, output_path=None):
     
     save_path = output_path if output_path else img_path
     cropped_img.save(save_path)
-    
     return cropped_img
+
+
+def _crop_by_edge_detection_b64(img_b64):
+    img = Image.open(io.BytesIO(base64.b64decode(img_b64))).convert('RGB')  # b64 to PIL
+    
+    cv_img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+    height, width = cv_img.shape[:2]
+    
+    blurred = cv2.GaussianBlur(cv_img, (5, 5), 0)
+    
+    v = np.median(blurred)
+    lower = int(max(0, (1.0 - 0.33) * v))
+    upper = int(min(255, (1.0 + 0.33) * v))
+    edges = cv2.Canny(blurred, lower, upper)
+    
+    edge_coords = np.where(edges > 0)  
+    
+    if len(edge_coords[0]) == 0:
+        return img
+    
+    min_y, max_y = np.min(edge_coords[0]), np.max(edge_coords[0])
+    min_x, max_x = np.min(edge_coords[1]), np.max(edge_coords[1])
+    
+    padding = 5
+    min_x = max(0, min_x - padding)
+    max_x = min(width - 1, max_x + padding)
+    min_y = max(0, min_y - padding)
+    max_y = min(height - 1, max_y + padding)
+    
+    cropped_img = img.crop((min_x, min_y, max_x + 1, max_y + 1))
+    
+    # PIL to base64
+    img_io = io.BytesIO()
+    cropped_img.save(img_io, format="PNG")
+    img_b64 = base64.b64encode(img_io.getvalue()).decode("utf-8")
+    return img_b64
 
 
 def _crop_by_black_border(img_path, output_path=None, threshold=230):
@@ -121,11 +156,12 @@ def _isSolidColorImage(img_path, max_size=400, tolerance=0.92):
         return peak_ratio >= tolerance
     
 # if __name__ == "__main__":
-#     with open("/home/lx/codespace/PaperGen/task_img.png", "rb") as f:
+#     with open("/home/lx/codespace/PaperGen/task_output.png", "rb") as f:
 #         img = f.read()
 #     img_b64 = base64.b64encode(img).decode('utf-8')
-#     img_b64 = _crop_scrollbar_b64(img_b64)
+#     # img_b64 = _crop_scrollbar_b64(img_b64)
+#     img_b64 = _crop_by_edge_detection_b64(img_b64)
 #     print(img_b64)
     
-#     with open("/home/lx/codespace/PaperGen/task_output.png", "wb") as f:
+#     with open("/home/lx/codespace/PaperGen/task_output2.png", "wb") as f:
 #         f.write(base64.b64decode(img_b64, validate=True))
