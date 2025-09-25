@@ -227,7 +227,7 @@ PaperGen
 │  │  ├─ __init__.py
 │  │  └─ loader.py          # 配置文件加载
 │  ├─ domain
-│  │  ├─ parser
+│  │  └─ services
 │  │  │  ├─ __init__.py
 │  │  │  ├─ data_parser.py  # 输入解析为module与page任务
 │  │  │  ├─ prompts.py      # prompt相关
@@ -249,9 +249,12 @@ PaperGen
 │  │  │  └─ gradio_renderer.py   # Gradio渲染
 │  │  └─ storage                
 │  │     ├─ __init__.py
-│  │     └─ local_storage.py     # 存储管理，管理代码和图片的本地存储(screenshot/) 
+│  │     └─ local_storage.py     # 本地存储，管理代码和图片的本地存储(screenshot/) 
+│  │     └─ minio_storage.py     # MinIO存储，管理代码和图片S3存储
 │  ├─ repository
 │  │  └─ progress_repository.py  # 流程控制，处理状态JSON保存至MongoDB
+│  │  ├─ storage_factory.py      # 存储工厂，根据配置决定实例化minio/local
+│  │  └─ storage_repository.py   # storage抽象层
 │  └─ utils
 │     ├─ __init__.py
 │     ├─ common.py
