@@ -1,6 +1,7 @@
 import time
 from concurrent.futures import ThreadPoolExecutor, TimeoutError, as_completed
 from multiprocessing import Process, Queue
+import os
 
 from .services import DataParser, SYSTEM_PROMPT
 
@@ -130,7 +131,7 @@ class TaskManager:
                 self.logger.info(f"Request ID: {request_id} -> Task_{page_id}: Chrome driver 初始化成功！")
                 
                 # 8.  wait rendering (25s)
-                driver.get(f'http://papergen-service:{port}')
+                driver.get(f'http://{os.getenv("IMAGE_HOST_NAME")}:{port}')
                 wait_for_render(request_id, page_id, conf["service"]["render_timeout_sec"], browser_registry, self.logger)
                 
                 # 9. save jsx code
