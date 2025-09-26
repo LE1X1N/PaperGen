@@ -1,5 +1,5 @@
-# PaperGen
-An automonous undergraduate thesis generator.
+# Pagergen 论文配图生成服务
+An automonous pipeline for generating thesis' figures.
 
 
 # 1. Prerequisite 🚧
