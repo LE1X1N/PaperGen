@@ -164,14 +164,3 @@ def _isSolidColorImage(img_path, max_size=400, tolerance=0.92):
         peak_ratio = max_count / float(total_pixels)
         
         return peak_ratio >= tolerance
-    
-# if __name__ == "__main__":
-#     with open("/home/lx/codespace/PaperGen/task_img.png", "rb") as f:
-#         img = f.read()
-#     img_b64 = base64.b64encode(img).decode('utf-8')
-#     # img_b64 = _crop_scrollbar_b64(img_b64)
-#     # img_b64 = _crop_by_edge_detection_b64(img_b64)
-#     img_b64 = post_processing_img_b64(img_b64, style=2)
-    
-#     with open("/home/lx/codespace/PaperGen/task_output3.png", "wb") as f:
-#         f.write(base64.b64decode(img_b64, validate=True))
