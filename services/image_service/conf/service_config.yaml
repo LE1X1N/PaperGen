@@ -12,7 +12,7 @@ service:
             base_dir:  screenshots/
             
     log:
-        base_dir: services/image_service/log/
+        base_dir: log/
         file_name: service.log
         roll_max_bytes: 524288000  # 500MB   
         backup_count: 180
