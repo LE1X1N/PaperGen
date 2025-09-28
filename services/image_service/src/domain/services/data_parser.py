@@ -12,10 +12,10 @@ class DataParser:
             tasks = []
             tmpls = {}
             # choose template for different styles
-            for module in data["web_pages"]:
+            for module in data["roles"]:
                 tmpls[int(module["style"])] = self.tmpl_parser.load_template(int(module["style"]))
             
-            for mid, module in enumerate(data["web_pages"]):
+            for mid, module in enumerate(data["roles"]):
                 tasks.append(
                     {
                         "request_id": request_id,
@@ -24,9 +24,9 @@ class DataParser:
                         "style": int(module["style"]),
                         "query": build_module_prompt({
                                                 "web_title": data["title"], 
-                                                "module_name": module["page_name"],
+                                                "module_name": module["role"],
                                                 "style": int(module["style"]),
-                                                "module_pages": [m["name"] for m in module['page'] if m["tab"]],
+                                                "module_pages": [page["name"] for page in module['pages'] if page["tab"]],
                                                 "tmpl": tmpls[int(module["style"])]
                         })
                     }
@@ -41,8 +41,8 @@ class DataParser:
         # Parse page JSON into tasks list
         try:
             tasks = []
-            for mid, module in enumerate(data["web_pages"]):
-                for pid, page in enumerate(module['page']):
+            for mid, module in enumerate(data["roles"]):
+                for pid, page in enumerate(module['pages']):
                     tasks.append(
                         {
                             "request_id": request_id,
@@ -51,10 +51,10 @@ class DataParser:
                             "style": int(module["style"]),
                             "query": build_page_prompt({
                                         "web_title": data["title"], 
-                                        "module_name": module["page_name"],
+                                        "module_name": module["role"],
                                         "style": module["style"],
                                         "page_name": page["name"],
-                                        "page_desc": page["text"],
+                                        "page_desc": page["desc"],
                                         "tmpl": gen_tmpls[mid],
                                         "tab": page['tab']
                             })
@@ -70,7 +70,7 @@ class DataParser:
     @staticmethod
     def parse_page_ids(data:dict) -> list[str]:
         task_ids = []
-        for module in data["web_pages"]:
-            for page in module['page']:
+        for module in data["roles"]:
+            for page in module['pages']:
                 task_ids.append(page["id"])
         return task_ids
