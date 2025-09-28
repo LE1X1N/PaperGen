@@ -2,10 +2,11 @@ import os
 from openai import OpenAI
 
 from src.errors import OpenAIError
+from src.config import conf
 
  # OpenAI client
 client = OpenAI(
-    base_url=os.getenv("OPENAI_BASE_URL"),
+    base_url=conf["openai"]["base_url"],
     api_key=os.getenv("OPENAI_API_KEY")
 )
 
@@ -16,7 +17,7 @@ def call_chat_completion(messages, **kwargs):
     try:
         # openai compatible
         response = client.chat.completions.create(
-                model=os.getenv("OPENAI_MODEL"),  
+                model=conf["openai"]["model"],  
                 messages=messages,
                 stream=True,
                 **kwargs
@@ -37,7 +38,7 @@ def check_openai_health():
     messages=[{"role": "user", "content": "ping"}]
     try:
         call_chat_completion(messages, max_completion_tokens=5)
-        print(f"OpenAI 检查通过！默认模型：{os.getenv("OPENAI_MODEL")}")
+        print(f"OpenAI 检查通过！默认模型：{conf["openai"]["model"]}")
     except OpenAIError:
         raise
     

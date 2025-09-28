@@ -10,13 +10,13 @@ def setup_logger():
     """
         Initialize the logger for the application.
     """
-    log_dir = Path(conf["service"]["log"]["base_dir"])
+    log_dir = Path(conf["log"]["base_dir"])
     if not log_dir.exists():
         log_dir.mkdir(exist_ok=True)
         print(f"创建日志路径：{log_dir}") 
     
     # log file 
-    logger_file_path = os.path.join(log_dir, conf["service"]["log"]["file_name"])
+    logger_file_path = os.path.join(log_dir, conf["log"]["file_name"])
 
     # init logger
     logger = logging.getLogger(conf["service"]["name"])
@@ -25,9 +25,9 @@ def setup_logger():
     
     # log config
     service_handler = ConcurrentRotatingFileHandler(
-        logger_file_path, maxBytes=conf["service"]["log"]["roll_max_bytes"], backupCount=conf["service"]["log"]["backup_count"], encoding="utf-8"
+        logger_file_path, maxBytes=conf["log"]["roll_max_bytes"], backupCount=conf["log"]["backup_count"], encoding="utf-8"
     )
-    service_handler.setFormatter(logging.Formatter(conf["service"]["log"]["format"]))
+    service_handler.setFormatter(logging.Formatter(conf["log"]["format"]))
     logger.addHandler(service_handler)
     return logger_file_path
 
