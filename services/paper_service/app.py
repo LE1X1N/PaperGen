@@ -29,7 +29,7 @@ system_prompt = """
    - "name"：具体页面名称
    - "desc"：详细描述页面功能、包含元素及操作方式（
    - "id"：唯一标识符（数字，从0开始递增）
-   - "tab"：布尔值，表示该页面是否为导航标签页（直接展示在导航栏的页面为true）
+   - "tab"：布尔值，表示该页面是否需要功能栏（默认为True）
 
 输出要求：
 - 仅返回JSON数据，不包含任何额外解释或说明文字
@@ -63,7 +63,7 @@ if __name__ == "__main__":
         raw_res = response.choices[0].message.content.strip()
         res = json.loads(raw_res)
         
-        with open("services/paper_service/tmp.json", 'w', encoding='utf-8') as f:
+        with open("services/paper_service/test/tmp.json", 'w', encoding='utf-8') as f:
             json.dump(res, f, indent=2, ensure_ascii=False)
         print("JSON已保存")
     
