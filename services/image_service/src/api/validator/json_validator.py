@@ -8,36 +8,35 @@ class JSONValidator:
         try:
             if "title" not in data:
                 raise InvalidJSONError("缺少必需字段: title")
-            if "web_pages" not in data:
-                raise InvalidJSONError("缺少必需字段: web_pages") 
-                
-            # check web_pages type
-            if not isinstance(data["web_pages"], list):
-                raise InvalidJSONError("web_pages必须是数组类型") 
+
+            if "roles" not in data:
+                raise InvalidJSONError("缺少必需字段: roles")
+            if not isinstance(data["roles"], list):
+                raise InvalidJSONError("roles必须是数组类型") 
             
-            # check web_pages
-            for mid, module in enumerate(data["web_pages"]):
+            # check roles
+            for mid, module in enumerate(data["roles"]):
                 if not isinstance(module, dict):
-                    raise InvalidJSONError("web_pages[{mid}]必须是对象类型")
+                    raise InvalidJSONError("roles[{mid}]必须是对象类型")
                     
-                if "page_name" not in module:
-                    raise InvalidJSONError("web_pages[{mid}]缺少必需字段: page_name")
-                if "page" not in module:
-                    raise InvalidJSONError("web_pages[{mid}]缺少必需字段: page")
-                    
+                if "role" not in module:
+                    raise InvalidJSONError("roles[{mid}]缺少必需字段: role")
+                
                 # check page
-                if not isinstance(module["page"], list):
-                    raise InvalidJSONError("web_pages[{mid}].page必须是数组类型")
+                if "pages" not in module:
+                    raise InvalidJSONError("roles[{mid}]缺少必需字段: page")
+                if not isinstance(module["pages"], list):
+                    raise InvalidJSONError("roles[{mid}].page必须是数组类型")
                     
-                for pid, page in enumerate(module["page"]):
+                for pid, page in enumerate(module["pages"]):
                     if not isinstance(page, dict):
-                        raise InvalidJSONError("web_pages[{mid}].page[{pid}]必须是对象类型")
+                        raise InvalidJSONError("roles[{mid}].pages[{pid}]必须是对象类型")
                     if "id" not in page:
-                        raise InvalidJSONError("web_pages[{mid}].page[{pid}]缺少必需字段: id")
+                        raise InvalidJSONError("roles[{mid}].pages[{pid}]缺少必需字段: id")
                     if "name" not in page:
-                        raise InvalidJSONError("web_pages[{mid}].page[{pid}]缺少必需字段: name")
-                    if "text" not in page:
-                        raise InvalidJSONError("web_pages[{mid}].page[{pid}]缺少必需字段: text")
+                        raise InvalidJSONError("roles[{mid}].pages[{pid}]缺少必需字段: name")
+                    if "desc" not in page:
+                        raise InvalidJSONError("roles[{mid}].pages[{pid}]缺少必需字段: desc")
 
         except InvalidJSONError:
             raise
