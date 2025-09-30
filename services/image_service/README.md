@@ -198,16 +198,11 @@ docker compose down
 # 6. 项目结构 🏠
 
 ```
-PaperGen
-├─ .devcontainer
-│  └─ devcontainer.json
+PaperGen-Image-Service
 ├─ Dockerfile
 ├─ README.md
 ├─ conf
 │  └─ service_config.yaml 
-├─ docker
-│  ├─ .env。              # 存放系统变量，根据需要自行修改
-│  └─ docker-compose.yml
 ├─ docs
 │  ├─ 接口文档.md
 │  ├─ 测试输入JSON
