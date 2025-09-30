@@ -8,5 +8,6 @@ services/image_service/test/
 services/image_service/log/
 services/image_service/screenshots/
 data/
+test/
 
 services/paper_service/test/
