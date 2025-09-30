@@ -8,14 +8,11 @@ def llm_json_generator(system_prompt: str) -> callable:
     """
         a decorator which encapsulate llm calling, JSON parsing and file saving
     """
-    print("decorator function")
     
     def decorator(func):    # input is a function
-        
         def wrapper(*args, **kwargs) -> Dict:
             func(*args, **kwargs)   # run initial function
             
-            print("wrapper function")
             title = kwargs["title"]
             save = kwargs["save"]
             save_path = kwargs["save_path"]
@@ -36,15 +33,14 @@ def llm_json_generator(system_prompt: str) -> callable:
                 print("不是有效的JSON格式")
             
         return wrapper
-    return decorator    # return is a decorated function
+    return decorator   
 
 
 @llm_json_generator(PAPER_STRUCTURE_PROMPT)
 def generate_paper_structure(title: str=None, save: bool=False, save_path: str=None) -> Dict:
-    print("Begin generating paper structure...")
     pass
+
 
 @llm_json_generator(IMAGE_JSON_PROMPT)
 def generate_image_json(title: str=None, save: bool=False, save_path: str=None) -> Dict:
-    print("Begin generating figures' JSON...")
     pass
