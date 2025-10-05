@@ -1,0 +1,2 @@
+openai==2.1.0
+python_docx==1.2.0
