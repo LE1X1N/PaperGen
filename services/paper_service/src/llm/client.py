@@ -1,17 +1,19 @@
+import os
 from openai import OpenAI
 
-client = OpenAI(
-    base_url="http://localhost:8000/v1",
-    api_key="sk-xxxxx"
-)
+from src.config import conf
 
-model = "Qwen3-4B-Instruct-2507-FP8"
+
+client = OpenAI(
+    base_url=conf["openai"]["base_url"],
+    api_key=os.getenv("OPENAI_API_KEY")
+)
 
 def call_chat_completion(messages):
     # non-stream
     response = client.chat.completions.create(
             messages=messages,
-            model=model,
+            model=conf["openai"]["model"],
             temperature=0.8
         )
     return response.choices[0].message.content.strip()
