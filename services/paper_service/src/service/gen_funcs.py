@@ -25,10 +25,11 @@ def llm_json_generator(system_prompt: str) -> callable:
             try:
                 raw_res = call_chat_completion(messages)
                 res = json.loads(raw_res)
-                if not save:
-                    return res
-                with open(save_path, 'w', encoding='utf-8') as f:
-                    json.dump(res, f, indent=2, ensure_ascii=False)
+                if save:
+                    with open(save_path, 'w', encoding='utf-8') as f:
+                        json.dump(res, f, indent=2, ensure_ascii=False)
+                return res
+            
             except json.JSONDecodeError:
                 print("不是有效的JSON格式")
             
