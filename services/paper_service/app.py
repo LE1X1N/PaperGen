@@ -10,7 +10,7 @@ if __name__== "__main__":
     #     save=True,
     #     save_path="test/structure_test.json")
 
-    structure = load_structure_from_json("test/structure_test.json")
+    structure = load_structure_from_json("test/structure_test_full.json")
     
     compose_toc(structure, "test/demo.docx")
     compose_main_body(title, structure, "test/demo.docx")

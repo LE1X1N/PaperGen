@@ -2,6 +2,7 @@ from docx import Document
 from docx.shared import Pt
 from docx.text.paragraph import Paragraph
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
+from docx.enum.style import WD_STYLE_TYPE
 from docx.oxml.ns import qn
 import os
 from tqdm import tqdm
@@ -12,34 +13,78 @@ def compose_main_body(title: str, structure: dict, file_path: str=None):
     doc = Document(file_path)
 
     # generate main body of docx
-    tasks = []
+    # tasks = []
+    # for chapter in structure["chapters"]:
+    #     # 1-level
+    #     if "sections" not in chapter:
+    #         tasks.append(chapter["title"])
+
+    #     # 2-level
+    #     else:
+    #         for section in chapter["sections"]:
+    #             if "subsections" not in section:
+    #                 tasks.append(f"{chapter['title']} -> {section['title']}")
+
+    #             # 3-level 
+    #             else:
+    #                 for subsection in section["subsections"]:
+    #                     tasks.append(f"{chapter['title']} -> {section['title']} -> {subsection['title']}")
+    
+
     for chapter in structure["chapters"]:
         # 1-level
         if "sections" not in chapter:
-            tasks.append(chapter["title"])
+            # Handling
+            doc.add_heading(chapter["title"], level=1)
+            # Main Body     
+            texts = generate_section_text(title=title, section=chapter["title"], structure=structure)
+            for text in texts:
+                para = doc.add_paragraph(text)
+                _set_main_body_style(doc, para)
 
         # 2-level
         else:
             for section in chapter["sections"]:
                 if "subsections" not in section:
-                    tasks.append(f"{chapter['title']} -> {section['title']}")
+                    # Handling
+                    doc.add_heading(section['title'], level=2)
+                    # Main Body
+                    texts = generate_section_text(title=title, section=f"{chapter['title']} -> {section['title']}", structure=structure)
+                    for text in texts:
+                        para = doc.add_paragraph(text)
+                        _set_main_body_style(doc, para)
 
                 # 3-level 
                 else:
                     for subsection in section["subsections"]:
-                        tasks.append(f"{chapter['title']} -> {section['title']} -> {subsection['title']}")
+                        # Handling
+                        doc.add_heading(subsection['title'], level=3)
+                        # Main Body
+                        texts = generate_section_text(title=title, section=f"{chapter['title']} -> {section['title']} -> {subsection['title']}", structure=structure)
+                        for text in texts:
+                            para = doc.add_paragraph(text)
+                            _set_main_body_style(doc, para)
+
+        doc.add_page_break()   
+
+    doc.save(file_path)
+
+
+def _set_main_body_style(doc: Document, paragraph: Paragraph):
+    style_name = "MainBodyStyle"
+
+    if style_name not in doc.styles:
+        style = doc.styles.add_style(style_name, WD_STYLE_TYPE.PARAGRAPH)
+
+        # font style
+        style.font.size = Pt(12)
+        style.font.bold = False
+        style.font.name = "Times New Roman"
+        style.element.rPr.rFonts.set(qn('w:eastAsia'), '宋体')
+        style.paragraph_format.alignment = WD_PARAGRAPH_ALIGNMENT.JUSTIFY
+
+    paragraph.style = doc.styles[style_name]
     
-    # generate text for each section
-    for task in tqdm(tasks):
-        text = generate_section_text(title=title, section=task, structure=structure)
-        
-        doc.add_heading(task, level=1)
-        doc.add_paragraph(text)
-        doc.add_page_break()
-        doc.save(file_path)
-
-
-
 
 def compose_toc(structure: dict, file_path: str=None):
     # generate table of contents in a docx

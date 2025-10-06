@@ -53,4 +53,5 @@ def generate_section_text(title: str=None, section: str=None, structure: dict=No
         {'role': 'user', 'content': f"请分析论文题目《{title}》，当前需要生成的章节为： {section}。你可参考该论文的论文结构：{str(structure)}"}
     ]    
     res = call_chat_completion(messages)
+    res = res.split("\n\n")
     return res
