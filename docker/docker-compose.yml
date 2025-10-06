@@ -1,15 +1,15 @@
 version: '3'
 
 services:
-  papergen-image-service: 
-    build: ../services/image_service
-    image: papergen-image-nightly-build:latest
-    container_name: papergen-image-service
+  papergen-figure-service: 
+    build: ../services/figure_service
+    image: papergen-figure-nightly-build:latest
+    container_name: papergen-figure-service
     env_file: .env
     environment:
-      - IMAGE_HOST_NAME=papergen-image-service
+      - IMAGE_HOST_NAME=papergen-figure-service
     volumes:
-      - ../services/image_service:/app       # 代码挂载
+      - ../services/figure_service:/app       # 代码挂载
     entrypoint: /bin/bash
     tty: true
     networks:

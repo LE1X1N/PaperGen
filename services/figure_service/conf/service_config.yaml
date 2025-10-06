@@ -1,5 +1,5 @@
 service:
-    name: image-service               # service name
+    name: figure-service               # service name
     max_workers: 10                   # multithread
     max_retries: 5                    # Number of retry attempts after failure
     connect_timeout_sec: 15           # Wait the port to be listend

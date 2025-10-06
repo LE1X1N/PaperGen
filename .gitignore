@@ -4,9 +4,9 @@
 .VSCodeCounter
 __pycache__
 
-services/image_service/test/
-services/image_service/log/
-services/image_service/screenshots/
+services/figure_service/test/
+services/figure_service/log/
+services/figure_service/screenshots/
 data/
 test/
 

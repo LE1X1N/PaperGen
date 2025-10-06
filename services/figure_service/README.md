@@ -74,7 +74,7 @@ SE_NODE_MAX_SESSIONS=5    # <- Make it larger!
 
 当前服务对外提供三个接口：
 
-- /v1/gen_images
+- /v1/gen_figures
 - /v1/progress/{request_id}
 - /v1/health
 
@@ -82,11 +82,11 @@ SE_NODE_MAX_SESSIONS=5    # <- Make it larger!
 
 ## 3.1 生成请求
 
-- **/v1/gen_images**
+- **/v1/gen_figures**
 
 ``` bash
 # 发送请求
-curl -X POST http://localhost:8686/v1/gen_images -H "Content-Type: application/json"  -d @docs/测试输入JSON/app/基于Android的背单词系统设计与实现.json
+curl -X POST http://localhost:8686/v1/gen_figures -H "Content-Type: application/json"  -d @docs/测试输入JSON/app/基于Android的背单词系统设计与实现.json
 ```
 
 此时会立马返回对应的任务ID号，如下所示。其中 **request_id** 为系统自动为本次请求创建的唯一ID，后续可基于此ID查询任务进度。
@@ -198,7 +198,7 @@ docker compose down
 # 6. 项目结构 🏠
 
 ```
-PaperGen-Image-Service
+PaperGen-Figure-Service
 ├─ Dockerfile
 ├─ README.md
 ├─ conf

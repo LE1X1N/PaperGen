@@ -14,8 +14,8 @@ logger = get_logger()
 task_manager = TaskManager(logger=logger)  # global task manager
 
 
-@api_bp.route('/gen_images', methods=['POST'])
-def gen_images():
+@api_bp.route('/gen_figures', methods=['POST'])
+def gen_figures():
     request_id = str(uuid.uuid4())
     req = request.get_json()      
     logger.info(f"Request ID: {request_id} -> 接收请求：{req}")

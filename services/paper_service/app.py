@@ -1,4 +1,4 @@
-from src.service.gen_funcs import generate_image_json, generate_paper_structure
+from src.service.gen_funcs import generate_figure_json, generate_paper_structure
 from src.service.composer import compose_doc_toc
 from src.utils.common import load_structure_from_json
 
@@ -15,9 +15,9 @@ if __name__== "__main__":
     compose_doc_toc(structure, "test/demo.docx")
     print("Success")
     
-    # generate_image_json(
+    # generate_figure_json(
     #     title=title,
     #     save=True,
-    #     save_path="test/image_json_test.json"
+    #     save_path="test/figure_json_test.json"
     # )
     
