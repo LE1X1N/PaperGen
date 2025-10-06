@@ -1,5 +1,5 @@
 from src.service.gen_funcs import generate_figure_json, generate_paper_structure
-from src.service.composer import compose_doc_toc
+from src.service.composer import compose_toc, compose_main_body
 from src.utils.common import load_structure_from_json
 
 if __name__== "__main__":
@@ -12,9 +12,12 @@ if __name__== "__main__":
 
     structure = load_structure_from_json("test/structure_test.json")
     
-    compose_doc_toc(structure, "test/demo.docx")
+    compose_toc(structure, "test/demo.docx")
+    compose_main_body(title, structure, "test/demo.docx")
+
     print("Success")
     
+
     # generate_figure_json(
     #     title=title,
     #     save=True,

@@ -1,6 +1,6 @@
 import json
 from typing import Dict
-from src.llm.prompt import PAPER_STRUCTURE_PROMPT, FIGURE_JSON_PROMPT
+from src.llm.prompt import PAPER_STRUCTURE_PROMPT, FIGURE_JSON_PROMPT, PAPER_MAIN_BODY_PROMPT
 from src.llm.client import call_chat_completion
 
 
@@ -45,3 +45,12 @@ def generate_paper_structure(title: str=None, save: bool=False, save_path: str=N
 @llm_json_generator(FIGURE_JSON_PROMPT)
 def generate_figure_json(title: str=None, save: bool=False, save_path: str=None) -> Dict:
     pass
+
+
+def generate_section_text(title: str=None, section: str=None, structure: dict=None) -> str:
+    messages = [
+        {'role': 'assistant', 'content': PAPER_MAIN_BODY_PROMPT},
+        {'role': 'user', 'content': f"请分析论文题目《{title}》，当前需要生成的章节为： {section}。你可参考该论文的论文结构：{str(structure)}"}
+    ]    
+    res = call_chat_completion(messages)
+    return res

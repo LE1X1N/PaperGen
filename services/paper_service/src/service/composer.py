@@ -4,8 +4,44 @@ from docx.text.paragraph import Paragraph
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.oxml.ns import qn
 import os
+from tqdm import tqdm
+from src.service.gen_funcs import generate_section_text
 
-def compose_doc_toc(structure: dict, file_path: str=None):
+def compose_main_body(title: str, structure: dict, file_path: str=None):
+    
+    doc = Document(file_path)
+
+    # generate main body of docx
+    tasks = []
+    for chapter in structure["chapters"]:
+        # 1-level
+        if "sections" not in chapter:
+            tasks.append(chapter["title"])
+
+        # 2-level
+        else:
+            for section in chapter["sections"]:
+                if "subsections" not in section:
+                    tasks.append(f"{chapter['title']} -> {section['title']}")
+
+                # 3-level 
+                else:
+                    for subsection in section["subsections"]:
+                        tasks.append(f"{chapter['title']} -> {section['title']} -> {subsection['title']}")
+    
+    # generate text for each section
+    for task in tqdm(tasks):
+        text = generate_section_text(title=title, section=task, structure=structure)
+        
+        doc.add_heading(task, level=1)
+        doc.add_paragraph(text)
+        doc.add_page_break()
+        doc.save(file_path)
+
+
+
+
+def compose_toc(structure: dict, file_path: str=None):
     # generate table of contents in a docx
     if os.path.exists(file_path):
         doc = Document(file_path)
