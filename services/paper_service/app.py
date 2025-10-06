@@ -10,6 +10,7 @@ if __name__== "__main__":
         save_path="test/structure_test.json")
     
     compose_doc_toc(structure, "test/demo.docx")
+    print("Success")
     
     # generate_image_json(
     #     title=title,
