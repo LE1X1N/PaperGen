@@ -1,6 +1,6 @@
 from docx import Document
 import os
-from src.service.doc.styles import StyleController
+from src.service.doc.style_controller import StyleController
 
 style_controller = StyleController()
 
