@@ -12,9 +12,9 @@ class StyleController:
         self.TOC_STYLE_2 = "论文_目录 2"
         self.TOC_STYLE_3 = "论文_目录 3"
         self.NORMAL_STYLE = "论文_正文"
+        self.HEADING_STYLE_1 = "论文_标题 1"
         self.HEADING_STYLE_2 = "论文_标题 2"
         self.HEADING_STYLE_3 = "论文_标题 3"
-        self.HEADING_STYLE_4 = "论文_标题 4"
 
     def init_doc_style(self, doc: Document):
         self._modify_toc_head_styles(doc)
@@ -22,9 +22,9 @@ class StyleController:
         self._modify_toc_l2_styles(doc)
         self._modify_toc_l3_styles(doc)
         self._modify_normal_style(doc)
+        self._modify_heading_l1_styles(doc)
         self._modify_heading_l2_styles(doc)
         self._modify_heading_l3_styles(doc)
-        self._modify_heading_l4_styles(doc)
 
     def _modify_toc_head_styles(self, doc: Document):
         if self.TOC_HEAD_STYLE in doc.styles:
@@ -99,6 +99,22 @@ class StyleController:
         style.paragraph_format.first_line_indent = font_size * 2 
         style.paragraph_format.alignment = WD_PARAGRAPH_ALIGNMENT.JUSTIFY
 
+    def _modify_heading_l1_styles(self, doc: Document):
+        if self.HEADING_STYLE_1 in doc.styles:
+            style = doc.styles[self.HEADING_STYLE_1]
+        else:
+            style = doc.styles.add_style(self.HEADING_STYLE_1, WD_STYLE_TYPE.PARAGRAPH)
+
+        # font
+        style.font.size = Pt(16)
+        style.font.bold = True
+        style.font.name = "Times New Roman"
+        style.element.rPr.rFonts.set(qn('w:eastAsia'), '黑体')
+
+        # paragraph
+        style.paragraph_format.alignment = WD_PARAGRAPH_ALIGNMENT.LEFT
+        style.paragraph_format.space_before = Pt(13)
+
     def _modify_heading_l2_styles(self, doc: Document):
         if self.HEADING_STYLE_2 in doc.styles:
             style = doc.styles[self.HEADING_STYLE_2]
@@ -106,7 +122,7 @@ class StyleController:
             style = doc.styles.add_style(self.HEADING_STYLE_2, WD_STYLE_TYPE.PARAGRAPH)
 
         # font
-        style.font.size = Pt(16)
+        style.font.size = Pt(14)
         style.font.bold = True
         style.font.name = "Times New Roman"
         style.element.rPr.rFonts.set(qn('w:eastAsia'), '黑体')
@@ -120,22 +136,6 @@ class StyleController:
             style = doc.styles[self.HEADING_STYLE_3]
         else:
             style = doc.styles.add_style(self.HEADING_STYLE_3, WD_STYLE_TYPE.PARAGRAPH)
-
-        # font
-        style.font.size = Pt(14)
-        style.font.bold = True
-        style.font.name = "Times New Roman"
-        style.element.rPr.rFonts.set(qn('w:eastAsia'), '黑体')
-
-        # paragraph
-        style.paragraph_format.alignment = WD_PARAGRAPH_ALIGNMENT.LEFT
-        style.paragraph_format.space_before = Pt(13)
-
-    def _modify_heading_l4_styles(self, doc: Document):
-        if self.HEADING_STYLE_4 in doc.styles:
-            style = doc.styles[self.HEADING_STYLE_4]
-        else:
-            style = doc.styles.add_style(self.HEADING_STYLE_4, WD_STYLE_TYPE.PARAGRAPH)
 
         # font
         style.font.size = Pt(12)

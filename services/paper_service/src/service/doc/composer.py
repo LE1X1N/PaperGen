@@ -41,7 +41,7 @@ def compose_main_body(doc: Document, structure: dict, main_body: dict):
     
     for chapter in structure["chapters"]:
         # 1-level Handling
-        doc.add_paragraph(chapter["title"], style=style_controller.HEADING_STYLE_2)
+        doc.add_paragraph(chapter["title"], style=style_controller.HEADING_STYLE_1)
 
         if "sections" not in chapter:
             # Main Body     
@@ -53,7 +53,7 @@ def compose_main_body(doc: Document, structure: dict, main_body: dict):
         else:
             for section in chapter["sections"]:
                 # 2-level Handling
-                doc.add_paragraph(section['title'], style=style_controller.HEADING_STYLE_3)
+                doc.add_paragraph(section['title'], style=style_controller.HEADING_STYLE_2)
 
                 if "subsections" not in section:
                     # Main Body
@@ -65,7 +65,7 @@ def compose_main_body(doc: Document, structure: dict, main_body: dict):
                 else:
                     for subsection in section["subsections"]:
                         # 3-level Handling
-                        doc.add_paragraph(subsection['title'], style=style_controller.HEADING_STYLE_4)
+                        doc.add_paragraph(subsection['title'], style=style_controller.HEADING_STYLE_3)
                         # Main Body
                         texts = main_body[subsection['title']]
                         for text in texts:
