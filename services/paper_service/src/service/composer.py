@@ -1,14 +1,12 @@
 from docx import Document
 from docx.shared import Pt
-from docx.text.paragraph import Paragraph
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.enum.style import WD_STYLE_TYPE
 from docx.oxml.ns import qn
 import os
-from tqdm import tqdm
-from src.service.gen_funcs import generate_section_text
 
 
+TOC_HEAD_STYLE = "目录"
 TOC_STYLE_1 = "目录 1"
 TOC_STYLE_2 = "目录 2"
 TOC_STYLE_3 = "目录 3"
@@ -20,7 +18,6 @@ HEADING_STYLE_4 = "标题 4"
 
 def init_doc(file_path: str=None):
     # initialize a doc object and styles
-
     if os.path.exists(file_path):
         doc = Document(file_path)
         print(f"打开文档: {file_path}")
@@ -36,12 +33,7 @@ def init_doc(file_path: str=None):
 
 def compose_toc(doc: Document, structure: dict):
     # generate table of contents in a docx
-
-    title = doc.add_paragraph("目录")
-    title.runs[0].font.name = "Times New Roman"
-    title.runs[0].element.rPr.rFonts.set(qn('w:eastAsia'), '黑体')
-    title.runs[0].font.size = Pt(14)
-    title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    doc.add_paragraph("目录", style=TOC_HEAD_STYLE)
 
     for chapter in structure["chapters"]:
         # 1-level
@@ -59,7 +51,7 @@ def compose_toc(doc: Document, structure: dict):
     doc.add_page_break() 
 
 
-def compose_main_body(doc: Document, title: str, structure: dict):
+def compose_main_body(doc: Document, structure: dict, main_body: dict):
     
     for chapter in structure["chapters"]:
         # 1-level Handling
@@ -67,7 +59,7 @@ def compose_main_body(doc: Document, title: str, structure: dict):
 
         if "sections" not in chapter:
             # Main Body     
-            texts = generate_section_text(title=title, section=chapter["title"], structure=structure)
+            texts = main_body[chapter['title']]
             for text in texts:
                 doc.add_paragraph(text, style=NORMAL_STYLE) 
 
@@ -79,7 +71,7 @@ def compose_main_body(doc: Document, title: str, structure: dict):
 
                 if "subsections" not in section:
                     # Main Body
-                    texts = generate_section_text(title=title, section=f"{chapter['title']} -> {section['title']}", structure=structure)
+                    texts = main_body[section['title']]
                     for text in texts:
                         doc.add_paragraph(text, style=NORMAL_STYLE)
 
@@ -89,7 +81,7 @@ def compose_main_body(doc: Document, title: str, structure: dict):
                         # 3-level Handling
                         doc.add_paragraph(subsection['title'], style=HEADING_STYLE_4)
                         # Main Body
-                        texts = generate_section_text(title=title, section=f"{chapter['title']} -> {section['title']} -> {subsection['title']}", structure=structure)
+                        texts = main_body[subsection['title']]
                         for text in texts:
                             doc.add_paragraph(text, style=NORMAL_STYLE)
 
@@ -97,6 +89,17 @@ def compose_main_body(doc: Document, title: str, structure: dict):
 
 
 def _modify_toc_styles(doc: Document):
+    if TOC_HEAD_STYLE in doc.styles:
+        style = doc.styles[TOC_HEAD_STYLE]
+    else:
+        style = doc.styles.add_style(TOC_HEAD_STYLE, WD_STYLE_TYPE.PARAGRAPH)
+
+    style.font.name = "Times New Roman"
+    style.font.element.rPr.rFonts.set(qn('w:eastAsia'), '黑体')
+    style.font.size = Pt(16)
+    style.font.bold = True
+    style.paragraph_format.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+
     if TOC_STYLE_1 in doc.styles:
         style = doc.styles[TOC_STYLE_1]
     else:

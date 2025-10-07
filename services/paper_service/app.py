@@ -1,5 +1,5 @@
-from src.service.gen_funcs import generate_figure_json, generate_paper_structure
-from src.service.composer import compose_toc, compose_main_body
+from src.service.gen_funcs import generate_figure_json, generate_paper_structure, generate_main_body_text
+from src.service.composer import compose_toc, compose_main_body, init_doc
 from src.utils.common import load_structure_from_json
 
 if __name__== "__main__":
@@ -10,10 +10,15 @@ if __name__== "__main__":
     #     save=True,
     #     save_path="test/structure_test.json")
 
-    structure = load_structure_from_json("test/structure_test_full.json")
+    structure = load_structure_from_json("test/structure_test.json")
+    main_body = generate_main_body_text(title, structure)
     
-    compose_toc(structure, "test/demo.docx")
-    compose_main_body(title, structure, "test/demo.docx")
+    doc = init_doc("test/demo.docx")
+
+    compose_toc(doc, structure)
+    compose_main_body(doc, structure, main_body)
+    
+    doc.save("test/demo.docx")
 
     print("Success")
     
