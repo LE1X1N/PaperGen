@@ -1,5 +1,5 @@
 from src.service.gen_funcs import generate_figure_json, generate_paper_structure, generate_main_body_text
-from src.service.composer import compose_toc, compose_main_body, init_doc
+from src.service.doc.composer import compose_toc, compose_main_body, init_doc
 from src.utils.common import load_structure_from_json
 
 if __name__== "__main__":
