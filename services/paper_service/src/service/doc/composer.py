@@ -1,4 +1,5 @@
-from docx import Document
+from docx.document import Document
+import docx
 import os
 from src.service.doc.style_controller import StyleController
 
@@ -8,14 +9,22 @@ style_controller = StyleController()
 def init_doc(file_path: str=None):
     # initialize a doc object and styles
     if os.path.exists(file_path):
-        doc = Document(file_path)
+        doc = docx.Document(file_path)
         print(f"打开文档: {file_path}")
     else:
-        doc = Document()
+        doc = docx.Document()
         print(f"创建新文档: {file_path}")
 
     style_controller.init_doc_style(doc)
     return doc
+
+
+def compose_cover(doc: Document, title: str):
+    doc.add_paragraph("XXXX大学")
+    doc.add_paragraph("本科生毕业论文")
+
+    doc.add_page_break()
+
 
 def compose_toc(doc: Document, structure: dict):
     # generate table of contents in a docx

@@ -1,1 +1,1 @@
-from .composer import compose_toc, compose_main_body, init_doc
+from .composer import compose_toc, compose_main_body, init_doc, compose_cover

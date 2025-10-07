@@ -1,5 +1,5 @@
 from src.service.content import generate_figure_json, generate_paper_structure, generate_main_body_text
-from src.service.doc import compose_toc, compose_main_body, init_doc
+from src.service.doc import compose_toc, compose_main_body, init_doc, compose_cover
 from src.utils.common import load_structure_from_json
 
 if __name__== "__main__":
@@ -16,6 +16,7 @@ if __name__== "__main__":
     
     doc = init_doc(doc_path)
 
+    compose_cover(doc, title)
     compose_toc(doc, structure)
     compose_main_body(doc, structure, main_body)
     
