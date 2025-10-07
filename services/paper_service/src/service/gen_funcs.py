@@ -1,8 +1,9 @@
 import json
+import time
 from typing import Dict
 from src.llm.prompt import PAPER_STRUCTURE_PROMPT, FIGURE_JSON_PROMPT, PAPER_MAIN_BODY_PROMPT
 from src.llm.client import call_chat_completion
-
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 def llm_json_generator(system_prompt: str) -> callable:
     """
@@ -58,6 +59,7 @@ def _generate_section_text(title: str=None, section: str=None, structure: dict=N
 
 
 def generate_main_body_text(title: str=None, structure: dict=None):
+    start_time = time.time()
 
     # generate main body of docx
     tasks = {}
@@ -80,8 +82,17 @@ def generate_main_body_text(title: str=None, structure: dict=None):
     
     
 
-    text_map = {}
+    # multithread
+    res_map = {}
+    future_to_keys = {}
+    task_execuator = ThreadPoolExecutor(max_workers=10)
     for k, v in tasks.items():
-        text_map[k] =  _generate_section_text(title, v)
+        future = task_execuator.submit(_generate_section_text, title=title, section=v, structure=structure)
+        future_to_keys[future] = k
 
-    return text_map
+    for future in as_completed(future_to_keys):
+        res = future.result()
+        res_map[future_to_keys[future]] = res
+    
+    print(f"论文正文生成成功，耗时：{time.time() - start_time} s")
+    return res_map
