@@ -14,10 +14,7 @@ def init_doc(file_path: str=None):
         doc = Document()
         print(f"创建新文档: {file_path}")
 
-    style_controller._modify_toc_styles(doc)
-    style_controller._modify_normal_style(doc)
-    style_controller._modify_heading_styles(doc)
-
+    style_controller.init_doc_style(doc)
     return doc
 
 def compose_toc(doc: Document, structure: dict):
