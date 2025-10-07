@@ -32,10 +32,10 @@ def compose_main_body(title: str, structure: dict, file_path: str=None):
     
 
     for chapter in structure["chapters"]:
-        # 1-level
+        # 1-level Handling
+        doc.add_heading(chapter["title"], level=1)
+
         if "sections" not in chapter:
-            # Handling
-            doc.add_heading(chapter["title"], level=1)
             # Main Body     
             texts = generate_section_text(title=title, section=chapter["title"], structure=structure)
             for text in texts:
@@ -45,9 +45,10 @@ def compose_main_body(title: str, structure: dict, file_path: str=None):
         # 2-level
         else:
             for section in chapter["sections"]:
+                # 2-level Handling
+                doc.add_heading(section['title'], level=2)
+
                 if "subsections" not in section:
-                    # Handling
-                    doc.add_heading(section['title'], level=2)
                     # Main Body
                     texts = generate_section_text(title=title, section=f"{chapter['title']} -> {section['title']}", structure=structure)
                     for text in texts:
