@@ -7,16 +7,26 @@ from docx.oxml.ns import qn
 
 class StyleController:
     def __init__(self):
+        self.COVER_SCHOOL_STYLE = "论文_封面_学校"
+        self.COVER_HEAD_STYLE = "论文_封面_标题"
+        self.COVER_TITLE_STYLE = "论文_封面_题目"
+
         self.TOC_HEAD_STYLE = "论文_目录"
         self.TOC_STYLE_1 = "论文_目录 1"
         self.TOC_STYLE_2 = "论文_目录 2"
         self.TOC_STYLE_3 = "论文_目录 3"
+        
         self.NORMAL_STYLE = "论文_正文"
+        
         self.HEADING_STYLE_1 = "论文_标题 1"
         self.HEADING_STYLE_2 = "论文_标题 2"
         self.HEADING_STYLE_3 = "论文_标题 3"
 
     def init_doc_style(self, doc: Document):
+        self._modify_cover_school_style(doc)
+        self._modify_cover_head_style(doc)
+        self._modify_cover_title_style(doc)
+
         self._modify_toc_head_styles(doc)
         self._modify_toc_l1_styles(doc)
         self._modify_toc_l2_styles(doc)
@@ -26,11 +36,41 @@ class StyleController:
         self._modify_heading_l2_styles(doc)
         self._modify_heading_l3_styles(doc)
 
+    def _modify_cover_school_style(self, doc: Document):
+        style = doc.styles.add_style(self.COVER_SCHOOL_STYLE, WD_STYLE_TYPE.PARAGRAPH)
+
+        style.font.name = "Times New Roman"
+        style.font.element.rPr.rFonts.set(qn('w:eastAsia'), '仿宋')
+        style.font.size = Pt(24)
+        style.font.bold = True
+        style.paragraph_format.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+        style.paragraph_format.space_before = Pt(18)
+        style.paragraph_format.space_after = Pt(18)
+
+    def _modify_cover_head_style(self, doc: Document):
+        style = doc.styles.add_style(self.COVER_HEAD_STYLE, WD_STYLE_TYPE.PARAGRAPH)
+
+        style.font.name = "Times New Roman"
+        style.font.element.rPr.rFonts.set(qn('w:eastAsia'), '仿宋')
+        style.font.size = Pt(36)
+        style.font.bold = True
+        style.paragraph_format.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+        style.paragraph_format.space_before = Pt(30)
+        style.paragraph_format.space_after = Pt(24)
+
+    def _modify_cover_title_style(self, doc: Document):
+        style = doc.styles.add_style(self.COVER_TITLE_STYLE, WD_STYLE_TYPE.PARAGRAPH)
+
+        style.font.name = "Times New Roman"
+        style.font.element.rPr.rFonts.set(qn('w:eastAsia'), '宋体')
+        style.font.size = Pt(18)
+        style.font.bold = True
+        style.paragraph_format.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+        style.paragraph_format.space_before = Pt(120)
+        style.paragraph_format.space_after = Pt(60)
+
     def _modify_toc_head_styles(self, doc: Document):
-        if self.TOC_HEAD_STYLE in doc.styles:
-            style = doc.styles[self.TOC_HEAD_STYLE]
-        else:
-            style = doc.styles.add_style(self.TOC_HEAD_STYLE, WD_STYLE_TYPE.PARAGRAPH)
+        style = doc.styles.add_style(self.TOC_HEAD_STYLE, WD_STYLE_TYPE.PARAGRAPH)
 
         style.font.name = "Times New Roman"
         style.font.element.rPr.rFonts.set(qn('w:eastAsia'), '黑体')
@@ -39,10 +79,7 @@ class StyleController:
         style.paragraph_format.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
 
     def _modify_toc_l1_styles(self, doc: Document):
-        if self.TOC_STYLE_1 in doc.styles:
-            style = doc.styles[self.TOC_STYLE_1]
-        else:
-            style = doc.styles.add_style(self.TOC_STYLE_1, WD_STYLE_TYPE.PARAGRAPH)
+        style = doc.styles.add_style(self.TOC_STYLE_1, WD_STYLE_TYPE.PARAGRAPH)
 
         style.font.size = Pt(12)  # 12磅（小四）
         style.font.bold = True
@@ -53,10 +90,7 @@ class StyleController:
         style.paragraph_format.space_after = Pt(0)
 
     def _modify_toc_l2_styles(self, doc: Document):
-        if self.TOC_STYLE_2 in doc.styles:
-            style = doc.styles[self.TOC_STYLE_2]
-        else:
-            style = doc.styles.add_style(self.TOC_STYLE_2, WD_STYLE_TYPE.PARAGRAPH)
+        style = doc.styles.add_style(self.TOC_STYLE_2, WD_STYLE_TYPE.PARAGRAPH)
 
         style.font.size = Pt(12)  # 12磅（小四）
         style.font.bold = False
@@ -68,10 +102,7 @@ class StyleController:
         style.paragraph_format.left_indent = Pt(20)
 
     def _modify_toc_l3_styles(self, doc: Document):
-        if self.TOC_STYLE_3 in doc.styles:
-            style = doc.styles[self.TOC_STYLE_3]
-        else:
-            style = doc.styles.add_style(self.TOC_STYLE_3, WD_STYLE_TYPE.PARAGRAPH)
+        style = doc.styles.add_style(self.TOC_STYLE_3, WD_STYLE_TYPE.PARAGRAPH)
 
         style.font.size = Pt(12)  # 12磅（小四）
         style.font.bold = False
@@ -83,10 +114,7 @@ class StyleController:
         style.paragraph_format.left_indent = Pt(40)
 
     def _modify_normal_style(self, doc: Document):
-        if self.NORMAL_STYLE in doc.styles:
-            style = doc.styles[self.NORMAL_STYLE]
-        else:
-            style = doc.styles.add_style(self.NORMAL_STYLE, WD_STYLE_TYPE.PARAGRAPH)
+        style = doc.styles.add_style(self.NORMAL_STYLE, WD_STYLE_TYPE.PARAGRAPH)
             
         # font style
         font_size = Pt(12)
@@ -98,12 +126,10 @@ class StyleController:
         # jusify alignment, first line indent 2 characters
         style.paragraph_format.first_line_indent = font_size * 2 
         style.paragraph_format.alignment = WD_PARAGRAPH_ALIGNMENT.JUSTIFY
+        style.paragraph_format.line_spacing = 1.5
 
     def _modify_heading_l1_styles(self, doc: Document):
-        if self.HEADING_STYLE_1 in doc.styles:
-            style = doc.styles[self.HEADING_STYLE_1]
-        else:
-            style = doc.styles.add_style(self.HEADING_STYLE_1, WD_STYLE_TYPE.PARAGRAPH)
+        style = doc.styles.add_style(self.HEADING_STYLE_1, WD_STYLE_TYPE.PARAGRAPH)
 
         # font
         style.font.size = Pt(16)
@@ -116,10 +142,7 @@ class StyleController:
         style.paragraph_format.space_before = Pt(13)
 
     def _modify_heading_l2_styles(self, doc: Document):
-        if self.HEADING_STYLE_2 in doc.styles:
-            style = doc.styles[self.HEADING_STYLE_2]
-        else:
-            style = doc.styles.add_style(self.HEADING_STYLE_2, WD_STYLE_TYPE.PARAGRAPH)
+        style = doc.styles.add_style(self.HEADING_STYLE_2, WD_STYLE_TYPE.PARAGRAPH)
 
         # font
         style.font.size = Pt(14)
@@ -132,10 +155,7 @@ class StyleController:
         style.paragraph_format.space_before = Pt(13)
 
     def _modify_heading_l3_styles(self, doc: Document):
-        if self.HEADING_STYLE_3 in doc.styles:
-            style = doc.styles[self.HEADING_STYLE_3]
-        else:
-            style = doc.styles.add_style(self.HEADING_STYLE_3, WD_STYLE_TYPE.PARAGRAPH)
+        style = doc.styles.add_style(self.HEADING_STYLE_3, WD_STYLE_TYPE.PARAGRAPH)
 
         # font
         style.font.size = Pt(12)
