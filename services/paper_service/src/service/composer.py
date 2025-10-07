@@ -39,7 +39,7 @@ def compose_main_body(title: str, structure: dict, file_path: str=None):
             # Main Body     
             texts = generate_section_text(title=title, section=chapter["title"], structure=structure)
             for text in texts:
-                para = doc.add_paragraph(text)
+                para = doc.add_paragraph(text) 
                 _set_main_body_style(doc, para)
 
         # 2-level
@@ -78,11 +78,16 @@ def _set_main_body_style(doc: Document, paragraph: Paragraph):
         style = doc.styles.add_style(style_name, WD_STYLE_TYPE.PARAGRAPH)
 
         # font style
-        style.font.size = Pt(12)
+        font_size = Pt(12)
+        style.font.size = font_size
         style.font.bold = False
         style.font.name = "Times New Roman"
         style.element.rPr.rFonts.set(qn('w:eastAsia'), '宋体')
+
+        # jusify alignment, first line indent 2 characters
+        style.paragraph_format.first_line_indent = font_size * 2 
         style.paragraph_format.alignment = WD_PARAGRAPH_ALIGNMENT.JUSTIFY
+        
 
     paragraph.style = doc.styles[style_name]
     
