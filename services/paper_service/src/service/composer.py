@@ -18,14 +18,24 @@ HEADING_STYLE_3 = "标题 3"
 HEADING_STYLE_4 = "标题 4"
 
 
-def compose_toc(structure: dict, file_path: str=None):
-    # generate table of contents in a docx
+def init_doc(file_path: str=None):
+    # initialize a doc object and styles
+
     if os.path.exists(file_path):
         doc = Document(file_path)
+        print(f"打开文档: {file_path}")
     else:
         doc = Document()
-    
+        print(f"创建新文档: {file_path}")
+
     _modify_toc_styles(doc)
+    _modify_normal_style(doc)
+    _modify_heading_styles(doc)
+
+    return doc
+
+def compose_toc(doc: Document, structure: dict):
+    # generate table of contents in a docx
 
     title = doc.add_paragraph("目录")
     title.runs[0].font.name = "Times New Roman"
@@ -46,35 +56,11 @@ def compose_toc(structure: dict, file_path: str=None):
                 if "subsections" in section:
                     for subsection in section["subsections"]:
                         doc.add_paragraph(subsection["title"], style=TOC_STYLE_3) 
-    doc.add_page_break()
-    doc.save(file_path)  
+    doc.add_page_break() 
 
-def compose_main_body(title: str, structure: dict, file_path: str=None):
+
+def compose_main_body(doc: Document, title: str, structure: dict):
     
-    doc = Document(file_path)
-
-    _modify_normal_style(doc)
-    _modify_heading_styles(doc)
-
-    # generate main body of docx
-    # tasks = []
-    # for chapter in structure["chapters"]:
-    #     # 1-level
-    #     if "sections" not in chapter:
-    #         tasks.append(chapter["title"])
-
-    #     # 2-level
-    #     else:
-    #         for section in chapter["sections"]:
-    #             if "subsections" not in section:
-    #                 tasks.append(f"{chapter['title']} -> {section['title']}")
-
-    #             # 3-level 
-    #             else:
-    #                 for subsection in section["subsections"]:
-    #                     tasks.append(f"{chapter['title']} -> {section['title']} -> {subsection['title']}")
-    
-
     for chapter in structure["chapters"]:
         # 1-level Handling
         doc.add_paragraph(chapter["title"], style=HEADING_STYLE_2)
@@ -107,9 +93,7 @@ def compose_main_body(title: str, structure: dict, file_path: str=None):
                         for text in texts:
                             doc.add_paragraph(text, style=NORMAL_STYLE)
 
-        doc.add_page_break()   
-
-    doc.save(file_path)
+        doc.add_page_break() 
 
 
 def _modify_toc_styles(doc: Document):
@@ -153,33 +137,6 @@ def _modify_toc_styles(doc: Document):
     style.paragraph_format.space_before = Pt(0)
     style.paragraph_format.space_after = Pt(0)
     style.paragraph_format.left_indent = Pt(40)
-
-
-
-
-# def _set_toc_style(paragraph: Paragraph, level: int):
-#     """
-#         目录（TOC）：段前段后0，行间距1.25
-#     """
-#     run = paragraph.runs[0]
-
-#     run.font.size = Pt(12)  # 12磅（小四）
-#     run.font.name = "Times New Roman"
-#     paragraph.paragraph_format.line_spacing = 1.25
-#     paragraph.paragraph_format.space_before = Pt(0)
-#     paragraph.paragraph_format.space_after = Pt(0)
-
-#     if level == 1:
-#         run.font.bold = True
-#         run.font._element.rPr.rFonts.set(qn('w:eastAsia'), '黑体')
-#     elif level == 2:
-#         run.font.bold = False
-#         run.font._element.rPr.rFonts.set(qn('w:eastAsia'), '宋体')
-#         paragraph.paragraph_format.left_indent = Pt(20)
-#     elif level == 3:
-#         run.font.bold = False
-#         run.font._element.rPr.rFonts.set(qn('w:eastAsia'), '宋体')
-#         paragraph.paragraph_format.left_indent = Pt(40)
 
 
 def _modify_normal_style(doc: Document):
