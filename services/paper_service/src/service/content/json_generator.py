@@ -14,13 +14,13 @@ def llm_json_generator(system_prompt: str) -> callable:
         def wrapper(*args, **kwargs) -> Dict:
             func(*args, **kwargs)   # run initial function
             
-            title = kwargs["title"]
+            query = kwargs["query"]
             save = kwargs["save"]
             save_path = kwargs["save_path"]
         
             messages = [
                 {'role': 'assistant', 'content': system_prompt},
-                {'role': 'user', 'content': f"请分析论文题目《{title}》，按要求生成对应内容。"}
+                {'role': 'user', 'content': query}
             ]    
             
             try:
@@ -39,14 +39,15 @@ def llm_json_generator(system_prompt: str) -> callable:
 
 
 @llm_json_generator(PAPER_STRUCTURE_PROMPT)
-def generate_paper_structure(title: str=None, save: bool=False, save_path: str=None) -> Dict:
+def generate_paper_structure(query: str=None, save: bool=False, save_path: str=None) -> Dict:
     pass
 
 
 @llm_json_generator(FIGURE_JSON_PROMPT)
-def generate_figure_json(title: str=None, save: bool=False, save_path: str=None) -> Dict:
+def generate_figure_json(query: str=None, save: bool=False, save_path: str=None) -> Dict:
     pass
 
+
 @llm_json_generator(PAPER_ABSTRACT_PROMPT)
-def generate_abstract_json(title: str=None, save: bool=False, save_path: str=None) -> Dict:
+def generate_abstract_json(query: str=None, save: bool=False, save_path: str=None) -> Dict:
     pass

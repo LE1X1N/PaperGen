@@ -20,8 +20,10 @@ if __name__== "__main__":
     title = "基于Android+XAMPP+MySQL的家校互动平台设计与实现"
     doc_path = f"test/{title}.docx"
 
-    # structure = generate_paper_structure(title=title, save=True, save_path="test/structure_test.json")
-    # abstract = generate_abstract_json(title=title, save=True, save_path="test/abstract_test.json")
+    # structure = generate_paper_structure(query=f"请分析论文题目《{title}》，按要求生成对应JSON。", 
+    #                                      save=True, save_path="test/structure_test.json")
+    # abstract = generate_abstract_json(title=f"请分析论文题目《{title}》，按要求生成对应JSON。", 
+    #                                   save=True, save_path="test/abstract_test.json")
 
     abstract = load_json("test/abstract_test.json")
     structure = load_json("test/structure_test_cut.json")  
