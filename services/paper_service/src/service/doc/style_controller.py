@@ -4,7 +4,7 @@ from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.enum.table import WD_TABLE_ALIGNMENT, WD_CELL_VERTICAL_ALIGNMENT
 from docx.enum.style import WD_STYLE_TYPE
 from docx.oxml.ns import qn
-from docx.table import Table
+from docx.table import Table, _Cell
 from docx.oxml import OxmlElement
 
 
@@ -257,6 +257,74 @@ class StyleController:
             border = OxmlElement(f'w:bottom')
             border.set(qn('w:val'), 'single')
             border.set(qn('w:sz'), '8')
+            border.set(qn('w:space'), '0')
+            border.set(qn('w:color'), 'auto')  
+            tcPr.append(border)
+
+
+    def modify_main_body_table_style(self, table: Table):
+        table.autofit = True    # autofit cell width
+        table._tblPr.xpath("./w:tblLayout")[0].set(qn("w:type"), "autofit")
+
+        # alignment
+        table.alignment = WD_TABLE_ALIGNMENT.CENTER
+        for row in table.rows:
+            for cell in row.cells:
+                cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
+
+        # text style
+        def _set_cell_text_style(cell: _Cell , is_header: bool = False):
+            for para in cell.paragraphs:
+                para.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+                para.paragraph_format.space_before = Pt(0)
+                para.paragraph_format.space_after = Pt(0)
+                para.paragraph_format.line_spacing = 1.0  
+
+                for run in para.runs:
+                    run.font.name = "Times New Roman"
+                    run.font.element.rPr.rFonts.set(qn("w:eastAsia"), "宋体")
+
+                    if is_header:
+                        run.font.size = Pt(12)
+                        run.font.bold = True
+                    else:
+                        run.font.size = Pt(11)
+                        run.font.bold = False
+        
+        for cell in table.rows[0].cells:
+            _set_cell_text_style(cell, is_header=True)
+        for row in table.rows[1:]:
+            for cell in row.cells:
+                _set_cell_text_style(cell, is_header=False)
+        
+        # border
+        # header row
+        for cell in table.rows[0].cells:
+            tc = cell._tc
+            tcPr = tc.get_or_add_tcPr()
+
+            border = OxmlElement(f'w:top')
+            border.set(qn('w:val'), 'single')
+            border.set(qn('w:sz'), '12')
+            border.set(qn('w:space'), '0')
+            border.set(qn('w:color'), 'auto')  
+            tcPr.append(border)
+            
+            border = OxmlElement(f'w:bottom')
+            border.set(qn('w:val'), 'single')
+            border.set(qn('w:sz'), '8')
+            border.set(qn('w:space'), '0')
+            border.set(qn('w:color'), 'auto')  
+            tcPr.append(border)
+
+        # bottom row
+        for cell in table.rows[-1].cells:
+            tc = cell._tc
+            tcPr = tc.get_or_add_tcPr()
+
+            border = OxmlElement(f'w:bottom')
+            border.set(qn('w:val'), 'single')
+            border.set(qn('w:sz'), '12')
             border.set(qn('w:space'), '0')
             border.set(qn('w:color'), 'auto')  
             tcPr.append(border)

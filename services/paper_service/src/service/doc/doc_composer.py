@@ -11,12 +11,15 @@ class DocComposer:
         # init styles of doc
         self.style_controller.init_doc_style(self.doc)
 
-    def compose_all(self, title, abstract, structure, main_body=None):
+    def compose_all(self, title, abstract=None, structure=None, main_body=None, tables=None):
         self.compose_cover(title)
-        self.compose_abstract(abstract)
-        self.compose_toc(structure)
+        if abstract is not None:
+            self.compose_abstract(abstract)
+        if structure is not None:
+            self.compose_toc(structure)
         if main_body is not None:
-            self.compose_main_body(structure, main_body)
+            self.compose_main_body(structure, main_body, tables)
+        
 
     def compose_cover(self, title: str):
         self.doc.add_paragraph("XXXX大学", style=self.style_controller.COVER_SCHOOL_STYLE)
@@ -39,7 +42,6 @@ class DocComposer:
             row_cells[1].paragraphs[0].add_run(v)
 
         self.style_controller.modify_cover_table_style(table) 
-
         self.doc.add_page_break()
 
 
@@ -50,12 +52,10 @@ class DocComposer:
         self.doc.add_paragraph(f"关键字：{abstract['keyword_cn']}", style=self.style_controller.KEYWORD_STYLE)
         self.doc.add_page_break()
 
-
         self.doc.add_paragraph("ABSTRACT", style=self.style_controller.TOC_HEAD_STYLE)
         self.doc.add_paragraph(abstract["abstract_en"], style=self.style_controller.NORMAL_STYLE)
         self.doc.add_paragraph(f"Keywords: {abstract['keyword_en']}", style=self.style_controller.KEYWORD_STYLE)
         self.doc.add_page_break()
-
 
 
     def compose_toc(self, structure: dict):
@@ -78,7 +78,7 @@ class DocComposer:
         self.doc.add_page_break() 
 
 
-    def compose_main_body(self, structure: dict, main_body: dict):
+    def compose_main_body(self, structure: dict, main_body: dict, tables: dict=None):
         
         for chapter in structure["chapters"]:
             # 1-level Handling
@@ -113,3 +113,31 @@ class DocComposer:
                                 self.doc.add_paragraph(text, style=self.style_controller.NORMAL_STYLE)
 
             self.doc.add_page_break() 
+
+    def _compose_table(self, table_data: dict=None):
+        """
+            insert one table into a docx
+
+            table: dict
+                e.g.
+                {
+                    "headers": ["学号", "姓名", "语文", "数学", "英语"], 
+                    "rows": [
+                        ["001", "张三", "90", "85", "92"],
+                        ["002", "李四", "88", "91", "89"],
+                        ["003", "王五", "95", "87", "93"]
+                    ]
+                }
+        """
+        table = self.doc.add_table(rows=1, cols=len(table_data["headers"]))
+        # header
+        for idx, cell in enumerate(table.rows[0].cells):
+            cell.text = table_data["headers"][idx]
+        
+        # row
+        for row in table_data["rows"]:
+            row_cells = table.add_row().cells
+            for idx, cell in enumerate(row_cells):
+                cell.text = row[idx]
+
+        self.style_controller.modify_main_body_table_style(table) 
