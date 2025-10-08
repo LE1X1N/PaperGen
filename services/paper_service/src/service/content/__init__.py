@@ -1,2 +1,2 @@
 from .json_generator import JSONGenerator
-from .section_generator import generate_main_body_text
+from .section_generator import generate_main_body_text, generate_tables
