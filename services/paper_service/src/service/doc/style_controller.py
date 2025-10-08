@@ -263,11 +263,25 @@ class StyleController:
 
 
     def modify_main_body_table_style(self, table: Table):
-        table.autofit = True    # autofit cell width
-        table._tblPr.xpath("./w:tblLayout")[0].set(qn("w:type"), "autofit")
+        table.autofit = False
+        table.alignment = WD_TABLE_ALIGNMENT.CENTER
+
+        # col width
+        num_cols = len(table.columns)
+        col_maxlens = [0] * num_cols
+        for row in table.rows:
+            for col_idx, cell in enumerate(row.cells):
+                cell_text = "".join([para.text for para in cell.paragraphs])
+                col_maxlens[col_idx] = max(col_maxlens[col_idx], len(cell_text))
+
+        total_len = sum(col_maxlens) if sum(col_maxlens) > 0 else num_cols
+        total_width = Pt(400)
+        for col_idx, col in enumerate(table.columns):
+            col_width = total_width * (col_maxlens[col_idx] / total_len)
+            for cell in col.cells:
+                cell.width = col_width
 
         # alignment
-        table.alignment = WD_TABLE_ALIGNMENT.CENTER
         for row in table.rows:
             for cell in row.cells:
                 cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
@@ -290,13 +304,13 @@ class StyleController:
                     else:
                         run.font.size = Pt(11)
                         run.font.bold = False
-        
+
         for cell in table.rows[0].cells:
             _set_cell_text_style(cell, is_header=True)
         for row in table.rows[1:]:
             for cell in row.cells:
                 _set_cell_text_style(cell, is_header=False)
-        
+
         # border
         # header row
         for cell in table.rows[0].cells:
