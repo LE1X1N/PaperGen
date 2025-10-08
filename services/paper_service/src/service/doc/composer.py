@@ -27,18 +27,20 @@ def compose_cover(doc: Document, title: str):
     
     table = doc.add_table(rows=0, cols=2)
     info = (
-        ("姓名:", "XXX"),
-        ("学号:", "123456"),
-        ("院系:", "计算机学院"),
-        ("专业:", "软件工程"),
+        ("姓        名:", "XXX"),
+        ("学        号:", "123456"),
+        ("院        系:", "计算机学院"),
+        ("专        业:", "软件工程"),
         ("指导教师:", "XXX"),
         ("完成日期:", datetime.now().strftime("%Y年%m月%d日"))
     )
 
     for k, v in info:
         row_cells = table.add_row().cells
-        row_cells[0].text = k
-        row_cells[1].text = v
+        row_cells[0].paragraphs[0].add_run(k)
+        row_cells[1].paragraphs[0].add_run(v)
+
+    style_controller.modify_cover_table_style(table) 
 
     doc.add_page_break()
 
