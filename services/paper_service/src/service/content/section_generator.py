@@ -7,7 +7,7 @@ from src.llm.prompt import PAPER_MAIN_BODY_PROMPT, PAPER_TABLE_PROMPT
 from src.llm.client import call_chat_completion
 
 
-def generate_main_body_text(title: str=None, structure: dict=None, table_desc: dict=None):
+def generate_main_body_text(title: str=None, structure: dict=None, tables_desc: dict=None):
 
     def _generate_section_text(query: str) -> List[str]:
         messages = [
@@ -18,8 +18,18 @@ def generate_main_body_text(title: str=None, structure: dict=None, table_desc: d
         res = res.split("\n\n")
         return res
     
-    def _generate_query(section: str) -> str:
-        return f"请分析论文题目《{title}》，当前需要生成的章节为： {section}。你可参考该论文的论文结构：{str(structure)}"
+    def _generate_query(section: str, section_table_map: dict=None) -> str:
+        if section not in section_table_map:
+            return f"请分析论文题目《{title}》，当前需要生成的章节为： {section}。你可参考该论文的论文结构：{str(structure)}"
+        else:
+            return f"请分析论文题目《{title}》，当前需要生成的章节为： {section}。当前章节包含图表：{section_table_map[section]},你需要在生成的内容中通过 ``见表X-X``的方式来引用表中的内容。 本论文的论文结构为：{str(structure)}。"
+
+    # parsing table
+    section_table_map = {}
+    for section in tables_desc["data"]:
+        section_title = section["title"]
+        table_info = "".join([f"【表id: {table["id"]} {table["name"]} 表描述： {table["desc"]}】" for table in section["tables"]])
+        section_table_map[section_title] = table_info
 
     start_time = time.time()
     tasks = {}
@@ -29,18 +39,18 @@ def generate_main_body_text(title: str=None, structure: dict=None, table_desc: d
     for chapter in structure["chapters"]:
         # 1-level
         if "sections" not in chapter:
-            tasks[chapter["title"]] = _generate_query(chapter["title"])
+            tasks[chapter["title"]] = _generate_query(chapter["title"], section_table_map)
             
         # 2-level
         else:
             for section in chapter["sections"]:
                 if "subsections" not in section:
-                    tasks[section["title"]] = _generate_query(f"{chapter['title']} -> {section['title']}")
+                    tasks[section["title"]] = _generate_query(f"{section['title']}", section_table_map)
 
                 # 3-level 
                 else:
                     for subsection in section["subsections"]:
-                        tasks[subsection["title"]] = _generate_query(f"{chapter['title']} -> {section['title']} -> {subsection['title']}")
+                        tasks[subsection["title"]] = _generate_query(f"{subsection['title']}", section_table_map)
     
     # multithread
     future_to_keys = {}
