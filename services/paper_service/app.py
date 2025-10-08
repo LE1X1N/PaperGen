@@ -1,6 +1,20 @@
+import os
+import docx
+
 from src.service.content import generate_figure_json, generate_paper_structure, generate_main_body_text, generate_abstract_json
-from src.service.doc import compose_toc, compose_main_body, init_doc, compose_cover, compose_abstract
+from src.service.doc import DocComposer
 from src.utils.common import load_json
+
+def init_doc(file_path: str=None):
+    # initialize a doc object and styles
+    if os.path.exists(file_path):
+        doc = docx.Document(file_path)
+        print(f"打开文档: {file_path}")
+    else:
+        doc = docx.Document()
+        print(f"创建新文档: {file_path}")
+    return doc
+
 
 if __name__== "__main__":
     title = "基于Android+XAMPP+MySQL的家校互动平台设计与实现"
@@ -15,10 +29,9 @@ if __name__== "__main__":
     
     doc = init_doc(doc_path)
 
-    compose_cover(doc, title)
-    compose_abstract(doc, abstract)
-    compose_toc(doc, structure)
-    compose_main_body(doc, structure, main_body)
+    doc_composer = DocComposer(doc)
+    doc_composer.compose_all(title, abstract, structure, main_body)
+
     
     doc.save(doc_path)
 
