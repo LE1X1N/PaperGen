@@ -21,8 +21,6 @@ PAPER_STRUCTURE_PROMPT = """
 参考示例（计算机学科，只展开第一章作为演示）：
 {
   "chapters": [
-    {"title": "摘要"},
-    {"title": "Abstract"},
     {"title": "第1章 绪论", "sections": [
       {"title": "1.1 研究背景与意义"},
       {"title": "1.2 国内外研究现状", "subsections": [
