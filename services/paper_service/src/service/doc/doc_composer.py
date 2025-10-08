@@ -11,11 +11,12 @@ class DocComposer:
         # init styles of doc
         self.style_controller.init_doc_style(self.doc)
 
-    def compose_all(self, title, abstract, structure, main_body):
+    def compose_all(self, title, abstract, structure, main_body=None):
         self.compose_cover(title)
         self.compose_abstract(abstract)
         self.compose_toc(structure)
-        self.compose_main_body(structure, main_body)
+        if main_body is not None:
+            self.compose_main_body(structure, main_body)
 
     def compose_cover(self, title: str):
         self.doc.add_paragraph("XXXX大学", style=self.style_controller.COVER_SCHOOL_STYLE)
