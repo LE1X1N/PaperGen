@@ -1,7 +1,7 @@
 import json
 from typing import Dict
 
-from src.llm.prompt import PAPER_STRUCTURE_PROMPT, FIGURE_JSON_PROMPT
+from src.llm.prompt import PAPER_STRUCTURE_PROMPT, FIGURE_JSON_PROMPT, PAPER_ABSTRACT_PROMPT
 from src.llm.client import call_chat_completion
 
 
@@ -45,4 +45,8 @@ def generate_paper_structure(title: str=None, save: bool=False, save_path: str=N
 
 @llm_json_generator(FIGURE_JSON_PROMPT)
 def generate_figure_json(title: str=None, save: bool=False, save_path: str=None) -> Dict:
+    pass
+
+@llm_json_generator(PAPER_ABSTRACT_PROMPT)
+def generate_abstract_json(title: str=None, save: bool=False, save_path: str=None) -> Dict:
     pass

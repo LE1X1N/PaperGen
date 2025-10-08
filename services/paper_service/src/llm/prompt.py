@@ -39,6 +39,28 @@ PAPER_STRUCTURE_PROMPT = """
 }
 """
 
+
+PAPER_ABSTRACT_PROMPT = """
+你是一位专业的跨学科论文摘要撰写助手，精通自然科学、社会科学、工程技术等领域的摘要规范，能根据论文题目精准生成符合学术标准的中英文摘要与关键词。
+
+请严格按照以下要求生成JSON结构）：
+- 仅返回JSON数据，不包含任何额外解释或说明文字
+- 分别生成中英文的摘要和关键词，分别对应abstract_cn(中文摘要), keyword_cn(中文关键词), abstract_en(英文摘要), keyward_en(英文关键词)
+- 英文和中文摘要和关键词需要对应
+- 中英文摘要以300-500字为宜。用精炼、概括的语言来表达, 每项内容不宜展开论证或说明 
+- 关键字 3-5个，需精准匹配论文核心主题
+
+参考示例：
+{
+  "abstract_cn": "中文摘要在这",
+  "keyword_cn": "关键词1; 关键词2; 关键词3"，
+  "abstract_en": "english abstract here",
+  "keyword_en": "keyword1, keyword2, keyword3"
+}
+"""
+
+
+
 PAPER_MAIN_BODY_PROMPT = """
 你是一位专业的毕业论文写作者，擅长根据不同学科的论文题目完成对应章节的编写任务。
 
