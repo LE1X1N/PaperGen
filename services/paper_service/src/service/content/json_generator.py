@@ -1,7 +1,8 @@
 import json
 from typing import Dict
 
-from src.llm.prompt import PAPER_STRUCTURE_PROMPT,  PAPER_ABSTRACT_PROMPT, TABLE_JSON_PROMPT, FIGURE_JSON_PROMPT
+from src.llm.prompt import PAPER_STRUCTURE_PROMPT,  PAPER_ABSTRACT_PROMPT
+from src.llm.prompt import TABLE_DESC_JSON_PROMPT, FIGURE_DESC_JSON_PROMPT
 from src.llm.client import call_chat_completion
 
 
@@ -35,22 +36,26 @@ def llm_json_generator(system_prompt: str) -> callable:
                 print("不是有效的JSON格式")
             
         return wrapper
-    return decorator   
+    return decorator
 
 
-@llm_json_generator(PAPER_STRUCTURE_PROMPT)
-def generate_paper_structure(query: str=None, save: bool=False, save_path: str=None) -> Dict:
-    pass
+class JSONGenerator:
+    
+    @llm_json_generator(PAPER_STRUCTURE_PROMPT)
+    def generate_paper_structure(self, query: str=None, save: bool=False, save_path: str=None) -> Dict:
+        pass
 
 
-@llm_json_generator(PAPER_ABSTRACT_PROMPT)
-def generate_abstract_json(query: str=None, save: bool=False, save_path: str=None) -> Dict:
-    pass
+    @llm_json_generator(PAPER_ABSTRACT_PROMPT)
+    def generate_abstract_json(self, query: str=None, save: bool=False, save_path: str=None) -> Dict:
+        pass
 
-@llm_json_generator(TABLE_JSON_PROMPT)
-def generate_table_json(query: str=None, save: bool=False, save_path: str=None) -> Dict:
-    pass
 
-@llm_json_generator(FIGURE_JSON_PROMPT)
-def generate_figure_json(query: str=None, save: bool=False, save_path: str=None) -> Dict:
-    pass
+    @llm_json_generator(TABLE_DESC_JSON_PROMPT)
+    def generate_table_desc_json(self, query: str=None, save: bool=False, save_path: str=None) -> Dict:
+        pass
+
+
+    @llm_json_generator(FIGURE_DESC_JSON_PROMPT)
+    def generate_figure_desc_json(self, query: str=None, save: bool=False, save_path: str=None) -> Dict:
+        pass

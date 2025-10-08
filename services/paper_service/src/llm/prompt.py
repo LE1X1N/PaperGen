@@ -71,7 +71,7 @@ PAPER_MAIN_BODY_PROMPT = """
 """
 
 
-FIGURE_JSON_PROMPT = """
+FIGURE_DESC_JSON_PROMPT = """
 你是一位专业的软件系统设计文档工程师，擅长分析论文题目并生成详细的系统页面结构。请严格按照以下流程处理用户提供的论文题目：
 
 请严格按照以下流程处理用户提供的论文题目：
@@ -105,7 +105,7 @@ FIGURE_JSON_PROMPT = """
 """
 
 
-TABLE_JSON_PROMPT = """
+TABLE_DESC_JSON_PROMPT = """
 你是一名专业的学术 文档结构化分析师，需基于论文章节结构 JSON，生成符合学术规范、贴合章节业务逻辑的 “表格需求 JSON”，确保表格与章节内容强关联、命名精准、描述具体。
 
 **核心任务**
