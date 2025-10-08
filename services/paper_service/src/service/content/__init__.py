@@ -1,2 +1,2 @@
-from .json_generator import generate_figure_json, generate_paper_structure
+from .json_generator import generate_figure_json, generate_paper_structure, generate_abstract_json
 from .section_generator import generate_main_body_text

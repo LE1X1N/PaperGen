@@ -45,6 +45,21 @@ def compose_cover(doc: Document, title: str):
     doc.add_page_break()
 
 
+def compose_abstract(doc: Document, abstract: dict):
+    # generate abstract (both Chinese and English)
+    doc.add_paragraph("摘要", style=style_controller.TOC_HEAD_STYLE)
+    doc.add_paragraph(abstract["abstract_cn"], style=style_controller.NORMAL_STYLE)
+    doc.add_paragraph(f"关键字：{abstract['keyword_cn']}", style=style_controller.KEYWORD_STYLE)
+    doc.add_page_break()
+
+
+    doc.add_paragraph("ABSTRACT", style=style_controller.TOC_HEAD_STYLE)
+    doc.add_paragraph(abstract["abstract_en"], style=style_controller.NORMAL_STYLE)
+    doc.add_paragraph(f"Keywords: {abstract['keyword_en']}", style=style_controller.KEYWORD_STYLE)
+    doc.add_page_break()
+
+
+
 def compose_toc(doc: Document, structure: dict):
     # generate table of contents in a docx
     doc.add_paragraph("目录", style=style_controller.TOC_HEAD_STYLE)

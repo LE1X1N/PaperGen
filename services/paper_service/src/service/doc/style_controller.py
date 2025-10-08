@@ -16,6 +16,8 @@ class StyleController:
         self.COVER_TABLE_LEFT_COL_STYLE = "论文_封面_表左"
         self.COVER_TABLE_RIGHT_COL_STYLE = "论文_封面_表右"
 
+        self.KEYWORD_STYLE = "论文_关键字"
+
         self.TOC_HEAD_STYLE = "论文_目录"
         self.TOC_STYLE_1 = "论文_目录 1"
         self.TOC_STYLE_2 = "论文_目录 2"
@@ -34,11 +36,15 @@ class StyleController:
         self._modify_cover_table_left_col_style(doc)
         self._modify_cover_table_right_col_style(doc)
 
+        self._modify_keyword_style(doc)
+
         self._modify_toc_head_styles(doc)
         self._modify_toc_l1_styles(doc)
         self._modify_toc_l2_styles(doc)
         self._modify_toc_l3_styles(doc)
+
         self._modify_normal_style(doc)
+        
         self._modify_heading_l1_styles(doc)
         self._modify_heading_l2_styles(doc)
         self._modify_heading_l3_styles(doc)
@@ -94,6 +100,17 @@ class StyleController:
         style.font.size = Pt(16)
         style.font.bold = False
 
+    def _modify_keyword_style(self, doc: Document):
+        style = doc.styles.add_style(self.KEYWORD_STYLE, WD_STYLE_TYPE.PARAGRAPH)
+            
+        # font style
+        font_size = Pt(12)
+        style.font.size = font_size
+        style.font.bold = False
+        style.font.name = "Times New Roman"
+        style.element.rPr.rFonts.set(qn('w:eastAsia'), '宋体')
+        style.paragraph_format.alignment = WD_PARAGRAPH_ALIGNMENT.JUSTIFY
+        style.paragraph_format.line_spacing = 1.5
 
     def _modify_toc_head_styles(self, doc: Document):
         style = doc.styles.add_style(self.TOC_HEAD_STYLE, WD_STYLE_TYPE.PARAGRAPH)
@@ -103,6 +120,7 @@ class StyleController:
         style.font.size = Pt(16)
         style.font.bold = True
         style.paragraph_format.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+        style.paragraph_format.line_spacing = 1.5
 
     def _modify_toc_l1_styles(self, doc: Document):
         style = doc.styles.add_style(self.TOC_STYLE_1, WD_STYLE_TYPE.PARAGRAPH)
