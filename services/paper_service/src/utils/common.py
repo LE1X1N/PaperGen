@@ -1,6 +1,6 @@
 import json
 
-def load_structure_from_json(path):
+def load_json(path):
     with open(path, "r", encoding='utf-8') as f:
-        structure = json.load(f)
-    return structure
+        res = json.load(f)
+    return res
