@@ -29,6 +29,8 @@ class StyleController:
         self.HEADING_STYLE_2 = "论文_标题 2"
         self.HEADING_STYLE_3 = "论文_标题 3"
 
+        self.TABLE_TITLE_STYLE = "论文_表头"
+
     def init_doc_style(self, doc: Document):
         self._modify_cover_school_style(doc)
         self._modify_cover_head_style(doc)
@@ -48,6 +50,8 @@ class StyleController:
         self._modify_heading_l1_styles(doc)
         self._modify_heading_l2_styles(doc)
         self._modify_heading_l3_styles(doc)
+
+        self._modify_table_title_style(doc)
 
     
     def _modify_cover_school_style(self, doc: Document):
@@ -211,6 +215,22 @@ class StyleController:
         style.paragraph_format.alignment = WD_PARAGRAPH_ALIGNMENT.LEFT
         style.paragraph_format.space_before = Pt(13)
 
+
+    def _modify_table_title_style(self, doc: Document):
+        style = doc.styles.add_style(self.TABLE_TITLE_STYLE, WD_STYLE_TYPE.PARAGRAPH)
+    
+        # font
+        style.font.size = Pt(11)
+        style.font.bold = False
+        style.font.name = "Times New Roman"
+        style.element.rPr.rFonts.set(qn('w:eastAsia'), '宋体')
+
+        # paragraph
+        style.paragraph_format.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+        style.paragraph_format.space_before = Pt(12)
+        style.paragraph_format.space_after = Pt(6)
+        style.paragraph_format.line_spacing = 1
+        
 
     def modify_cover_table_style(self, table: Table):
         # table dimension

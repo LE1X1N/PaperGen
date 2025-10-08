@@ -60,7 +60,7 @@ def generate_main_body_text(title: str=None, structure: dict=None, table_desc: d
 def generate_tables(title: str=None, tables_desc: dict=None):
     
     def _generate_query(table: dict) -> str:
-        return f"请分析论文题目《{title}》，根据需求生成对应的表数据。当前需要生成的表为：【{table['id']} {table['name']}】, 该表描述为：{table['desc']}"
+        return f"请分析论文题目《{title}》，根据需求生成对应的表数据。当前需要生成的表ID为：【{table['id']} {table['name']}】, 该表描述为：{table['desc']}"
     
     def _generate_table(query: str | List ):
 

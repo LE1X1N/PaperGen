@@ -133,6 +133,7 @@ class DocComposer:
             table: dict
                 e.g.
                 {
+                    "id": "表1-1 学生成绩表"
                     "headers": ["学号", "姓名", "语文", "数学", "英语"], 
                     "rows": [
                         ["001", "张三", "90", "85", "92"],
@@ -145,6 +146,10 @@ class DocComposer:
             table_data = [table_data]
             
         for data in table_data:
+            # add tatle title
+            self.doc.add_paragraph(data['id'], style=self.style_controller.TABLE_TITLE_STYLE)
+
+            # add table
             table = self.doc.add_table(rows=1, cols=len(data["headers"]))
             # header
             for idx, cell in enumerate(table.rows[0].cells):
