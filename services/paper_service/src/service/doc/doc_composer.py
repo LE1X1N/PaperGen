@@ -1,7 +1,7 @@
 from docx.document import Document
 from datetime import datetime
 from src.service.doc.style_controller import StyleController
-
+from typing import List
 
 class DocComposer:
     def __init__(self, doc: Document):
@@ -89,6 +89,10 @@ class DocComposer:
                 texts = main_body[chapter['title']]
                 for text in texts:
                     self.doc.add_paragraph(text, style=self.style_controller.NORMAL_STYLE) 
+                
+                # compose table
+                if chapter['title'] in tables:
+                    self._compose_table(tables[chapter['title']])
 
             # 2-level
             else:
@@ -102,6 +106,10 @@ class DocComposer:
                         for text in texts:
                             self.doc.add_paragraph(text, style=self.style_controller.NORMAL_STYLE)
 
+                        # compose table
+                        if section['title'] in tables:
+                            self._compose_table(tables[section['title']])
+
                     # 3-level 
                     else:
                         for subsection in section["subsections"]:
@@ -112,11 +120,15 @@ class DocComposer:
                             for text in texts:
                                 self.doc.add_paragraph(text, style=self.style_controller.NORMAL_STYLE)
 
+                            # compose table
+                            if subsection['title'] in tables:
+                                self._compose_table(tables[subsection['title']])
+                        
             self.doc.add_page_break() 
 
-    def _compose_table(self, table_data: dict=None):
+    def _compose_table(self, table_data: dict | List[dict]):
         """
-            insert one table into a docx
+            insert tables into a docx
 
             table: dict
                 e.g.
@@ -129,15 +141,19 @@ class DocComposer:
                     ]
                 }
         """
-        table = self.doc.add_table(rows=1, cols=len(table_data["headers"]))
-        # header
-        for idx, cell in enumerate(table.rows[0].cells):
-            cell.text = table_data["headers"][idx]
-        
-        # row
-        for row in table_data["rows"]:
-            row_cells = table.add_row().cells
-            for idx, cell in enumerate(row_cells):
-                cell.text = row[idx]
+        if isinstance(table_data, dict):
+            table_data = [table_data]
+            
+        for data in table_data:
+            table = self.doc.add_table(rows=1, cols=len(data["headers"]))
+            # header
+            for idx, cell in enumerate(table.rows[0].cells):
+                cell.text = data["headers"][idx]
+            
+            # row
+            for row in data["rows"]:
+                row_cells = table.add_row().cells
+                for idx, cell in enumerate(row_cells):
+                    cell.text = row[idx]
 
-        self.style_controller.modify_main_body_table_style(table) 
+            self.style_controller.modify_main_body_table_style(table) 

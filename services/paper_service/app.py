@@ -33,25 +33,16 @@ if __name__== "__main__":
     #                                  save=True, save_path="test/tables_desc_test.json")
 
     abstract = load_json("test/abstract_test.json")
-    structure = load_json("test/structure_test.json")  
+    structure = load_json("test/structure_test_cut.json")  
     tables_desc = load_json("test/tables_desc_test.json")
 
-    # tables = generate_tables(title, tables_desc)
-    # main_body = generate_main_body_text(title, structure, tables_desc)
+    tables = generate_tables(title, tables_desc)
+    main_body = generate_main_body_text(title, structure, tables_desc)
 
     doc = init_doc(doc_path)
 
     doc_composer = DocComposer(doc)
-    # doc_composer.compose_all(title, abstract, structure, main_body, tables)
-
-    doc_composer._compose_table(                {
-                    "headers": ["学号", "姓名", "语文", "数学", "英语"], 
-                    "rows": [
-                        ["001", "张三", "90", "85", "92"],
-                        ["002", "李四", "88", "91", "89"],
-                        ["003", "王五", "95", "87", "93"]
-                    ]
-                })
+    doc_composer.compose_all(title, abstract, structure, main_body, tables)
     
     doc.save(doc_path)
 

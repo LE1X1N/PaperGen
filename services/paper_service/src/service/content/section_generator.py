@@ -94,10 +94,17 @@ def generate_tables(title: str=None, tables_desc: dict=None):
         tasks[section_title] = query
 
     # execute
+    future_to_keys = {}
+    task_execuator = ThreadPoolExecutor(max_workers=10)
     for k, v in tasks.items():
-        tables_map[k] = _generate_table(v)
+        future = task_execuator.submit(_generate_table, v)
+        future_to_keys[future] = k
+
+    for future in as_completed(future_to_keys):
+        res = future.result()
+        tables_map[future_to_keys[future]] = res
     
-    print(f"论文正文生成成功，耗时：{time.time() - start_time} s")
+    print(f"表格生成成功，耗时：{time.time() - start_time} s")
     return tables_map
 
 
