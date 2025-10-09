@@ -9,7 +9,7 @@ from docx2pdf import convert
 from src.service.content import JSONGenerator
 from src.service.content import generate_main_body_text, generate_tables
 from src.service.doc import DocComposer, StyleController
-from src.utils.common import load_json, parse_section_titles
+from src.utils.common import load_json, parse_main_body_titles
 
 class Pipeline:
 
@@ -73,7 +73,7 @@ class Pipeline:
 
         # tables description
         tables_desc = await self._get_or_generate(doc_folder / self.TABLES_DESC_JSON_FILE, self.json_generator.generate_table_desc_json, True,
-                                          query=f"请分析论文题目 《{title}》，按照提供的论文章节目录设计所需的表格映射表。本论文所有【论文章节】包括: 【{parse_section_titles(structure)}】")
+                                          query=f"请分析论文题目 《{title}》，按照提供的论文章节目录设计所需的表格映射表。本论文的【论文目录】为: 【{parse_main_body_titles(structure)}】")
 
 
         # main body

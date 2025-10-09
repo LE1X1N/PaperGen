@@ -20,3 +20,20 @@ def parse_section_titles(structure: dict):
                         for subsection in section["subsections"]:
                              titles.append(subsection["title"])     
     return titles
+
+
+def parse_main_body_titles(structure: dict):
+    titles = []
+
+    for chapter in structure["chapters"]:
+        if "sections" not in chapter:
+            titles.append(chapter["title"])
+
+        else:
+            for section in chapter["sections"]:
+                if "subsections" not in section:
+                    titles.append(f"{section['title']}")
+                else:
+                    for subsection in section["subsections"]:
+                        titles.append(f"{subsection['title']}")
+    return titles

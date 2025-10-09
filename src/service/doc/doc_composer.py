@@ -113,8 +113,8 @@ class DocComposer:
                                 self._compose_table(doc, tables[subsection['title']])
 
                     # compose table
-                        if section['title'] in tables:
-                            self._compose_table(doc, tables[section['title']])
+                    if section['title'] in tables:
+                        self._compose_table(doc, tables[section['title']])
 
             # compose table
             if chapter['title'] in tables:
