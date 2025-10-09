@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 import docx
+from docx2pdf import convert
 
 from src.service.content import JSONGenerator
 from src.service.content import generate_main_body_text, generate_tables
@@ -98,6 +99,9 @@ class Pipeline:
 
         # compose content
         self.doc_composer.compose_all(doc, title, abstract, structure, main_body, tables)
-        
         doc.save(doc_path)
+
+        # convert to pdf
+        convert(doc_path, doc_folder / f"{title}.pdf")
+
         print(f"论文生成成功，文章保存路径：{doc_path}")

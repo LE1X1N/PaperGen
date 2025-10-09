@@ -18,6 +18,5 @@ def parse_section_titles(structure: dict):
 
                 if "subsections" in section:
                         for subsection in section["subsections"]:
-                             titles.append(subsection["title"]) 
-    
+                             titles.append(subsection["title"])     
     return titles
