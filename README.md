@@ -1,5 +1,4 @@
 # Pagergen 论文主体生成服务
-An automonous pipeline for generating thesis' body.
 
 自动化生成论文主体结构与内容，输入论文题目即可生成可直接编辑的 docx 文档。
 
@@ -16,13 +15,13 @@ An automonous pipeline for generating thesis' body.
 - LLM 服务访问权限（需配置 API 密钥或本地化模型地址）  
 - 依赖包：见 `requirements.txt`
 
-``` bash
+```bash
 git clone git@github.com:LE1X1N/PaperGen.git
 cd PaperGen
 ```
 
 ### 2. 安装依赖
-```
+```bash
 pip install -r requirements.txt
 ```
 
@@ -40,34 +39,56 @@ openai:
 
 指定论文标题, 生成默认配置的论文主体
 
-``` bash
+```bash
 python app.py --title "基于SpringBoot的网吧管理系统"
 ```
 
-``` bash
+```bash
 python app.py --title "基于协同过滤算法的电影推荐小程序"
 ```
 
-``` bash
+```bash
 python app.py --title "基于物联网的智能家居系统设计"
 ```
 
-``` bash
+```bash
 python app.py --title "网络文学对传统文学的影响"
 ```
 
-``` bash
+```bash
 python app.py --title "中小企业融资困境与突破路径研究"
 ```
 
 
 ## 四、效果演示
 
+### 1. 输出文件结构
 
+默认文件输出路径为 `cache/` 文件夹，我们已经在 `docs/` 文件夹中生成了一些用于测试。
 
+``` plaintext
+cache
+  └─ 中小企业融资困境与突破路径研究
+     ├─ abstract.json                     # 引言
+     ├─ main_body.json                    # 正文
+     ├─ structure.json                    # 目录 
+     ├─ tables.json                       # 表
+     ├─ tables_desc.json                  # 表描述
+     └─ 中小企业融资困境与突破路径研究.docx  # 论文
+```
 
+![生成案例1](imgs/img-1.png)
+![生成案例2](imgs/img-2.png)
+![生成案例3](imgs/img-3.png)
+![生成案例4](imgs/img-4.png)
+![生成案例5](imgs/img-5.png)
+![生成案例6](imgs/img-6.png)
+![生成案例7](imgs/img-7.png)
+![生成案例8](imgs/img-8.png)
+![生成案例9](imgs/img-9.png)
 
-项目结构：
+## 五、项目结构
+
 ```
 PaperGen
 ├─ app.py                       # 入口文件
@@ -96,3 +117,5 @@ PaperGen
    └─ utils
       └─ common.py
 ```
+
+⚠️⚠️⚠️ 本项目仅作测试，请勿用于真实环境。
