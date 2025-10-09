@@ -6,7 +6,7 @@ An automonous pipeline for generating thesis' body.
 生成方式：
 
 ``` bash
-python services/paper_service/app.py --title "基于SpringBoot的网吧管理系统"
+python app.py --title "基于SpringBoot的网吧管理系统"
 ```
 
 
