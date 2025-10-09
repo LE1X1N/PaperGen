@@ -1,5 +1,6 @@
 import os
 import docx
+from pathlib import Path
 
 from src.service.content import JSONGenerator
 from src.service.content import generate_main_body_text, generate_tables
@@ -18,30 +19,42 @@ def init_doc(file_path: str=None):
 
 
 if __name__== "__main__":
-    title = "基于Android+XAMPP+MySQL的家校互动平台设计与实现"
-    doc_path = f"test/{title}.docx"
+    title = "基于协同过滤算法的电影推荐小程序"
+
+    doc_folder = Path(f"data/{title}")
+
+    # create folder
+    if not doc_folder.exists():
+        os.mkdir(doc_folder)
+
 
     json_generator = JSONGenerator()
 
-    structure = json_generator.generate_paper_structure(query=f"请分析论文题目《{title}》，按要求生成对应JSON。", 
-                                         save=True, save_path="test/structure_test.json")
-    print("结构生成成功！")
+    # structure = json_generator.generate_paper_structure(query=f"请分析论文题目《{title}》，按要求生成对应JSON。", 
+    #                                      save=True, save_path= doc_folder / "structure.json")
+    # print("结构生成成功！")
 
-    abstract = json_generator.generate_abstract_json(query=f"请分析论文题目《{title}》，按要求生成对应JSON。", 
-                                      save=True, save_path="test/abstract_test.json")
-    print("引言生成成功！")
+    # abstract = json_generator.generate_abstract_json(query=f"请分析论文题目《{title}》，按要求生成对应JSON。", 
+    #                                   save=True, save_path= doc_folder / "abstract.json")
+    # print("引言生成成功！")
 
-    tables_desc = json_generator.generate_table_desc_json(query=f"请分析论文题目 《{title}》，按照提供的论文章节目录设计所需的表格映射表。论文目录JSON为: {structure}",
-                                     save=True, save_path="test/tables_desc_test.json")
+    # tables_desc = json_generator.generate_table_desc_json(query=f"请分析论文题目 《{title}》，按照提供的论文章节目录设计所需的表格映射表。论文目录JSON为: {structure}",
+    #                                  save=True, save_path=doc_folder / "tables_desc.json")
+    # print("表格描述生成成功！")
+
+    # main_body = generate_main_body_text(title, structure, tables_desc, save=True, save_path = doc_folder / "main_body.json")
+    # print("文章内容生成成功！")
+    
+
+    structure = load_json(doc_folder / "structure.json") 
+    abstract = load_json(doc_folder / "abstract.json")
+    tables_desc = load_json(doc_folder / "tables_desc.json")
+    main_body = load_json(doc_folder / "main_body.json")
+
+    tables = generate_tables(title, tables_desc, save = True, save_path = doc_folder / "tables.json")
     print("表格生成成功！")
 
-    # abstract = load_json("test/abstract_test.json")
-    # structure = load_json("test/structure_test_cut.json")  
-    # tables_desc = load_json("test/tables_desc_test.json")
-
-    main_body = generate_main_body_text(title, structure, tables_desc)
-    tables = generate_tables(title, tables_desc)
-
+    doc_path = doc_folder / f"{title}.docx"
     doc = init_doc(doc_path)
 
     doc_composer = DocComposer(doc)

@@ -7,7 +7,7 @@ from src.llm.prompt import PAPER_MAIN_BODY_PROMPT, PAPER_TABLE_PROMPT
 from src.llm.client import call_chat_completion
 
 
-def generate_main_body_text(title: str=None, structure: dict=None, tables_desc: dict=None):
+def generate_main_body_text(title: str=None, structure: dict=None, tables_desc: dict=None , save: bool=False, save_path: str=None):
 
     def _generate_section_text(query: str) -> List[str]:
         messages = [
@@ -64,10 +64,15 @@ def generate_main_body_text(title: str=None, structure: dict=None, tables_desc: 
         res_map[future_to_keys[future]] = res
     
     print(f"论文正文生成成功，耗时：{time.time() - start_time} s")
+
+    if save:
+        with open(save_path, 'w', encoding='utf-8') as f:
+            json.dump(res_map, f, indent=2, ensure_ascii=False)
+
     return res_map
 
 
-def generate_tables(title: str=None, tables_desc: dict=None):
+def generate_tables(title: str=None, tables_desc: dict=None, save: bool=False, save_path: str=None):
     
     def _generate_query(table: dict) -> str:
         return f"请分析论文题目《{title}》，根据需求生成对应的表数据。当前需要生成的表ID为：【{table['id']} {table['name']}】, 该表描述为：{table['desc']}"
@@ -93,8 +98,8 @@ def generate_tables(title: str=None, tables_desc: dict=None):
     
     # generate tables (JSON-format) based on corresponding description  
     start_time = time.time()
-    tables_map = {}
     tasks = {}
+    res_map = {}
 
     # parsing to tasks
     for section in tables_desc["data"]:
@@ -112,9 +117,14 @@ def generate_tables(title: str=None, tables_desc: dict=None):
 
     for future in as_completed(future_to_keys):
         res = future.result()
-        tables_map[future_to_keys[future]] = res
+        res_map[future_to_keys[future]] = res
     
     print(f"表格生成成功，耗时：{time.time() - start_time} s")
-    return tables_map
+
+    if save:
+        with open(save_path, 'w', encoding='utf-8') as f:
+            json.dump(res_map, f, indent=2, ensure_ascii=False)
+
+    return res_map
 
 

@@ -62,3 +62,5 @@ class JSONGenerator:
     @llm_json_generator(FIGURE_DESC_JSON_PROMPT)
     def generate_figure_desc_json(self, query: str=None, save: bool=False, save_path: str=None) -> Dict:
         pass
+
+    
