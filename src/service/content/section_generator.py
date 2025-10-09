@@ -6,7 +6,7 @@ from src.llm.prompt import PAPER_MAIN_BODY_PROMPT, PAPER_TABLE_PROMPT
 from src.llm.client import call_chat_completion
 
 
-def generate_main_body_text(title: str=None, structure: dict=None, tables_desc: dict=None):
+async def generate_main_body_text(title: str=None, structure: dict=None, tables_desc: dict=None):
 
     def _generate_section_text(query: str) -> List[str]:
         messages = [
@@ -62,7 +62,7 @@ def generate_main_body_text(title: str=None, structure: dict=None, tables_desc: 
     return res_map
 
 
-def generate_tables(title: str=None, tables_desc: dict=None):
+async def generate_tables(title: str=None, tables_desc: dict=None):
     
     def _generate_query(table: dict) -> str:
         return f"请分析论文题目《{title}》，根据需求生成对应的表数据。当前需要生成的表ID为：【{table['id']}】, 该表描述为：{table['desc']}"
