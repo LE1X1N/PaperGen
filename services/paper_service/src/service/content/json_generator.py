@@ -55,10 +55,6 @@ class JSONGenerator:
     def generate_table_desc_json(self, query: str=None, save: bool=False, save_path: str=None) -> Dict:
         pass
 
-    @llm_json_generator(TABLE_DESC_JSON_PROMPT)
-    def generate_table_desc_json(self, query: str=None, save: bool=False, save_path: str=None) -> Dict:
-        pass
-
     @llm_json_generator(FIGURE_DESC_JSON_PROMPT)
     def generate_figure_desc_json(self, query: str=None, save: bool=False, save_path: str=None) -> Dict:
         pass

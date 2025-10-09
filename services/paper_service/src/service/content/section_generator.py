@@ -26,10 +26,9 @@ def generate_main_body_text(title: str=None, structure: dict=None, tables_desc: 
 
     # parsing table
     section_table_map = {}
-    for section in tables_desc["data"]:
-        section_title = section["title"]
-        table_info = "".join([f"【表id: {table["id"]} {table["name"]} 表描述： {table["desc"]}】" for table in section["tables"]])
-        section_table_map[section_title] = table_info
+    for k, v in tables_desc.items():
+        table_info = "".join([f"【表id: {table["id"]} 表描述： {table["desc"]}】" for table in v])
+        section_table_map[k] = table_info
 
     start_time = time.time()
     tasks = {}
@@ -75,7 +74,7 @@ def generate_main_body_text(title: str=None, structure: dict=None, tables_desc: 
 def generate_tables(title: str=None, tables_desc: dict=None, save: bool=False, save_path: str=None):
     
     def _generate_query(table: dict) -> str:
-        return f"请分析论文题目《{title}》，根据需求生成对应的表数据。当前需要生成的表ID为：【{table['id']} {table['name']}】, 该表描述为：{table['desc']}"
+        return f"请分析论文题目《{title}》，根据需求生成对应的表数据。当前需要生成的表ID为：【{table['id']}】, 该表描述为：{table['desc']}"
     
     def _generate_table(query: str | List ):
 
@@ -102,11 +101,9 @@ def generate_tables(title: str=None, tables_desc: dict=None, save: bool=False, s
     res_map = {}
 
     # parsing to tasks
-    for section in tables_desc["data"]:
-        section_title = section["title"]
-        query = [_generate_query(table) for table in section["tables"]]
-        
-        tasks[section_title] = query
+    for k, v in tables_desc.items():
+        query = [_generate_query(table) for table in v]
+        tasks[k] = query
 
     # execute
     future_to_keys = {}
