@@ -1,5 +1,4 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
-import time
 import json
 from typing import List
 
@@ -7,7 +6,7 @@ from src.llm.prompt import PAPER_MAIN_BODY_PROMPT, PAPER_TABLE_PROMPT
 from src.llm.client import call_chat_completion
 
 
-def generate_main_body_text(title: str=None, structure: dict=None, tables_desc: dict=None , save: bool=False, save_path: str=None):
+def generate_main_body_text(title: str=None, structure: dict=None, tables_desc: dict=None):
 
     def _generate_section_text(query: str) -> List[str]:
         messages = [
@@ -30,7 +29,6 @@ def generate_main_body_text(title: str=None, structure: dict=None, tables_desc: 
         table_info = "".join([f"【表id: {table["id"]} 表描述： {table["desc"]}】" for table in v])
         section_table_map[k] = table_info
 
-    start_time = time.time()
     tasks = {}
     res_map = {}
     
@@ -61,17 +59,10 @@ def generate_main_body_text(title: str=None, structure: dict=None, tables_desc: 
     for future in as_completed(future_to_keys):
         res = future.result()
         res_map[future_to_keys[future]] = res
-    
-    print(f"论文正文生成成功，耗时：{time.time() - start_time} s")
-
-    if save:
-        with open(save_path, 'w', encoding='utf-8') as f:
-            json.dump(res_map, f, indent=2, ensure_ascii=False)
-
     return res_map
 
 
-def generate_tables(title: str=None, tables_desc: dict=None, save: bool=False, save_path: str=None):
+def generate_tables(title: str=None, tables_desc: dict=None):
     
     def _generate_query(table: dict) -> str:
         return f"请分析论文题目《{title}》，根据需求生成对应的表数据。当前需要生成的表ID为：【{table['id']}】, 该表描述为：{table['desc']}"
@@ -96,7 +87,6 @@ def generate_tables(title: str=None, tables_desc: dict=None, save: bool=False, s
     
     
     # generate tables (JSON-format) based on corresponding description  
-    start_time = time.time()
     tasks = {}
     res_map = {}
 
@@ -116,12 +106,6 @@ def generate_tables(title: str=None, tables_desc: dict=None, save: bool=False, s
         res = future.result()
         res_map[future_to_keys[future]] = res
     
-    print(f"表格生成成功，耗时：{time.time() - start_time} s")
-
-    if save:
-        with open(save_path, 'w', encoding='utf-8') as f:
-            json.dump(res_map, f, indent=2, ensure_ascii=False)
-
     return res_map
 
 

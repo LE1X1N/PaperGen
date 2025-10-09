@@ -16,8 +16,6 @@ def llm_json_generator(system_prompt: str) -> callable:
             func(*args, **kwargs)   # run initial function
             
             query = kwargs["query"]
-            save = kwargs["save"]
-            save_path = kwargs["save_path"]
         
             messages = [
                 {'role': 'assistant', 'content': system_prompt},
@@ -27,9 +25,6 @@ def llm_json_generator(system_prompt: str) -> callable:
             try:
                 raw_res = call_chat_completion(messages)
                 res = json.loads(raw_res)
-                if save:
-                    with open(save_path, 'w', encoding='utf-8') as f:
-                        json.dump(res, f, indent=2, ensure_ascii=False)
                 return res
             
             except json.JSONDecodeError:
@@ -42,21 +37,21 @@ def llm_json_generator(system_prompt: str) -> callable:
 class JSONGenerator:
     
     @llm_json_generator(PAPER_STRUCTURE_PROMPT)
-    def generate_paper_structure(self, query: str=None, save: bool=False, save_path: str=None) -> Dict:
+    def generate_paper_structure(self, query: str=None) -> Dict:
         pass
 
 
     @llm_json_generator(PAPER_ABSTRACT_PROMPT)
-    def generate_abstract_json(self, query: str=None, save: bool=False, save_path: str=None) -> Dict:
+    def generate_abstract_json(self, query: str=None) -> Dict:
         pass
 
 
     @llm_json_generator(TABLE_DESC_JSON_PROMPT)
-    def generate_table_desc_json(self, query: str=None, save: bool=False, save_path: str=None) -> Dict:
+    def generate_table_desc_json(self, query: str=None) -> Dict:
         pass
 
     @llm_json_generator(FIGURE_DESC_JSON_PROMPT)
-    def generate_figure_desc_json(self, query: str=None, save: bool=False, save_path: str=None) -> Dict:
+    def generate_figure_desc_json(self, query: str=None) -> Dict:
         pass
 
     
