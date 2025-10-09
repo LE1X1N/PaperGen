@@ -1,6 +1,0 @@
-{
-  "abstract_cn": "随着信息技术的快速发展和教育信息化的深入推进，传统的家校沟通模式已难以满足现代教育需求。本研究设计并实现了一个基于Android平台的家校互动平台，采用XAMPP集成开发环境和MySQL数据库技术，构建了高效便捷的家校沟通系统。该平台实现了学生信息管理、作业发布与提交、成绩查询、通知公告、在线交流等核心功能模块，通过移动终端实现了家长与教师的实时互动。系统采用B/S架构，具有良好的可扩展性和维护性，为构建新型家校合作关系提供了技术支撑。",
-  "keyword_cn": "家校互动; Android; XAMPP; MySQL; 教育信息化",
-  "abstract_en": "With the rapid development of information technology and the deep advancement of educational informatization, traditional parent-school communication models can no longer meet modern educational needs. This research designs and implements a parent-school interaction platform based on Android platform, utilizing XAMPP integrated development environment and MySQL database technology to construct an efficient and convenient parent-school communication system. The platform realizes core functional modules including student information management, homework release and submission, grade inquiry, notification announcements, and online communication, achieving real-time interaction between parents and teachers through mobile terminals. The system adopts B/S architecture with good scalability and maintainability, providing technical support for building new parent-school cooperative relationships.",
-  "keyword_en": "parent-school interaction; Android; XAMPP; MySQL; educational informatization"
-}
